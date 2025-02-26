@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": [],
+  "sections": [
+    {"offset": {"line": 7, "column": 0}, "map": {"version":3,"sources":["file:///app/src/components/users.tsx"],"sourcesContent":["'use client'\nimport useSWR from \"swr\";\nimport { fetcher } from \"@/utils/fetcher\"\nexport default function Users() {\n    const { data, error, isLoading } = useSWR('http://localhost:8080/users/getusers')\n    console.log(data)\n    if (isLoading) return (<p>Carregando</p>)\n    if (error) return (<p>Error</p>)\n    return (\n        <div>\n            <h1>Lista de Usuários</h1>\n            <ul>\n                {data?.map((user: any) => (\n                    <li key={user.id}>{user.name}</li>\n                ))}\n            </ul>\n        </div>\n    )\n}"],"names":[],"mappings":";;;;AACA;;;AADA;;AAGe,SAAS;;IACpB,MAAM,EAAE,IAAI,EAAE,KAAK,EAAE,SAAS,EAAE,GAAG,CAAA,GAAA,iKAAA,CAAA,UAAM,AAAD,EAAE;IAC1C,QAAQ,GAAG,CAAC;IACZ,IAAI,WAAW,qBAAQ,6LAAC;kBAAE;;;;;;IAC1B,IAAI,OAAO,qBAAQ,6LAAC;kBAAE;;;;;;IACtB,qBACI,6LAAC;;0BACG,6LAAC;0BAAG;;;;;;0BACJ,6LAAC;0BACI,MAAM,IAAI,CAAC,qBACR,6LAAC;kCAAkB,KAAK,IAAI;uBAAnB,KAAK,EAAE;;;;;;;;;;;;;;;;AAKpC;GAfwB;;QACe,iKAAA,CAAA,UAAM;;;KADrB"}},
+    {"offset": {"line": 74, "column": 0}, "map": {"version":3,"sources":[],"names":[],"mappings":"A"}}]
+}

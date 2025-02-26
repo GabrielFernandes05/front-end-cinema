@@ -1,0 +1,12 @@
+services:
+  # Serviço Next.js
+  nextjs-app:
+    container_name: cinema-front-app
+    build:
+      context: ./
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+    volumes:
+      - ./:/app

@@ -8,6 +8,8 @@ export default function Navmenu() {
             <h1><a href="/emcartaz">Em cartaz</a></h1>
             <h1>Em breve</h1>
             <h1><a href="/sala">Sua sessão</a></h1>
+            <h1><a href="/login">Login</a></h1>
+            <h1><a href="/cadastro">Cadastro</a></h1>
         </nav>
     )
 }
