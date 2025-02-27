@@ -169,7 +169,7 @@ function Home() {
                     type: "text",
                     name: "",
                     id: "",
-                    className: "bg-red-950 w-full p-2 shadow-black shadow-md rounded-xl outline-none placeholder-white",
+                    className: "bg-zinc-950 w-full p-2 shadow-black shadow-md rounded-xl outline-none placeholder-white",
                     placeholder: "Enter your email..."
                 }, void 0, false, {
                     fileName: "[project]/src/app/cadastro/page.tsx",
@@ -180,7 +180,7 @@ function Home() {
                     type: "password",
                     name: "",
                     id: "",
-                    className: "bg-red-950 w-full p-2 shadow-black shadow-md rounded-xl outline-none placeholder-white",
+                    className: "bg-zinc-950 w-full p-2 shadow-black shadow-md rounded-xl outline-none placeholder-white",
                     placeholder: "Enter your password..."
                 }, void 0, false, {
                     fileName: "[project]/src/app/cadastro/page.tsx",
@@ -191,7 +191,7 @@ function Home() {
                     type: "password",
                     name: "",
                     id: "",
-                    className: "bg-red-950 w-full p-2 shadow-black shadow-md rounded-xl outline-none placeholder-white",
+                    className: "bg-zinc-950 w-full p-2 shadow-black shadow-md rounded-xl outline-none placeholder-white",
                     placeholder: "Confirm your password..."
                 }, void 0, false, {
                     fileName: "[project]/src/app/cadastro/page.tsx",
@@ -203,7 +203,7 @@ function Home() {
                     children: [
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$rsc$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
                             type: "submit",
-                            className: "bg-red-950 w-full p-2 shadow-black shadow-md rounded-xl hover:bg-red-900 active:bg-red-800 active:scale-95 duration-300",
+                            className: "bg-zinc-950 w-full p-2 shadow-black shadow-md rounded-xl hover:bg-red-900 active:bg-red-800 active:scale-95 duration-300",
                             children: "Sign Up"
                         }, void 0, false, {
                             fileName: "[project]/src/app/cadastro/page.tsx",
@@ -211,7 +211,7 @@ function Home() {
                             columnNumber: 21
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$rsc$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
-                            className: "bg-red-950 w-full p-2 shadow-black shadow-md rounded-xl hover:bg-red-900 active:bg-red-800 active:scale-95 duration-300",
+                            className: "bg-zinc-950 w-full p-2 shadow-black shadow-md rounded-xl hover:bg-red-900 active:bg-red-800 active:scale-95 duration-300",
                             children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$rsc$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["jsxDEV"])("a", {
                                 href: "/login",
                                 children: "Login"

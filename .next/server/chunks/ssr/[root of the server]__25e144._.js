@@ -16,8 +16,8 @@ var { r: __turbopack_require__, f: __turbopack_module_context__, i: __turbopack_
 __turbopack_esm__({
     "fetcher": (()=>fetcher)
 });
-async function fetcher(url, options = {}) {
-    const response = await fetch(url, options);
+async function fetcher(url) {
+    const response = await fetch(url);
     if (!response.ok) {
         throw new Error('Erro ao buscar dados!');
     }

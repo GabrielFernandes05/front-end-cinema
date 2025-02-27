@@ -1,28 +1,42 @@
-'use client';
+import axios from "axios";
 
-import useSWR from 'swr';
-import { fetcher } from '@/utils/fetcher';
+type getDataProps = {
+    code: number,
+    description: string
+}
 
-export default function Users() {
-    const { data, error, isLoading } = useSWR('http://localhost:8080/users/getusers', fetcher);
+const getData = async () => {
+    try {
+        const response = await axios.get<getDataProps>('https://httpstat.us/200')
+        if (response.status !== 200) {
+            throw new Error(`status code: ${response.status}}`)
+        }
+        return response.data;
+    }
+    catch (error) {
+        throw error
+    }
+}
 
-    if (isLoading) return <p>Carregando...</p>;
-    if (error) return <p>Erro ao carregar dados</p>;
+export default async function Users() {
 
-    if (!data?.Users || !Array.isArray(data.Users)) {
-        return <p>Dados inválidos ou nenhum usuário encontrado</p>;
+    try {
+        const response = await getData()
+        return (
+            <div>
+                <h1>Users</h1>
+                <p>{response.code}</p>
+                <p>{response.description}</p>
+            </div>
+        )
+    } catch (error) {
+        console.error(error)
+        return (
+            <div>
+                <h1>Error</h1>
+            </div>
+        )
     }
 
-    return (
-        <div>
-            <h1>Lista de Usuários</h1>
-            <ul>
-                {data.Users.map((user: any) => (
-                    <li key={user.ID}>
-                        <strong>{user.name}</strong> - {user.Email} ({user.age} anos)
-                    </li>
-                ))}
-            </ul>
-        </div>
-    );
+
 }

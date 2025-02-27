@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": [],
+  "sections": [
+    {"offset": {"line": 119, "column": 0}, "map": {"version":3,"sources":["file:///app/src/components/users.tsx"],"sourcesContent":["'use client'\n\nimport axios from \"axios\";\n\nconst getData = async () => {\n    const response = await axios.get('https://localhost:8080/api/v1/usuarios')\n    return response.data;\n}\n\nexport default async function Users() {\n    const response = await getData()\n\n    console.log({ response })\n\n    return (\n        <>\n            <h1>Users</h1>\n        </>\n    )\n}"],"names":[],"mappings":";;;;AAEA;AAFA;;;AAIA,MAAM,UAAU;IACZ,MAAM,WAAW,MAAM,qIAAA,CAAA,UAAK,CAAC,GAAG,CAAC;IACjC,OAAO,SAAS,IAAI;AACxB;AAEe,eAAe;IAC1B,MAAM,WAAW,MAAM;IAEvB,QAAQ,GAAG,CAAC;QAAE;IAAS;IAEvB,qBACI;kBACI,cAAA,8OAAC;sBAAG;;;;;;;AAGhB"}},
+    {"offset": {"line": 146, "column": 0}, "map": {"version":3,"sources":[],"names":[],"mappings":"A"}}]
+}
