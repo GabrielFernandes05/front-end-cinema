@@ -16,17 +16,23 @@ var _s = __turbopack_refresh__.signature();
 ;
 function LoginForm() {
     _s();
-    const [formData, setFormData] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])({
-        email: "",
-        password: ""
-    });
+    const [useEmail, setEmail] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])();
+    const [usePassword, setPassword] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])();
+    const handleSubmit = ()=>{
+        let data = {
+            email: useEmail,
+            password: usePassword
+        };
+    };
     return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("form", {
+        onSubmit: handleSubmit,
+        className: "flex items-center justify-center flex-col gap-5 rounded-xl shadow-inner shadow-black p-4",
         children: [
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h1", {
                 children: "Login"
             }, void 0, false, {
                 fileName: "[project]/src/components/loginform.tsx",
-                lineNumber: 14,
+                lineNumber: 24,
                 columnNumber: 13
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -37,28 +43,26 @@ function LoginForm() {
                         children: "Email"
                     }, void 0, false, {
                         fileName: "[project]/src/components/loginform.tsx",
-                        lineNumber: 16,
+                        lineNumber: 26,
                         columnNumber: 17
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
-                        value: formData.email,
-                        onChange: (e)=>setFormData((prev)=>({
-                                    ...prev,
-                                    email: e.target.value
-                                })),
-                        className: "px-2 rounded-r-xl bg-zinc-500 outline-none",
+                        onChange: (e)=>{
+                            setEmail(e.target.value);
+                        },
+                        className: "w-40 px-2 rounded-r-xl bg-zinc-600 outline-none",
                         type: "email",
                         name: "",
                         id: ""
                     }, void 0, false, {
                         fileName: "[project]/src/components/loginform.tsx",
-                        lineNumber: 17,
+                        lineNumber: 27,
                         columnNumber: 17
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/src/components/loginform.tsx",
-                lineNumber: 15,
+                lineNumber: 25,
                 columnNumber: 13
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -69,48 +73,48 @@ function LoginForm() {
                         children: "Password"
                     }, void 0, false, {
                         fileName: "[project]/src/components/loginform.tsx",
-                        lineNumber: 20,
+                        lineNumber: 30,
                         columnNumber: 17
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
-                        value: formData.password,
-                        onChange: (e)=>setFormData((prev)=>({
-                                    ...prev,
-                                    password: e.target.value
-                                })),
-                        className: "px-2 rounded-r-xl bg-zinc-500 outline-none",
+                        onChange: (e)=>{
+                            setPassword(e.target.value);
+                        },
+                        className: "w-40 px-2 rounded-r-xl bg-zinc-600 outline-none",
                         type: "password",
                         name: "",
                         id: ""
                     }, void 0, false, {
                         fileName: "[project]/src/components/loginform.tsx",
-                        lineNumber: 21,
+                        lineNumber: 31,
                         columnNumber: 17
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/src/components/loginform.tsx",
-                lineNumber: 19,
+                lineNumber: 29,
                 columnNumber: 13
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
-                onClick: ()=>{},
+                onClick: ()=>{
+                    handleSubmit();
+                },
                 type: "button",
-                className: "bg-zinc-900 p-2",
+                className: "bg-zinc-900 p-2 rounded-xl",
                 children: "Login"
             }, void 0, false, {
                 fileName: "[project]/src/components/loginform.tsx",
-                lineNumber: 23,
+                lineNumber: 33,
                 columnNumber: 13
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/src/components/loginform.tsx",
-        lineNumber: 13,
+        lineNumber: 23,
         columnNumber: 9
     }, this);
 }
-_s(LoginForm, "S/PMgPc7smM3/aThXBDA0mkgvj4=");
+_s(LoginForm, "z+Wczn1JUAohqTGQFaSV9RnCYuk=");
 _c = LoginForm;
 var _c;
 __turbopack_refresh__.register(_c, "LoginForm");

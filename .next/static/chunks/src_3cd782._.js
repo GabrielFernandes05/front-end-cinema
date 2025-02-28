@@ -6,31 +6,19 @@
 var { r: __turbopack_require__, f: __turbopack_module_context__, i: __turbopack_import__, s: __turbopack_esm__, v: __turbopack_export_value__, n: __turbopack_export_namespace__, c: __turbopack_cache__, M: __turbopack_modules__, l: __turbopack_load__, j: __turbopack_dynamic__, P: __turbopack_resolve_absolute_path__, U: __turbopack_relative_url__, R: __turbopack_resolve_module_id_path__, b: __turbopack_worker_blob_url__, g: global, __dirname, k: __turbopack_refresh__, m: module, z: __turbopack_require_stub__ } = __turbopack_context__;
 {
 __turbopack_esm__({
-    "default": (()=>__TURBOPACK__default__export__)
+    "UsuarioService": (()=>UsuarioService),
+    "axiosInstance": (()=>axiosInstance)
 });
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$axios$2f$lib$2f$axios$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_import__("[project]/node_modules/axios/lib/axios.js [app-client] (ecmascript)");
 ;
-const loginUser = async (data)=>{
-    try {
-        const response = await __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$axios$2f$lib$2f$axios$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"].post("http://localhost:8080/api/v1/login", data);
-        return response.data;
-    } catch (error) {
-        if (__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$axios$2f$lib$2f$axios$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"].isAxiosError(error)) {
-            console.error("Erro na requisição:", error.message);
-            if (error.response) {
-                console.error("Resposta do servidor:", error.response.data);
-            } else if (error.request) {
-                console.error("Sem resposta do servidor:", error.request);
-            } else {
-                console.error("Erro desconhecido:", error.message);
-            }
-        } else {
-            console.error("Erro inesperado:", error);
-        }
-        throw error;
+const axiosInstance = __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$axios$2f$lib$2f$axios$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"].create({
+    baseURL: "http://localhost:8080"
+});
+class UsuarioService {
+    loginUsuario(data) {
+        return axiosInstance.post("/api/v1/login", data);
     }
-};
-const __TURBOPACK__default__export__ = loginUser;
+}
 if (typeof globalThis.$RefreshHelpers$ === 'object' && globalThis.$RefreshHelpers !== null) {
     __turbopack_refresh__.registerExports(module, globalThis.$RefreshHelpers$);
 }
@@ -44,36 +32,37 @@ __turbopack_esm__({
     "default": (()=>LoginForm)
 });
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_import__("[project]/node_modules/next/dist/compiled/react/jsx-dev-runtime.js [app-client] (ecmascript)");
-var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_import__("[project]/node_modules/next/dist/compiled/react/index.js [app-client] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$utils$2f$axios$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_import__("[project]/src/utils/axios.ts [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_import__("[project]/node_modules/next/dist/compiled/react/index.js [app-client] (ecmascript)");
 ;
 var _s = __turbopack_refresh__.signature();
 'use client';
 ;
 ;
+const usuarioService = new __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$utils$2f$axios$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["UsuarioService"]();
 function LoginForm() {
     _s();
-    const [formData, setFormData] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])({
-        email: "",
-        password: ""
-    });
-    const handleSubmit = async (e)=>{
-        e.preventDefault();
-        try {
-            const response = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$utils$2f$axios$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"])(formData);
-            console.log("Login bem-sucedido:", response);
-        } catch (error) {
-            console.error("Erro ao fazer login:", error);
-        }
+    const [useEmail, setEmail] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])();
+    const [usePassword, setPassword] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])();
+    const handleSubmit = ()=>{
+        usuarioService.loginUsuario({
+            email: String(useEmail),
+            password: String(usePassword)
+        }).then((response)=>{
+            console.log(response);
+        }).catch((error)=>{
+            console.error(error);
+        });
     };
     return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("form", {
         onSubmit: handleSubmit,
+        className: "flex items-center justify-center flex-col gap-5 rounded-xl shadow-inner shadow-black p-4",
         children: [
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h1", {
                 children: "Login"
             }, void 0, false, {
                 fileName: "[project]/src/components/loginform.tsx",
-                lineNumber: 24,
+                lineNumber: 27,
                 columnNumber: 13
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -84,28 +73,26 @@ function LoginForm() {
                         children: "Email"
                     }, void 0, false, {
                         fileName: "[project]/src/components/loginform.tsx",
-                        lineNumber: 26,
+                        lineNumber: 29,
                         columnNumber: 17
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
-                        value: formData.email,
-                        onChange: (e)=>setFormData((prev)=>({
-                                    ...prev,
-                                    email: e.target.value
-                                })),
-                        className: "px-2 rounded-r-xl bg-zinc-500 outline-none",
+                        onChange: (e)=>{
+                            setEmail(e.target.value);
+                        },
+                        className: "w-40 px-2 rounded-r-xl bg-zinc-600 outline-none",
                         type: "email",
                         name: "",
                         id: ""
                     }, void 0, false, {
                         fileName: "[project]/src/components/loginform.tsx",
-                        lineNumber: 27,
+                        lineNumber: 30,
                         columnNumber: 17
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/src/components/loginform.tsx",
-                lineNumber: 25,
+                lineNumber: 28,
                 columnNumber: 13
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -116,50 +103,48 @@ function LoginForm() {
                         children: "Password"
                     }, void 0, false, {
                         fileName: "[project]/src/components/loginform.tsx",
-                        lineNumber: 30,
+                        lineNumber: 33,
                         columnNumber: 17
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
-                        value: formData.password,
-                        onChange: (e)=>setFormData((prev)=>({
-                                    ...prev,
-                                    password: e.target.value
-                                })),
-                        className: "px-2 rounded-r-xl bg-zinc-500 outline-none",
+                        onChange: (e)=>{
+                            setPassword(e.target.value);
+                        },
+                        className: "w-40 px-2 rounded-r-xl bg-zinc-600 outline-none",
                         type: "password",
                         name: "",
                         id: ""
                     }, void 0, false, {
                         fileName: "[project]/src/components/loginform.tsx",
-                        lineNumber: 31,
+                        lineNumber: 34,
                         columnNumber: 17
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/src/components/loginform.tsx",
-                lineNumber: 29,
+                lineNumber: 32,
                 columnNumber: 13
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
                 onClick: ()=>{
-                    (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$utils$2f$axios$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"])(formData);
+                    handleSubmit();
                 },
                 type: "button",
-                className: "bg-zinc-900 p-2",
+                className: "bg-zinc-900 p-2 rounded-xl",
                 children: "Login"
             }, void 0, false, {
                 fileName: "[project]/src/components/loginform.tsx",
-                lineNumber: 33,
+                lineNumber: 36,
                 columnNumber: 13
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/src/components/loginform.tsx",
-        lineNumber: 23,
+        lineNumber: 26,
         columnNumber: 9
     }, this);
 }
-_s(LoginForm, "S/PMgPc7smM3/aThXBDA0mkgvj4=");
+_s(LoginForm, "z+Wczn1JUAohqTGQFaSV9RnCYuk=");
 _c = LoginForm;
 var _c;
 __turbopack_refresh__.register(_c, "LoginForm");

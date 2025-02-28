@@ -12,7 +12,7 @@
     {"offset": {"line": 167, "column": 0}, "map": {"version":3,"sources":[],"names":[],"mappings":"A"}},
     {"offset": {"line": 173, "column": 0}, "map": {"version":3,"sources":[],"names":[],"mappings":""}},
     {"offset": {"line": 177, "column": 0}, "map": {"version":3,"sources":[],"names":[],"mappings":"A"}},
-    {"offset": {"line": 183, "column": 0}, "map": {"version":3,"sources":["file:///app/src/app/page.tsx"],"sourcesContent":["import Background from \"@/components/background\"\nimport Users from \"@/components/users\"\nexport default function Home() {\n\n  return (\n    <Background Propriedades=\"flex items-center justify-center\">\n      <Users></Users>\n    </Background>\n  )\n}"],"names":[],"mappings":";;;;AAAA;AACA;;;;AACe,SAAS;IAEtB,qBACE,8OAAC,gIAAA,CAAA,UAAU;QAAC,cAAa;kBACvB,cAAA,8OAAC,2HAAA,CAAA,UAAK;;;;;;;;;;AAGZ"}},
+    {"offset": {"line": 183, "column": 0}, "map": {"version":3,"sources":["file:///app/src/app/page.tsx"],"sourcesContent":["import Background from \"@/components/background\"\nimport Users from \"@/components/users\"\nimport Mudarnome from \"@/components/mudarnomeform\"\nexport default function Home() {\n\n  return (\n    <Background Propriedades=\"flex items-center justify-center\">\n      <Users></Users>\n    </Background>\n  )\n}"],"names":[],"mappings":";;;;AAAA;AACA;;;;AAEe,SAAS;IAEtB,qBACE,8OAAC,gIAAA,CAAA,UAAU;QAAC,cAAa;kBACvB,cAAA,8OAAC,2HAAA,CAAA,UAAK;;;;;;;;;;AAGZ"}},
     {"offset": {"line": 206, "column": 0}, "map": {"version":3,"sources":[],"names":[],"mappings":"A"}},
     {"offset": {"line": 217, "column": 0}, "map": {"version":3,"sources":[],"names":[],"mappings":""}},
     {"offset": {"line": 217, "column": 0}, "map": {"version":3,"sources":[],"names":[],"mappings":"A"}},

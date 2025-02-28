@@ -1,10 +1,9 @@
 import Background from "@/components/background"
-import Users from "@/components/users"
 export default function Home() {
 
   return (
     <Background Propriedades="flex items-center justify-center">
-      <Users></Users>
+      <h1>Bem vindo ! =) </h1>
     </Background>
   )
 }
