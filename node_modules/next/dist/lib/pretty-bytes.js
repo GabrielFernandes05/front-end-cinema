@@ -45,7 +45,11 @@ Formats the given number using `Number#toLocaleString`.
 };
 function prettyBytes(number, options) {
     if (!Number.isFinite(number)) {
-        throw new TypeError(`Expected a finite number, got ${typeof number}: ${number}`);
+        throw Object.defineProperty(new TypeError(`Expected a finite number, got ${typeof number}: ${number}`), "__NEXT_ERROR_CODE", {
+            value: "E572",
+            enumerable: false,
+            configurable: true
+        });
     }
     options = Object.assign({}, options);
     if (options.signed && number === 0) {

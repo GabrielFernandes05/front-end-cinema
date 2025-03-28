@@ -7,6 +7,7 @@ import { getCustomDocumentError, getGlobalImportError, getGlobalModuleImportErro
 import { getPostCssPlugins } from './plugins';
 import { nonNullable } from '../../../../../lib/non-nullable';
 import { WEBPACK_LAYERS } from '../../../../../lib/constants';
+import { getRspackCore } from '../../../../../shared/lib/get-rspack';
 // RegExps for all Style Sheet variants
 export const regexLikeCss = /\.(css|scss|sass)$/;
 // RegExps for Style Sheets
@@ -101,6 +102,7 @@ export async function lazyPostCSS(rootDirectory, supportedBrowsers, disablePostc
     return postcssInstancePromise;
 }
 export const css = curry(async function css(ctx, config) {
+    const isRspack = Boolean(process.env.NEXT_RSPACK);
     const { prependData: sassPrependData, additionalData: sassAdditionalData, implementation: sassImplementation, ...sassOptions } = ctx.sassOptions;
     const lazyPostCSSInitializer = ()=>lazyPostCSS(ctx.rootDirectory, ctx.supportedBrowsers, ctx.experimental.disablePostcssPresetEnv, ctx.experimental.useLightningcss);
     const sassPreprocessors = [
@@ -508,7 +510,7 @@ export const css = curry(async function css(ctx, config) {
     // Enable full mini-css-extract-plugin hmr for prod mode pages or app dir
     if (ctx.isClient && (ctx.isProduction || ctx.hasAppDir)) {
         // Extract CSS as CSS file(s) in the client-side production bundle.
-        const MiniCssExtractPlugin = require('../../../plugins/mini-css-extract-plugin').default;
+        const MiniCssExtractPlugin = isRspack ? getRspackCore().CssExtractRspackPlugin : require('../../../plugins/mini-css-extract-plugin').default;
         fns.push(plugin(// @ts-ignore webpack 5 compat
         new MiniCssExtractPlugin({
             filename: ctx.isProduction ? 'static/css/[contenthash].css' : 'static/css/[name].css',
@@ -528,7 +530,7 @@ export const css = curry(async function css(ctx, config) {
             insert: function(linkTag) {
                 if (typeof _N_E_STYLE_LOAD === 'function') {
                     const { href, onload, onerror } = linkTag;
-                    _N_E_STYLE_LOAD(new URL(href).pathname).then(()=>onload == null ? void 0 : onload.call(linkTag, {
+                    _N_E_STYLE_LOAD(href.indexOf(window.location.origin) === 0 ? new URL(href).pathname : href).then(()=>onload == null ? void 0 : onload.call(linkTag, {
                             type: 'load'
                         }), ()=>onerror == null ? void 0 : onerror.call(linkTag, {}));
                 } else {

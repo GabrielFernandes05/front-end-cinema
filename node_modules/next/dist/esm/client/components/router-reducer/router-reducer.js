@@ -40,7 +40,11 @@ import { serverActionReducer } from './reducers/server-action-reducer';
             }
         // This case should never be hit as dispatch is strongly typed.
         default:
-            throw new Error('Unknown action');
+            throw Object.defineProperty(new Error('Unknown action'), "__NEXT_ERROR_CODE", {
+                value: "E295",
+                enumerable: false,
+                configurable: true
+            });
     }
 }
 function serverReducer(state, _action) {

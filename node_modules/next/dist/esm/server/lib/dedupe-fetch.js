@@ -66,7 +66,11 @@ export function createDedupeFetch(originalFetch) {
             if (key === cacheKey) {
                 return promise.then(()=>{
                     const response = cacheEntries[i][2];
-                    if (!response) throw new InvariantError('No cached response');
+                    if (!response) throw Object.defineProperty(new InvariantError('No cached response'), "__NEXT_ERROR_CODE", {
+                        value: "E579",
+                        enumerable: false,
+                        configurable: true
+                    });
                     // We're cloning the response using this utility because there exists
                     // a bug in the undici library around response cloning. See the
                     // following pull request for more details:

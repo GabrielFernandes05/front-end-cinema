@@ -175,6 +175,17 @@ export declare function Agdasima<T extends CssVariable | undefined = undefined>(
     adjustFontFallback?: boolean;
     subsets?: Array<'latin' | 'latin-ext'>;
 }): T extends undefined ? NextFont : NextFontWithVariable;
+export declare function Agu_Display<T extends CssVariable | undefined = undefined>(options?: {
+    weight?: '400' | 'variable' | Array<'400'>;
+    style?: 'normal' | Array<'normal'>;
+    display?: Display;
+    variable?: T;
+    preload?: boolean;
+    fallback?: string[];
+    adjustFontFallback?: boolean;
+    subsets?: Array<'latin' | 'latin-ext' | 'vietnamese'>;
+    axes?: 'MORF'[];
+}): T extends undefined ? NextFont : NextFontWithVariable;
 export declare function Aguafina_Script<T extends CssVariable | undefined = undefined>(options: {
     weight: '400' | Array<'400'>;
     style?: 'normal' | Array<'normal'>;
@@ -1406,7 +1417,17 @@ export declare function Bad_Script<T extends CssVariable | undefined = undefined
     preload?: boolean;
     fallback?: string[];
     adjustFontFallback?: boolean;
-    subsets?: Array<'cyrillic' | 'latin'>;
+    subsets?: Array<'cyrillic' | 'cyrillic-ext' | 'latin' | 'latin-ext' | 'vietnamese'>;
+}): T extends undefined ? NextFont : NextFontWithVariable;
+export declare function Badeen_Display<T extends CssVariable | undefined = undefined>(options: {
+    weight: '400' | Array<'400'>;
+    style?: 'normal' | Array<'normal'>;
+    display?: Display;
+    variable?: T;
+    preload?: boolean;
+    fallback?: string[];
+    adjustFontFallback?: boolean;
+    subsets?: Array<'arabic' | 'latin' | 'latin-ext'>;
 }): T extends undefined ? NextFont : NextFontWithVariable;
 export declare function Bagel_Fat_One<T extends CssVariable | undefined = undefined>(options: {
     weight: '400' | Array<'400'>;
@@ -5821,6 +5842,16 @@ export declare function Hind_Madurai<T extends CssVariable | undefined = undefin
     adjustFontFallback?: boolean;
     subsets?: Array<'latin' | 'latin-ext' | 'tamil'>;
 }): T extends undefined ? NextFont : NextFontWithVariable;
+export declare function Hind_Mysuru<T extends CssVariable | undefined = undefined>(options: {
+    weight: '300' | '400' | '500' | '600' | '700' | Array<'300' | '400' | '500' | '600' | '700'>;
+    style?: 'normal' | Array<'normal'>;
+    display?: Display;
+    variable?: T;
+    preload?: boolean;
+    fallback?: string[];
+    adjustFontFallback?: boolean;
+    subsets?: Array<'kannada' | 'latin' | 'latin-ext'>;
+}): T extends undefined ? NextFont : NextFontWithVariable;
 export declare function Hind_Siliguri<T extends CssVariable | undefined = undefined>(options: {
     weight: '300' | '400' | '500' | '600' | '700' | Array<'300' | '400' | '500' | '600' | '700'>;
     style?: 'normal' | Array<'normal'>;
@@ -6656,7 +6687,7 @@ export declare function Jomhuria<T extends CssVariable | undefined = undefined>(
     preload?: boolean;
     fallback?: string[];
     adjustFontFallback?: boolean;
-    subsets?: Array<'arabic' | 'latin' | 'latin-ext'>;
+    subsets?: Array<'latin' | 'latin-ext'>;
 }): T extends undefined ? NextFont : NextFontWithVariable;
 export declare function Jomolhari<T extends CssVariable | undefined = undefined>(options: {
     weight: '400' | Array<'400'>;
@@ -9007,6 +9038,16 @@ export declare function Montserrat_Subrayada<T extends CssVariable | undefined =
     adjustFontFallback?: boolean;
     subsets?: Array<'latin'>;
 }): T extends undefined ? NextFont : NextFontWithVariable;
+export declare function Montserrat_Underline<T extends CssVariable | undefined = undefined>(options?: {
+    weight?: '100' | '200' | '300' | '400' | '500' | '600' | '700' | '800' | '900' | 'variable' | Array<'100' | '200' | '300' | '400' | '500' | '600' | '700' | '800' | '900'>;
+    style?: 'normal' | 'italic' | Array<'normal' | 'italic'>;
+    display?: Display;
+    variable?: T;
+    preload?: boolean;
+    fallback?: string[];
+    adjustFontFallback?: boolean;
+    subsets?: Array<'cyrillic' | 'cyrillic-ext' | 'latin' | 'latin-ext' | 'vietnamese'>;
+}): T extends undefined ? NextFont : NextFontWithVariable;
 export declare function Moo_Lah_Lah<T extends CssVariable | undefined = undefined>(options: {
     weight: '400' | Array<'400'>;
     style?: 'normal' | Array<'normal'>;
@@ -10747,7 +10788,7 @@ export declare function Noto_Sans_Pau_Cin_Hau<T extends CssVariable | undefined 
     adjustFontFallback?: boolean;
     subsets?: Array<'latin' | 'latin-ext' | 'pau-cin-hau'>;
 }): T extends undefined ? NextFont : NextFontWithVariable;
-export declare function Noto_Sans_Phags_Pa<T extends CssVariable | undefined = undefined>(options: {
+export declare function Noto_Sans_PhagsPa<T extends CssVariable | undefined = undefined>(options: {
     weight: '400' | Array<'400'>;
     style?: 'normal' | Array<'normal'>;
     display?: Display;
@@ -10755,7 +10796,7 @@ export declare function Noto_Sans_Phags_Pa<T extends CssVariable | undefined = u
     preload?: boolean;
     fallback?: string[];
     adjustFontFallback?: boolean;
-    subsets?: Array<'phags-pa'>;
+    subsets?: Array<'latin' | 'latin-ext' | 'math' | 'phags-pa' | 'symbols'>;
 }): T extends undefined ? NextFont : NextFontWithVariable;
 export declare function Noto_Sans_Phoenician<T extends CssVariable | undefined = undefined>(options: {
     weight: '400' | Array<'400'>;
@@ -12567,8 +12608,24 @@ export declare function Playwrite_AR<T extends CssVariable | undefined = undefin
     fallback?: string[];
     adjustFontFallback?: boolean;
 }): T extends undefined ? NextFont : NextFontWithVariable;
+export declare function Playwrite_AR_Guides<T extends CssVariable | undefined = undefined>(options: {
+    weight: '400' | Array<'400'>;
+    style?: 'normal' | Array<'normal'>;
+    display?: Display;
+    variable?: T;
+    fallback?: string[];
+    adjustFontFallback?: boolean;
+}): T extends undefined ? NextFont : NextFontWithVariable;
 export declare function Playwrite_AT<T extends CssVariable | undefined = undefined>(options?: {
     weight?: '100' | '200' | '300' | '400' | 'variable' | Array<'100' | '200' | '300' | '400'>;
+    style?: 'normal' | 'italic' | Array<'normal' | 'italic'>;
+    display?: Display;
+    variable?: T;
+    fallback?: string[];
+    adjustFontFallback?: boolean;
+}): T extends undefined ? NextFont : NextFontWithVariable;
+export declare function Playwrite_AT_Guides<T extends CssVariable | undefined = undefined>(options: {
+    weight: '400' | Array<'400'>;
     style?: 'normal' | 'italic' | Array<'normal' | 'italic'>;
     display?: Display;
     variable?: T;
@@ -12583,8 +12640,24 @@ export declare function Playwrite_AU_NSW<T extends CssVariable | undefined = und
     fallback?: string[];
     adjustFontFallback?: boolean;
 }): T extends undefined ? NextFont : NextFontWithVariable;
+export declare function Playwrite_AU_NSW_Guides<T extends CssVariable | undefined = undefined>(options: {
+    weight: '400' | Array<'400'>;
+    style?: 'normal' | Array<'normal'>;
+    display?: Display;
+    variable?: T;
+    fallback?: string[];
+    adjustFontFallback?: boolean;
+}): T extends undefined ? NextFont : NextFontWithVariable;
 export declare function Playwrite_AU_QLD<T extends CssVariable | undefined = undefined>(options?: {
     weight?: '100' | '200' | '300' | '400' | 'variable' | Array<'100' | '200' | '300' | '400'>;
+    style?: 'normal' | Array<'normal'>;
+    display?: Display;
+    variable?: T;
+    fallback?: string[];
+    adjustFontFallback?: boolean;
+}): T extends undefined ? NextFont : NextFontWithVariable;
+export declare function Playwrite_AU_QLD_Guides<T extends CssVariable | undefined = undefined>(options: {
+    weight: '400' | Array<'400'>;
     style?: 'normal' | Array<'normal'>;
     display?: Display;
     variable?: T;
@@ -12599,8 +12672,24 @@ export declare function Playwrite_AU_SA<T extends CssVariable | undefined = unde
     fallback?: string[];
     adjustFontFallback?: boolean;
 }): T extends undefined ? NextFont : NextFontWithVariable;
+export declare function Playwrite_AU_SA_Guides<T extends CssVariable | undefined = undefined>(options: {
+    weight: '400' | Array<'400'>;
+    style?: 'normal' | Array<'normal'>;
+    display?: Display;
+    variable?: T;
+    fallback?: string[];
+    adjustFontFallback?: boolean;
+}): T extends undefined ? NextFont : NextFontWithVariable;
 export declare function Playwrite_AU_TAS<T extends CssVariable | undefined = undefined>(options?: {
     weight?: '100' | '200' | '300' | '400' | 'variable' | Array<'100' | '200' | '300' | '400'>;
+    style?: 'normal' | Array<'normal'>;
+    display?: Display;
+    variable?: T;
+    fallback?: string[];
+    adjustFontFallback?: boolean;
+}): T extends undefined ? NextFont : NextFontWithVariable;
+export declare function Playwrite_AU_TAS_Guides<T extends CssVariable | undefined = undefined>(options: {
+    weight: '400' | Array<'400'>;
     style?: 'normal' | Array<'normal'>;
     display?: Display;
     variable?: T;
@@ -12615,8 +12704,24 @@ export declare function Playwrite_AU_VIC<T extends CssVariable | undefined = und
     fallback?: string[];
     adjustFontFallback?: boolean;
 }): T extends undefined ? NextFont : NextFontWithVariable;
+export declare function Playwrite_AU_VIC_Guides<T extends CssVariable | undefined = undefined>(options: {
+    weight: '400' | Array<'400'>;
+    style?: 'normal' | Array<'normal'>;
+    display?: Display;
+    variable?: T;
+    fallback?: string[];
+    adjustFontFallback?: boolean;
+}): T extends undefined ? NextFont : NextFontWithVariable;
 export declare function Playwrite_BE_VLG<T extends CssVariable | undefined = undefined>(options?: {
     weight?: '100' | '200' | '300' | '400' | 'variable' | Array<'100' | '200' | '300' | '400'>;
+    style?: 'normal' | Array<'normal'>;
+    display?: Display;
+    variable?: T;
+    fallback?: string[];
+    adjustFontFallback?: boolean;
+}): T extends undefined ? NextFont : NextFontWithVariable;
+export declare function Playwrite_BE_VLG_Guides<T extends CssVariable | undefined = undefined>(options: {
+    weight: '400' | Array<'400'>;
     style?: 'normal' | Array<'normal'>;
     display?: Display;
     variable?: T;
@@ -12631,8 +12736,24 @@ export declare function Playwrite_BE_WAL<T extends CssVariable | undefined = und
     fallback?: string[];
     adjustFontFallback?: boolean;
 }): T extends undefined ? NextFont : NextFontWithVariable;
+export declare function Playwrite_BE_WAL_Guides<T extends CssVariable | undefined = undefined>(options: {
+    weight: '400' | Array<'400'>;
+    style?: 'normal' | Array<'normal'>;
+    display?: Display;
+    variable?: T;
+    fallback?: string[];
+    adjustFontFallback?: boolean;
+}): T extends undefined ? NextFont : NextFontWithVariable;
 export declare function Playwrite_BR<T extends CssVariable | undefined = undefined>(options?: {
     weight?: '100' | '200' | '300' | '400' | 'variable' | Array<'100' | '200' | '300' | '400'>;
+    style?: 'normal' | Array<'normal'>;
+    display?: Display;
+    variable?: T;
+    fallback?: string[];
+    adjustFontFallback?: boolean;
+}): T extends undefined ? NextFont : NextFontWithVariable;
+export declare function Playwrite_BR_Guides<T extends CssVariable | undefined = undefined>(options: {
+    weight: '400' | Array<'400'>;
     style?: 'normal' | Array<'normal'>;
     display?: Display;
     variable?: T;
@@ -12647,8 +12768,24 @@ export declare function Playwrite_CA<T extends CssVariable | undefined = undefin
     fallback?: string[];
     adjustFontFallback?: boolean;
 }): T extends undefined ? NextFont : NextFontWithVariable;
+export declare function Playwrite_CA_Guides<T extends CssVariable | undefined = undefined>(options: {
+    weight: '400' | Array<'400'>;
+    style?: 'normal' | Array<'normal'>;
+    display?: Display;
+    variable?: T;
+    fallback?: string[];
+    adjustFontFallback?: boolean;
+}): T extends undefined ? NextFont : NextFontWithVariable;
 export declare function Playwrite_CL<T extends CssVariable | undefined = undefined>(options?: {
     weight?: '100' | '200' | '300' | '400' | 'variable' | Array<'100' | '200' | '300' | '400'>;
+    style?: 'normal' | Array<'normal'>;
+    display?: Display;
+    variable?: T;
+    fallback?: string[];
+    adjustFontFallback?: boolean;
+}): T extends undefined ? NextFont : NextFontWithVariable;
+export declare function Playwrite_CL_Guides<T extends CssVariable | undefined = undefined>(options: {
+    weight: '400' | Array<'400'>;
     style?: 'normal' | Array<'normal'>;
     display?: Display;
     variable?: T;
@@ -12663,8 +12800,24 @@ export declare function Playwrite_CO<T extends CssVariable | undefined = undefin
     fallback?: string[];
     adjustFontFallback?: boolean;
 }): T extends undefined ? NextFont : NextFontWithVariable;
+export declare function Playwrite_CO_Guides<T extends CssVariable | undefined = undefined>(options: {
+    weight: '400' | Array<'400'>;
+    style?: 'normal' | Array<'normal'>;
+    display?: Display;
+    variable?: T;
+    fallback?: string[];
+    adjustFontFallback?: boolean;
+}): T extends undefined ? NextFont : NextFontWithVariable;
 export declare function Playwrite_CU<T extends CssVariable | undefined = undefined>(options?: {
     weight?: '100' | '200' | '300' | '400' | 'variable' | Array<'100' | '200' | '300' | '400'>;
+    style?: 'normal' | Array<'normal'>;
+    display?: Display;
+    variable?: T;
+    fallback?: string[];
+    adjustFontFallback?: boolean;
+}): T extends undefined ? NextFont : NextFontWithVariable;
+export declare function Playwrite_CU_Guides<T extends CssVariable | undefined = undefined>(options: {
+    weight: '400' | Array<'400'>;
     style?: 'normal' | Array<'normal'>;
     display?: Display;
     variable?: T;
@@ -12679,8 +12832,24 @@ export declare function Playwrite_CZ<T extends CssVariable | undefined = undefin
     fallback?: string[];
     adjustFontFallback?: boolean;
 }): T extends undefined ? NextFont : NextFontWithVariable;
+export declare function Playwrite_CZ_Guides<T extends CssVariable | undefined = undefined>(options: {
+    weight: '400' | Array<'400'>;
+    style?: 'normal' | Array<'normal'>;
+    display?: Display;
+    variable?: T;
+    fallback?: string[];
+    adjustFontFallback?: boolean;
+}): T extends undefined ? NextFont : NextFontWithVariable;
 export declare function Playwrite_DE_Grund<T extends CssVariable | undefined = undefined>(options?: {
     weight?: '100' | '200' | '300' | '400' | 'variable' | Array<'100' | '200' | '300' | '400'>;
+    style?: 'normal' | Array<'normal'>;
+    display?: Display;
+    variable?: T;
+    fallback?: string[];
+    adjustFontFallback?: boolean;
+}): T extends undefined ? NextFont : NextFontWithVariable;
+export declare function Playwrite_DE_Grund_Guides<T extends CssVariable | undefined = undefined>(options: {
+    weight: '400' | Array<'400'>;
     style?: 'normal' | Array<'normal'>;
     display?: Display;
     variable?: T;
@@ -12695,8 +12864,24 @@ export declare function Playwrite_DE_LA<T extends CssVariable | undefined = unde
     fallback?: string[];
     adjustFontFallback?: boolean;
 }): T extends undefined ? NextFont : NextFontWithVariable;
+export declare function Playwrite_DE_LA_Guides<T extends CssVariable | undefined = undefined>(options: {
+    weight: '400' | Array<'400'>;
+    style?: 'normal' | Array<'normal'>;
+    display?: Display;
+    variable?: T;
+    fallback?: string[];
+    adjustFontFallback?: boolean;
+}): T extends undefined ? NextFont : NextFontWithVariable;
 export declare function Playwrite_DE_SAS<T extends CssVariable | undefined = undefined>(options?: {
     weight?: '100' | '200' | '300' | '400' | 'variable' | Array<'100' | '200' | '300' | '400'>;
+    style?: 'normal' | Array<'normal'>;
+    display?: Display;
+    variable?: T;
+    fallback?: string[];
+    adjustFontFallback?: boolean;
+}): T extends undefined ? NextFont : NextFontWithVariable;
+export declare function Playwrite_DE_SAS_Guides<T extends CssVariable | undefined = undefined>(options: {
+    weight: '400' | Array<'400'>;
     style?: 'normal' | Array<'normal'>;
     display?: Display;
     variable?: T;
@@ -12711,6 +12896,14 @@ export declare function Playwrite_DE_VA<T extends CssVariable | undefined = unde
     fallback?: string[];
     adjustFontFallback?: boolean;
 }): T extends undefined ? NextFont : NextFontWithVariable;
+export declare function Playwrite_DE_VA_Guides<T extends CssVariable | undefined = undefined>(options: {
+    weight: '400' | Array<'400'>;
+    style?: 'normal' | Array<'normal'>;
+    display?: Display;
+    variable?: T;
+    fallback?: string[];
+    adjustFontFallback?: boolean;
+}): T extends undefined ? NextFont : NextFontWithVariable;
 export declare function Playwrite_DK_Loopet<T extends CssVariable | undefined = undefined>(options?: {
     weight?: '100' | '200' | '300' | '400' | 'variable' | Array<'100' | '200' | '300' | '400'>;
     style?: 'normal' | Array<'normal'>;
@@ -12719,8 +12912,24 @@ export declare function Playwrite_DK_Loopet<T extends CssVariable | undefined = 
     fallback?: string[];
     adjustFontFallback?: boolean;
 }): T extends undefined ? NextFont : NextFontWithVariable;
+export declare function Playwrite_DK_Loopet_Guides<T extends CssVariable | undefined = undefined>(options: {
+    weight: '400' | Array<'400'>;
+    style?: 'normal' | Array<'normal'>;
+    display?: Display;
+    variable?: T;
+    fallback?: string[];
+    adjustFontFallback?: boolean;
+}): T extends undefined ? NextFont : NextFontWithVariable;
 export declare function Playwrite_DK_Uloopet<T extends CssVariable | undefined = undefined>(options?: {
     weight?: '100' | '200' | '300' | '400' | 'variable' | Array<'100' | '200' | '300' | '400'>;
+    style?: 'normal' | Array<'normal'>;
+    display?: Display;
+    variable?: T;
+    fallback?: string[];
+    adjustFontFallback?: boolean;
+}): T extends undefined ? NextFont : NextFontWithVariable;
+export declare function Playwrite_DK_Uloopet_Guides<T extends CssVariable | undefined = undefined>(options: {
+    weight: '400' | Array<'400'>;
     style?: 'normal' | Array<'normal'>;
     display?: Display;
     variable?: T;
@@ -12743,8 +12952,32 @@ export declare function Playwrite_ES_Deco<T extends CssVariable | undefined = un
     fallback?: string[];
     adjustFontFallback?: boolean;
 }): T extends undefined ? NextFont : NextFontWithVariable;
+export declare function Playwrite_ES_Deco_Guides<T extends CssVariable | undefined = undefined>(options: {
+    weight: '400' | Array<'400'>;
+    style?: 'normal' | Array<'normal'>;
+    display?: Display;
+    variable?: T;
+    fallback?: string[];
+    adjustFontFallback?: boolean;
+}): T extends undefined ? NextFont : NextFontWithVariable;
+export declare function Playwrite_ES_Guides<T extends CssVariable | undefined = undefined>(options: {
+    weight: '400' | Array<'400'>;
+    style?: 'normal' | Array<'normal'>;
+    display?: Display;
+    variable?: T;
+    fallback?: string[];
+    adjustFontFallback?: boolean;
+}): T extends undefined ? NextFont : NextFontWithVariable;
 export declare function Playwrite_FR_Moderne<T extends CssVariable | undefined = undefined>(options?: {
     weight?: '100' | '200' | '300' | '400' | 'variable' | Array<'100' | '200' | '300' | '400'>;
+    style?: 'normal' | Array<'normal'>;
+    display?: Display;
+    variable?: T;
+    fallback?: string[];
+    adjustFontFallback?: boolean;
+}): T extends undefined ? NextFont : NextFontWithVariable;
+export declare function Playwrite_FR_Moderne_Guides<T extends CssVariable | undefined = undefined>(options: {
+    weight: '400' | Array<'400'>;
     style?: 'normal' | Array<'normal'>;
     display?: Display;
     variable?: T;
@@ -12759,8 +12992,24 @@ export declare function Playwrite_FR_Trad<T extends CssVariable | undefined = un
     fallback?: string[];
     adjustFontFallback?: boolean;
 }): T extends undefined ? NextFont : NextFontWithVariable;
+export declare function Playwrite_FR_Trad_Guides<T extends CssVariable | undefined = undefined>(options: {
+    weight: '400' | Array<'400'>;
+    style?: 'normal' | Array<'normal'>;
+    display?: Display;
+    variable?: T;
+    fallback?: string[];
+    adjustFontFallback?: boolean;
+}): T extends undefined ? NextFont : NextFontWithVariable;
 export declare function Playwrite_GB_J<T extends CssVariable | undefined = undefined>(options?: {
     weight?: '100' | '200' | '300' | '400' | 'variable' | Array<'100' | '200' | '300' | '400'>;
+    style?: 'normal' | 'italic' | Array<'normal' | 'italic'>;
+    display?: Display;
+    variable?: T;
+    fallback?: string[];
+    adjustFontFallback?: boolean;
+}): T extends undefined ? NextFont : NextFontWithVariable;
+export declare function Playwrite_GB_J_Guides<T extends CssVariable | undefined = undefined>(options: {
+    weight: '400' | Array<'400'>;
     style?: 'normal' | 'italic' | Array<'normal' | 'italic'>;
     display?: Display;
     variable?: T;
@@ -12775,8 +13024,24 @@ export declare function Playwrite_GB_S<T extends CssVariable | undefined = undef
     fallback?: string[];
     adjustFontFallback?: boolean;
 }): T extends undefined ? NextFont : NextFontWithVariable;
+export declare function Playwrite_GB_S_Guides<T extends CssVariable | undefined = undefined>(options: {
+    weight: '400' | Array<'400'>;
+    style?: 'normal' | 'italic' | Array<'normal' | 'italic'>;
+    display?: Display;
+    variable?: T;
+    fallback?: string[];
+    adjustFontFallback?: boolean;
+}): T extends undefined ? NextFont : NextFontWithVariable;
 export declare function Playwrite_HR<T extends CssVariable | undefined = undefined>(options?: {
     weight?: '100' | '200' | '300' | '400' | 'variable' | Array<'100' | '200' | '300' | '400'>;
+    style?: 'normal' | Array<'normal'>;
+    display?: Display;
+    variable?: T;
+    fallback?: string[];
+    adjustFontFallback?: boolean;
+}): T extends undefined ? NextFont : NextFontWithVariable;
+export declare function Playwrite_HR_Guides<T extends CssVariable | undefined = undefined>(options: {
+    weight: '400' | Array<'400'>;
     style?: 'normal' | Array<'normal'>;
     display?: Display;
     variable?: T;
@@ -12791,8 +13056,24 @@ export declare function Playwrite_HR_Lijeva<T extends CssVariable | undefined = 
     fallback?: string[];
     adjustFontFallback?: boolean;
 }): T extends undefined ? NextFont : NextFontWithVariable;
+export declare function Playwrite_HR_Lijeva_Guides<T extends CssVariable | undefined = undefined>(options: {
+    weight: '400' | Array<'400'>;
+    style?: 'normal' | Array<'normal'>;
+    display?: Display;
+    variable?: T;
+    fallback?: string[];
+    adjustFontFallback?: boolean;
+}): T extends undefined ? NextFont : NextFontWithVariable;
 export declare function Playwrite_HU<T extends CssVariable | undefined = undefined>(options?: {
     weight?: '100' | '200' | '300' | '400' | 'variable' | Array<'100' | '200' | '300' | '400'>;
+    style?: 'normal' | Array<'normal'>;
+    display?: Display;
+    variable?: T;
+    fallback?: string[];
+    adjustFontFallback?: boolean;
+}): T extends undefined ? NextFont : NextFontWithVariable;
+export declare function Playwrite_HU_Guides<T extends CssVariable | undefined = undefined>(options: {
+    weight: '400' | Array<'400'>;
     style?: 'normal' | Array<'normal'>;
     display?: Display;
     variable?: T;
@@ -12807,8 +13088,24 @@ export declare function Playwrite_ID<T extends CssVariable | undefined = undefin
     fallback?: string[];
     adjustFontFallback?: boolean;
 }): T extends undefined ? NextFont : NextFontWithVariable;
+export declare function Playwrite_ID_Guides<T extends CssVariable | undefined = undefined>(options: {
+    weight: '400' | Array<'400'>;
+    style?: 'normal' | Array<'normal'>;
+    display?: Display;
+    variable?: T;
+    fallback?: string[];
+    adjustFontFallback?: boolean;
+}): T extends undefined ? NextFont : NextFontWithVariable;
 export declare function Playwrite_IE<T extends CssVariable | undefined = undefined>(options?: {
     weight?: '100' | '200' | '300' | '400' | 'variable' | Array<'100' | '200' | '300' | '400'>;
+    style?: 'normal' | Array<'normal'>;
+    display?: Display;
+    variable?: T;
+    fallback?: string[];
+    adjustFontFallback?: boolean;
+}): T extends undefined ? NextFont : NextFontWithVariable;
+export declare function Playwrite_IE_Guides<T extends CssVariable | undefined = undefined>(options: {
+    weight: '400' | Array<'400'>;
     style?: 'normal' | Array<'normal'>;
     display?: Display;
     variable?: T;
@@ -12823,8 +13120,24 @@ export declare function Playwrite_IN<T extends CssVariable | undefined = undefin
     fallback?: string[];
     adjustFontFallback?: boolean;
 }): T extends undefined ? NextFont : NextFontWithVariable;
+export declare function Playwrite_IN_Guides<T extends CssVariable | undefined = undefined>(options: {
+    weight: '400' | Array<'400'>;
+    style?: 'normal' | Array<'normal'>;
+    display?: Display;
+    variable?: T;
+    fallback?: string[];
+    adjustFontFallback?: boolean;
+}): T extends undefined ? NextFont : NextFontWithVariable;
 export declare function Playwrite_IS<T extends CssVariable | undefined = undefined>(options?: {
     weight?: '100' | '200' | '300' | '400' | 'variable' | Array<'100' | '200' | '300' | '400'>;
+    style?: 'normal' | Array<'normal'>;
+    display?: Display;
+    variable?: T;
+    fallback?: string[];
+    adjustFontFallback?: boolean;
+}): T extends undefined ? NextFont : NextFontWithVariable;
+export declare function Playwrite_IS_Guides<T extends CssVariable | undefined = undefined>(options: {
+    weight: '400' | Array<'400'>;
     style?: 'normal' | Array<'normal'>;
     display?: Display;
     variable?: T;
@@ -12839,8 +13152,24 @@ export declare function Playwrite_IT_Moderna<T extends CssVariable | undefined =
     fallback?: string[];
     adjustFontFallback?: boolean;
 }): T extends undefined ? NextFont : NextFontWithVariable;
+export declare function Playwrite_IT_Moderna_Guides<T extends CssVariable | undefined = undefined>(options: {
+    weight: '400' | Array<'400'>;
+    style?: 'normal' | Array<'normal'>;
+    display?: Display;
+    variable?: T;
+    fallback?: string[];
+    adjustFontFallback?: boolean;
+}): T extends undefined ? NextFont : NextFontWithVariable;
 export declare function Playwrite_IT_Trad<T extends CssVariable | undefined = undefined>(options?: {
     weight?: '100' | '200' | '300' | '400' | 'variable' | Array<'100' | '200' | '300' | '400'>;
+    style?: 'normal' | Array<'normal'>;
+    display?: Display;
+    variable?: T;
+    fallback?: string[];
+    adjustFontFallback?: boolean;
+}): T extends undefined ? NextFont : NextFontWithVariable;
+export declare function Playwrite_IT_Trad_Guides<T extends CssVariable | undefined = undefined>(options: {
+    weight: '400' | Array<'400'>;
     style?: 'normal' | Array<'normal'>;
     display?: Display;
     variable?: T;
@@ -12855,8 +13184,24 @@ export declare function Playwrite_MX<T extends CssVariable | undefined = undefin
     fallback?: string[];
     adjustFontFallback?: boolean;
 }): T extends undefined ? NextFont : NextFontWithVariable;
+export declare function Playwrite_MX_Guides<T extends CssVariable | undefined = undefined>(options: {
+    weight: '400' | Array<'400'>;
+    style?: 'normal' | Array<'normal'>;
+    display?: Display;
+    variable?: T;
+    fallback?: string[];
+    adjustFontFallback?: boolean;
+}): T extends undefined ? NextFont : NextFontWithVariable;
 export declare function Playwrite_NG_Modern<T extends CssVariable | undefined = undefined>(options?: {
     weight?: '100' | '200' | '300' | '400' | 'variable' | Array<'100' | '200' | '300' | '400'>;
+    style?: 'normal' | Array<'normal'>;
+    display?: Display;
+    variable?: T;
+    fallback?: string[];
+    adjustFontFallback?: boolean;
+}): T extends undefined ? NextFont : NextFontWithVariable;
+export declare function Playwrite_NG_Modern_Guides<T extends CssVariable | undefined = undefined>(options: {
+    weight: '400' | Array<'400'>;
     style?: 'normal' | Array<'normal'>;
     display?: Display;
     variable?: T;
@@ -12871,8 +13216,24 @@ export declare function Playwrite_NL<T extends CssVariable | undefined = undefin
     fallback?: string[];
     adjustFontFallback?: boolean;
 }): T extends undefined ? NextFont : NextFontWithVariable;
+export declare function Playwrite_NL_Guides<T extends CssVariable | undefined = undefined>(options: {
+    weight: '400' | Array<'400'>;
+    style?: 'normal' | Array<'normal'>;
+    display?: Display;
+    variable?: T;
+    fallback?: string[];
+    adjustFontFallback?: boolean;
+}): T extends undefined ? NextFont : NextFontWithVariable;
 export declare function Playwrite_NO<T extends CssVariable | undefined = undefined>(options?: {
     weight?: '100' | '200' | '300' | '400' | 'variable' | Array<'100' | '200' | '300' | '400'>;
+    style?: 'normal' | Array<'normal'>;
+    display?: Display;
+    variable?: T;
+    fallback?: string[];
+    adjustFontFallback?: boolean;
+}): T extends undefined ? NextFont : NextFontWithVariable;
+export declare function Playwrite_NO_Guides<T extends CssVariable | undefined = undefined>(options: {
+    weight: '400' | Array<'400'>;
     style?: 'normal' | Array<'normal'>;
     display?: Display;
     variable?: T;
@@ -12887,8 +13248,24 @@ export declare function Playwrite_NZ<T extends CssVariable | undefined = undefin
     fallback?: string[];
     adjustFontFallback?: boolean;
 }): T extends undefined ? NextFont : NextFontWithVariable;
+export declare function Playwrite_NZ_Guides<T extends CssVariable | undefined = undefined>(options: {
+    weight: '400' | Array<'400'>;
+    style?: 'normal' | Array<'normal'>;
+    display?: Display;
+    variable?: T;
+    fallback?: string[];
+    adjustFontFallback?: boolean;
+}): T extends undefined ? NextFont : NextFontWithVariable;
 export declare function Playwrite_PE<T extends CssVariable | undefined = undefined>(options?: {
     weight?: '100' | '200' | '300' | '400' | 'variable' | Array<'100' | '200' | '300' | '400'>;
+    style?: 'normal' | Array<'normal'>;
+    display?: Display;
+    variable?: T;
+    fallback?: string[];
+    adjustFontFallback?: boolean;
+}): T extends undefined ? NextFont : NextFontWithVariable;
+export declare function Playwrite_PE_Guides<T extends CssVariable | undefined = undefined>(options: {
+    weight: '400' | Array<'400'>;
     style?: 'normal' | Array<'normal'>;
     display?: Display;
     variable?: T;
@@ -12903,8 +13280,24 @@ export declare function Playwrite_PL<T extends CssVariable | undefined = undefin
     fallback?: string[];
     adjustFontFallback?: boolean;
 }): T extends undefined ? NextFont : NextFontWithVariable;
+export declare function Playwrite_PL_Guides<T extends CssVariable | undefined = undefined>(options: {
+    weight: '400' | Array<'400'>;
+    style?: 'normal' | Array<'normal'>;
+    display?: Display;
+    variable?: T;
+    fallback?: string[];
+    adjustFontFallback?: boolean;
+}): T extends undefined ? NextFont : NextFontWithVariable;
 export declare function Playwrite_PT<T extends CssVariable | undefined = undefined>(options?: {
     weight?: '100' | '200' | '300' | '400' | 'variable' | Array<'100' | '200' | '300' | '400'>;
+    style?: 'normal' | Array<'normal'>;
+    display?: Display;
+    variable?: T;
+    fallback?: string[];
+    adjustFontFallback?: boolean;
+}): T extends undefined ? NextFont : NextFontWithVariable;
+export declare function Playwrite_PT_Guides<T extends CssVariable | undefined = undefined>(options: {
+    weight: '400' | Array<'400'>;
     style?: 'normal' | Array<'normal'>;
     display?: Display;
     variable?: T;
@@ -12919,8 +13312,24 @@ export declare function Playwrite_RO<T extends CssVariable | undefined = undefin
     fallback?: string[];
     adjustFontFallback?: boolean;
 }): T extends undefined ? NextFont : NextFontWithVariable;
+export declare function Playwrite_RO_Guides<T extends CssVariable | undefined = undefined>(options: {
+    weight: '400' | Array<'400'>;
+    style?: 'normal' | Array<'normal'>;
+    display?: Display;
+    variable?: T;
+    fallback?: string[];
+    adjustFontFallback?: boolean;
+}): T extends undefined ? NextFont : NextFontWithVariable;
 export declare function Playwrite_SK<T extends CssVariable | undefined = undefined>(options?: {
     weight?: '100' | '200' | '300' | '400' | 'variable' | Array<'100' | '200' | '300' | '400'>;
+    style?: 'normal' | Array<'normal'>;
+    display?: Display;
+    variable?: T;
+    fallback?: string[];
+    adjustFontFallback?: boolean;
+}): T extends undefined ? NextFont : NextFontWithVariable;
+export declare function Playwrite_SK_Guides<T extends CssVariable | undefined = undefined>(options: {
+    weight: '400' | Array<'400'>;
     style?: 'normal' | Array<'normal'>;
     display?: Display;
     variable?: T;
@@ -12935,8 +13344,24 @@ export declare function Playwrite_TZ<T extends CssVariable | undefined = undefin
     fallback?: string[];
     adjustFontFallback?: boolean;
 }): T extends undefined ? NextFont : NextFontWithVariable;
+export declare function Playwrite_TZ_Guides<T extends CssVariable | undefined = undefined>(options: {
+    weight: '400' | Array<'400'>;
+    style?: 'normal' | Array<'normal'>;
+    display?: Display;
+    variable?: T;
+    fallback?: string[];
+    adjustFontFallback?: boolean;
+}): T extends undefined ? NextFont : NextFontWithVariable;
 export declare function Playwrite_US_Modern<T extends CssVariable | undefined = undefined>(options?: {
     weight?: '100' | '200' | '300' | '400' | 'variable' | Array<'100' | '200' | '300' | '400'>;
+    style?: 'normal' | Array<'normal'>;
+    display?: Display;
+    variable?: T;
+    fallback?: string[];
+    adjustFontFallback?: boolean;
+}): T extends undefined ? NextFont : NextFontWithVariable;
+export declare function Playwrite_US_Modern_Guides<T extends CssVariable | undefined = undefined>(options: {
+    weight: '400' | Array<'400'>;
     style?: 'normal' | Array<'normal'>;
     display?: Display;
     variable?: T;
@@ -12951,6 +13376,14 @@ export declare function Playwrite_US_Trad<T extends CssVariable | undefined = un
     fallback?: string[];
     adjustFontFallback?: boolean;
 }): T extends undefined ? NextFont : NextFontWithVariable;
+export declare function Playwrite_US_Trad_Guides<T extends CssVariable | undefined = undefined>(options: {
+    weight: '400' | Array<'400'>;
+    style?: 'normal' | Array<'normal'>;
+    display?: Display;
+    variable?: T;
+    fallback?: string[];
+    adjustFontFallback?: boolean;
+}): T extends undefined ? NextFont : NextFontWithVariable;
 export declare function Playwrite_VN<T extends CssVariable | undefined = undefined>(options?: {
     weight?: '100' | '200' | '300' | '400' | 'variable' | Array<'100' | '200' | '300' | '400'>;
     style?: 'normal' | Array<'normal'>;
@@ -12959,8 +13392,24 @@ export declare function Playwrite_VN<T extends CssVariable | undefined = undefin
     fallback?: string[];
     adjustFontFallback?: boolean;
 }): T extends undefined ? NextFont : NextFontWithVariable;
+export declare function Playwrite_VN_Guides<T extends CssVariable | undefined = undefined>(options: {
+    weight: '400' | Array<'400'>;
+    style?: 'normal' | Array<'normal'>;
+    display?: Display;
+    variable?: T;
+    fallback?: string[];
+    adjustFontFallback?: boolean;
+}): T extends undefined ? NextFont : NextFontWithVariable;
 export declare function Playwrite_ZA<T extends CssVariable | undefined = undefined>(options?: {
     weight?: '100' | '200' | '300' | '400' | 'variable' | Array<'100' | '200' | '300' | '400'>;
+    style?: 'normal' | Array<'normal'>;
+    display?: Display;
+    variable?: T;
+    fallback?: string[];
+    adjustFontFallback?: boolean;
+}): T extends undefined ? NextFont : NextFontWithVariable;
+export declare function Playwrite_ZA_Guides<T extends CssVariable | undefined = undefined>(options: {
+    weight: '400' | Array<'400'>;
     style?: 'normal' | Array<'normal'>;
     display?: Display;
     variable?: T;
@@ -13860,15 +14309,16 @@ export declare function Road_Rage<T extends CssVariable | undefined = undefined>
     adjustFontFallback?: boolean;
     subsets?: Array<'latin' | 'latin-ext' | 'vietnamese'>;
 }): T extends undefined ? NextFont : NextFontWithVariable;
-export declare function Roboto<T extends CssVariable | undefined = undefined>(options: {
-    weight: '100' | '300' | '400' | '500' | '700' | '900' | Array<'100' | '300' | '400' | '500' | '700' | '900'>;
+export declare function Roboto<T extends CssVariable | undefined = undefined>(options?: {
+    weight?: '100' | '200' | '300' | '400' | '500' | '600' | '700' | '800' | '900' | 'variable' | Array<'100' | '200' | '300' | '400' | '500' | '600' | '700' | '800' | '900'>;
     style?: 'normal' | 'italic' | Array<'normal' | 'italic'>;
     display?: Display;
     variable?: T;
     preload?: boolean;
     fallback?: string[];
     adjustFontFallback?: boolean;
-    subsets?: Array<'cyrillic' | 'cyrillic-ext' | 'greek' | 'greek-ext' | 'latin' | 'latin-ext' | 'vietnamese'>;
+    subsets?: Array<'cyrillic' | 'cyrillic-ext' | 'greek' | 'greek-ext' | 'latin' | 'latin-ext' | 'math' | 'symbols' | 'vietnamese'>;
+    axes?: 'wdth'[];
 }): T extends undefined ? NextFont : NextFontWithVariable;
 export declare function Roboto_Condensed<T extends CssVariable | undefined = undefined>(options?: {
     weight?: '100' | '200' | '300' | '400' | '500' | '600' | '700' | '800' | '900' | 'variable' | Array<'100' | '200' | '300' | '400' | '500' | '600' | '700' | '800' | '900'>;
@@ -15320,10 +15770,8 @@ export declare function Song_Myung<T extends CssVariable | undefined = undefined
     style?: 'normal' | Array<'normal'>;
     display?: Display;
     variable?: T;
-    preload?: boolean;
     fallback?: string[];
     adjustFontFallback?: boolean;
-    subsets?: Array<'latin'>;
 }): T extends undefined ? NextFont : NextFontWithVariable;
 export declare function Sono<T extends CssVariable | undefined = undefined>(options?: {
     weight?: '200' | '300' | '400' | '500' | '600' | '700' | '800' | 'variable' | Array<'200' | '300' | '400' | '500' | '600' | '700' | '800'>;
@@ -15683,10 +16131,8 @@ export declare function Stylish<T extends CssVariable | undefined = undefined>(o
     style?: 'normal' | Array<'normal'>;
     display?: Display;
     variable?: T;
-    preload?: boolean;
     fallback?: string[];
     adjustFontFallback?: boolean;
-    subsets?: Array<'latin'>;
 }): T extends undefined ? NextFont : NextFontWithVariable;
 export declare function Sue_Ellen_Francisco<T extends CssVariable | undefined = undefined>(options: {
     weight: '400' | Array<'400'>;

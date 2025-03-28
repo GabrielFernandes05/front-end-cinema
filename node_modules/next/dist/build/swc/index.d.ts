@@ -12,7 +12,10 @@ export declare function createDefineEnv({ isTurbopack, clientRouterFilters, conf
 export declare function isWasm(): Promise<boolean>;
 export declare function transform(src: string, options?: any): Promise<any>;
 export declare function transformSync(src: string, options?: any): any;
-export declare function minify(src: string, options: any): Promise<string>;
+export declare function minify(src: string, options: any): Promise<{
+    code: string;
+    map: any;
+}>;
 export declare function parse(src: string, options: any): Promise<any>;
 export declare function getBinaryMetadata(): {
     target: string | undefined;
@@ -22,20 +25,6 @@ export declare function getBinaryMetadata(): {
  *
  */
 export declare function initCustomTraceSubscriber(traceFileName?: string): void;
-/**
- * Initialize heap profiler, if possible.
- * Note this is not available in release build of next-swc by default,
- * only available by manually building next-swc with specific flags.
- * Calling in release build will not do anything.
- */
-export declare function initHeapProfiler(): void;
-/**
- * Teardown heap profiler, if possible.
- *
- * Same as initialization, this is not available in release build of next-swc by default
- * and calling it will not do anything.
- */
-export declare const teardownHeapProfiler: () => void;
 /**
  * Teardown swc's trace subscriber if there's an initialized flush guard exists.
  *

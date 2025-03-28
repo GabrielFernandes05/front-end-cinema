@@ -8,7 +8,7 @@ Object.defineProperty(exports, "normalizeCatchAllRoutes", {
         return normalizeCatchAllRoutes;
     }
 });
-const _interceptionroutes = require("../server/lib/interception-routes");
+const _interceptionroutes = require("../shared/lib/router/utils/interception-routes");
 const _apppathnamenormalizer = require("../server/normalizers/built/app/app-pathname-normalizer");
 function normalizeCatchAllRoutes(appPaths, normalizer = new _apppathnamenormalizer.AppPathnameNormalizer()) {
     const catchAllRoutes = [

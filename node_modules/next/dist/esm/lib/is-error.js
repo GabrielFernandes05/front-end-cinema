@@ -26,13 +26,25 @@ export function getProperError(err) {
         // provide better error for case where `throw undefined`
         // is called in development
         if (typeof err === 'undefined') {
-            return new Error('An undefined error was thrown, ' + 'see here for more info: https://nextjs.org/docs/messages/threw-undefined');
+            return Object.defineProperty(new Error('An undefined error was thrown, ' + 'see here for more info: https://nextjs.org/docs/messages/threw-undefined'), "__NEXT_ERROR_CODE", {
+                value: "E98",
+                enumerable: false,
+                configurable: true
+            });
         }
         if (err === null) {
-            return new Error('A null error was thrown, ' + 'see here for more info: https://nextjs.org/docs/messages/threw-undefined');
+            return Object.defineProperty(new Error('A null error was thrown, ' + 'see here for more info: https://nextjs.org/docs/messages/threw-undefined'), "__NEXT_ERROR_CODE", {
+                value: "E336",
+                enumerable: false,
+                configurable: true
+            });
         }
     }
-    return new Error(isPlainObject(err) ? safeStringify(err) : err + '');
+    return Object.defineProperty(new Error(isPlainObject(err) ? safeStringify(err) : err + ''), "__NEXT_ERROR_CODE", {
+        value: "E394",
+        enumerable: false,
+        configurable: true
+    });
 }
 
 //# sourceMappingURL=is-error.js.map

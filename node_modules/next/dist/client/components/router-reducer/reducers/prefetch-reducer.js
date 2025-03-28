@@ -23,7 +23,7 @@ _export(exports, {
 const _promisequeue = require("../../promise-queue");
 const _prefetchcacheutils = require("../prefetch-cache-utils");
 const prefetchQueue = new _promisequeue.PromiseQueue(5);
-const prefetchReducer = process.env.__NEXT_PPR && process.env.__NEXT_CLIENT_SEGMENT_CACHE ? identityReducerWhenSegmentCacheIsEnabled : prefetchReducerImpl;
+const prefetchReducer = process.env.__NEXT_CLIENT_SEGMENT_CACHE ? identityReducerWhenSegmentCacheIsEnabled : prefetchReducerImpl;
 function identityReducerWhenSegmentCacheIsEnabled(state) {
     // Unlike the old implementation, the Segment Cache doesn't store its data in
     // the router reducer state.

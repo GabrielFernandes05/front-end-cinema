@@ -4,7 +4,7 @@ import type { NextParsedUrlQuery, NextUrlWithParsedQuery } from './request-meta'
 import type { Params } from './request/params';
 import type { LoadComponentsReturnType } from './load-components';
 import type { LoadedRenderOpts, MiddlewareRoutingItem, NormalizedRouteManifest, Options, RouteHandler } from './base-server';
-import type { Revalidate, ExpireTime } from './lib/revalidate';
+import type { CacheControl } from './lib/cache-control';
 import BaseServer from './base-server';
 import WebResponseCache from './response-cache/web';
 import { IncrementalCache } from './lib/incremental-cache';
@@ -12,12 +12,13 @@ import type { PAGE_TYPES } from '../lib/page-types';
 import type { Rewrite } from '../lib/load-custom-routes';
 import type { ServerOnInstrumentationRequestError } from './app-render/types';
 interface WebServerOptions extends Options {
+    buildId: string;
     webServerConfig: {
         page: string;
         pathname: string;
         pagesType: PAGE_TYPES;
         loadComponent: (page: string) => Promise<LoadComponentsReturnType | null>;
-        extendRenderOpts: Partial<BaseServer['renderOpts']> & Pick<BaseServer['renderOpts'], 'buildId'> & {
+        extendRenderOpts: Partial<BaseServer['renderOpts']> & {
             serverActionsManifest?: any;
         };
         renderToHTML: typeof import('./app-render/app-render').renderToHTMLOrFlight | undefined;
@@ -73,8 +74,7 @@ export default class NextWebServer extends BaseServer<WebServerOptions, WebNextR
         type: 'html' | 'json';
         generateEtags: boolean;
         poweredByHeader: boolean;
-        revalidate: Revalidate | undefined;
-        expireTime: ExpireTime | undefined;
+        cacheControl: CacheControl | undefined;
     }): Promise<void>;
     protected findPageComponents({ page, query, params, url: _url, }: {
         page: string;
@@ -84,16 +84,7 @@ export default class NextWebServer extends BaseServer<WebServerOptions, WebNextR
         url?: string;
     }): Promise<{
         query: {
-            [x: string]: string | string[] | undefined;
-            __nextNotFoundSrcPage?: string;
-            __nextDefaultLocale?: string;
-            __nextFallback?: "true";
-            __nextLocale?: string;
-            __nextInferredLocaleFromDefault?: "1";
-            __nextSsgPath?: string;
-            _nextBubbleNoFallback?: "1";
-            __nextDataReq?: "1";
-            __nextCustomErrorRender?: "1";
+            [x: string]: import("./request/params").ParamValue;
             _rsc?: string;
             amp?: "1";
         };
@@ -109,7 +100,7 @@ export default class NextWebServer extends BaseServer<WebServerOptions, WebNextR
     protected handleUpgrade(): Promise<void>;
     protected getFallbackErrorComponents(_url?: string): Promise<LoadComponentsReturnType | null>;
     protected getRoutesManifest(): NormalizedRouteManifest | undefined;
-    protected getMiddleware(): MiddlewareRoutingItem | undefined;
+    protected getMiddleware(): Promise<MiddlewareRoutingItem | undefined>;
     protected getFilesystemPaths(): Set<string>;
     protected getinterceptionRoutePatterns(): RegExp[];
     protected loadInstrumentationModule(): Promise<import("./instrumentation/types").InstrumentationModule | undefined>;

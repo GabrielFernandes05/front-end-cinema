@@ -37,7 +37,7 @@ const _react = /*#__PURE__*/ _interop_require_default._(require("react"));
 const _navigationuntracked = require("./navigation-untracked");
 const _isnextroutererror = require("./is-next-router-error");
 const _navfailurehandler = require("./nav-failure-handler");
-const _workasyncstorageexternal = require("../../server/app-render/work-async-storage.external");
+const workAsyncStorage = typeof window === 'undefined' ? require('../../server/app-render/work-async-storage.external').workAsyncStorage : undefined;
 const styles = {
     error: {
         // https://github.com/sindresorhus/modern-normalize/blob/main/modern-normalize.css#L38-L52
@@ -61,10 +61,12 @@ const styles = {
 // instead of caching the error page
 function HandleISRError(param) {
     let { error } = param;
-    const store = _workasyncstorageexternal.workAsyncStorage.getStore();
-    if ((store == null ? void 0 : store.isRevalidate) || (store == null ? void 0 : store.isStaticGeneration)) {
-        console.error(error);
-        throw error;
+    if (workAsyncStorage) {
+        const store = workAsyncStorage.getStore();
+        if ((store == null ? void 0 : store.isRevalidate) || (store == null ? void 0 : store.isStaticGeneration)) {
+            console.error(error);
+            throw error;
+        }
     }
     return null;
 }
@@ -157,9 +159,18 @@ function GlobalError(param) {
                         style: styles.error,
                         children: /*#__PURE__*/ (0, _jsxruntime.jsxs)("div", {
                             children: [
-                                /*#__PURE__*/ (0, _jsxruntime.jsx)("h2", {
+                                /*#__PURE__*/ (0, _jsxruntime.jsxs)("h2", {
                                     style: styles.text,
-                                    children: "Application error: a " + (digest ? 'server' : 'client') + "-side exception has occurred (see the " + (digest ? 'server logs' : 'browser console') + " for more information)."
+                                    children: [
+                                        "Application error: a ",
+                                        digest ? 'server' : 'client',
+                                        "-side exception has occurred while loading ",
+                                        window.location.hostname,
+                                        " (see the",
+                                        ' ',
+                                        digest ? 'server logs' : 'browser console',
+                                        " for more information)."
+                                    ]
                                 }),
                                 digest ? /*#__PURE__*/ (0, _jsxruntime.jsx)("p", {
                                     style: styles.text,

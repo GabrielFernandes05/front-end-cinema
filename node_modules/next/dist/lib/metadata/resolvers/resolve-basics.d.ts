@@ -14,3 +14,7 @@ export declare const resolveItunes: FieldResolverExtraArgs<'itunes', [
     MetadataContext
 ]>;
 export declare const resolveFacebook: FieldResolver<'facebook'>;
+export declare const resolvePagination: FieldResolverExtraArgs<'pagination', [
+    ResolvedMetadata['metadataBase'],
+    MetadataContext
+]>;

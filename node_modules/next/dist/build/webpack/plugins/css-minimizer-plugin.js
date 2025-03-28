@@ -12,7 +12,7 @@ const _cssnanosimple = /*#__PURE__*/ _interop_require_default(require("next/dist
 const _postcssscss = /*#__PURE__*/ _interop_require_default(require("next/dist/compiled/postcss-scss"));
 const _postcss = /*#__PURE__*/ _interop_require_default(require("postcss"));
 const _webpack = require("next/dist/compiled/webpack/webpack");
-const _profilingplugin = require("./profiling-plugin");
+const _utils = require("../utils");
 function _interop_require_default(obj) {
     return obj && obj.__esModule ? obj : {
         default: obj
@@ -44,7 +44,9 @@ class CssMinimizerPlugin {
             input = asset.source();
         }
         return (0, _postcss.default)([
-            (0, _cssnanosimple.default)({}, _postcss.default)
+            (0, _cssnanosimple.default)({
+                colormin: false
+            }, _postcss.default)
         ]).process(input, postcssOptions).then((res)=>{
             if (res.map) {
                 return new _webpack.sources.SourceMapSource(res.css, file, res.map.toJSON());
@@ -60,7 +62,7 @@ class CssMinimizerPlugin {
                 name: 'CssMinimizerPlugin',
                 stage: _webpack.webpack.Compilation.PROCESS_ASSETS_STAGE_OPTIMIZE_SIZE
             }, async (assets)=>{
-                const compilationSpan = _profilingplugin.spans.get(compilation) || _profilingplugin.spans.get(compiler);
+                const compilationSpan = (0, _utils.getCompilationSpan)(compilation) || (0, _utils.getCompilationSpan)(compiler);
                 const cssMinimizerSpan = compilationSpan.traceChild('css-minimizer-plugin');
                 return cssMinimizerSpan.traceAsyncFn(async ()=>{
                     const files = Object.keys(assets);
@@ -68,17 +70,17 @@ class CssMinimizerPlugin {
                         const assetSpan = cssMinimizerSpan.traceChild('minify-css');
                         assetSpan.setAttribute('file', file);
                         return assetSpan.traceAsyncFn(async ()=>{
-                            const asset = assets[file];
-                            const etag = cache.getLazyHashedEtag(asset);
+                            const assetSource = compilation.getAsset(file).source;
+                            const etag = cache.getLazyHashedEtag(assetSource);
                             const cachedResult = await cache.getPromise(file, etag);
                             assetSpan.setAttribute('cache', cachedResult ? 'HIT' : 'MISS');
                             if (cachedResult) {
-                                assets[file] = cachedResult;
+                                compilation.updateAsset(file, cachedResult);
                                 return;
                             }
-                            const result = await this.optimizeAsset(file, asset);
+                            const result = await this.optimizeAsset(file, assetSource);
                             await cache.storePromise(file, etag, result);
-                            assets[file] = result;
+                            compilation.updateAsset(file, result);
                         });
                     }));
                 });

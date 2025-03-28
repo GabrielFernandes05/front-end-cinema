@@ -68,7 +68,7 @@ class WebResponseCache {
                 if (!context.isOnDemandRevalidate) {
                     resolve(resolveValue);
                 }
-                if (key && cacheEntry && typeof cacheEntry.revalidate !== 'undefined') {
+                if (key && cacheEntry && cacheEntry.cacheControl) {
                     this.previousCacheItem = {
                         key: pendingResponseKey || key,
                         entry: cacheEntry,

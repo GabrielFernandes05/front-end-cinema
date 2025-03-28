@@ -6,6 +6,7 @@ export type EdgeAppRouteLoaderQuery = {
     preferredRegion: string | string[] | undefined;
     nextConfig: string;
     middlewareConfig: string;
+    cacheHandlers: string;
 };
 declare const EdgeAppRouteLoader: webpack.LoaderDefinitionFunction<EdgeAppRouteLoaderQuery>;
 export default EdgeAppRouteLoader;

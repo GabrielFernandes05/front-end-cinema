@@ -39,6 +39,9 @@ function getRouteModuleOptions(page) {
 const edgeSSRLoader = async function edgeSSRLoader() {
     const { dev, page, absolutePagePath, absoluteAppPath, absoluteDocumentPath, absolute500Path, absoluteErrorPath, isServerComponent, stringifiedConfig: stringifiedConfigBase64, appDirLoader: appDirLoaderBase64, pagesType, sriEnabled, cacheHandler, cacheHandlers: cacheHandlersStringified, preferredRegion, middlewareConfig: middlewareConfigBase64, serverActions } = this.getOptions();
     const cacheHandlers = JSON.parse(cacheHandlersStringified || '{}');
+    if (!cacheHandlers.default) {
+        cacheHandlers.default = require.resolve('../../../../server/lib/cache-handlers/default');
+    }
     const middlewareConfig = JSON.parse(Buffer.from(middlewareConfigBase64, 'base64').toString());
     const stringifiedConfig = Buffer.from(stringifiedConfigBase64 || '', 'base64').toString();
     const appDirLoader = Buffer.from(appDirLoaderBase64 || '', 'base64').toString();
@@ -74,8 +77,6 @@ const edgeSSRLoader = async function edgeSSRLoader() {
             serverActions: typeof serverActions === 'undefined' ? 'undefined' : JSON.stringify(serverActions)
         }, {
             incrementalCacheHandler: cacheHandler ?? null
-        }, {
-            cacheHandlers: cacheHandlers ?? {}
         });
     } else {
         return await (0, _loadentrypoint.loadEntrypoint)('edge-ssr', {
@@ -95,8 +96,6 @@ const edgeSSRLoader = async function edgeSSRLoader() {
         }, {
             userland500Page: userland500Path,
             incrementalCacheHandler: cacheHandler ?? null
-        }, {
-            cacheHandlers: cacheHandlers || {}
         });
     }
 };

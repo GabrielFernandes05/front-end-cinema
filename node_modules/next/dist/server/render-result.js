@@ -44,11 +44,19 @@ class RenderResult {
     }
     toUnchunkedBuffer(stream = false) {
         if (this.response === null) {
-            throw new Error('Invariant: null responses cannot be unchunked');
+            throw Object.defineProperty(new Error('Invariant: null responses cannot be unchunked'), "__NEXT_ERROR_CODE", {
+                value: "E274",
+                enumerable: false,
+                configurable: true
+            });
         }
         if (typeof this.response !== 'string') {
             if (!stream) {
-                throw new Error('Invariant: dynamic responses cannot be unchunked. This is a bug in Next.js');
+                throw Object.defineProperty(new Error('Invariant: dynamic responses cannot be unchunked. This is a bug in Next.js'), "__NEXT_ERROR_CODE", {
+                    value: "E81",
+                    enumerable: false,
+                    configurable: true
+                });
             }
             return (0, _nodewebstreamshelper.streamToBuffer)(this.readable);
         }
@@ -56,11 +64,19 @@ class RenderResult {
     }
     toUnchunkedString(stream = false) {
         if (this.response === null) {
-            throw new Error('Invariant: null responses cannot be unchunked');
+            throw Object.defineProperty(new Error('Invariant: null responses cannot be unchunked'), "__NEXT_ERROR_CODE", {
+                value: "E274",
+                enumerable: false,
+                configurable: true
+            });
         }
         if (typeof this.response !== 'string') {
             if (!stream) {
-                throw new Error('Invariant: dynamic responses cannot be unchunked. This is a bug in Next.js');
+                throw Object.defineProperty(new Error('Invariant: dynamic responses cannot be unchunked. This is a bug in Next.js'), "__NEXT_ERROR_CODE", {
+                    value: "E81",
+                    enumerable: false,
+                    configurable: true
+                });
             }
             return (0, _nodewebstreamshelper.streamToString)(this.readable);
         }
@@ -71,10 +87,18 @@ class RenderResult {
    * string.
    */ get readable() {
         if (this.response === null) {
-            throw new Error('Invariant: null responses cannot be streamed');
+            throw Object.defineProperty(new Error('Invariant: null responses cannot be streamed'), "__NEXT_ERROR_CODE", {
+                value: "E14",
+                enumerable: false,
+                configurable: true
+            });
         }
         if (typeof this.response === 'string') {
-            throw new Error('Invariant: static responses cannot be streamed');
+            throw Object.defineProperty(new Error('Invariant: static responses cannot be streamed'), "__NEXT_ERROR_CODE", {
+                value: "E151",
+                enumerable: false,
+                configurable: true
+            });
         }
         if (Buffer.isBuffer(this.response)) {
             return (0, _nodewebstreamshelper.streamFromBuffer)(this.response);
@@ -94,7 +118,11 @@ class RenderResult {
    * @param readable The new stream to chain
    */ chain(readable) {
         if (this.response === null) {
-            throw new Error('Invariant: response is null. This is a bug in Next.js');
+            throw Object.defineProperty(new Error('Invariant: response is null. This is a bug in Next.js'), "__NEXT_ERROR_CODE", {
+                value: "E258",
+                enumerable: false,
+                configurable: true
+            });
         }
         // If the response is not an array of streams already, make it one.
         let responses;

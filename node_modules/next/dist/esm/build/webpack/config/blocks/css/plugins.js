@@ -34,7 +34,11 @@ async function loadPlugin(dir, pluginName, options) {
     }
     if (options == null) {
         console.error(getError_NullConfig(pluginName));
-        throw new Error(genericErrorText);
+        throw Object.defineProperty(new Error(genericErrorText), "__NEXT_ERROR_CODE", {
+            value: "E394",
+            enumerable: false,
+            configurable: true
+        });
     }
     const pluginPath = require.resolve(pluginName, {
         paths: [
@@ -83,7 +87,11 @@ export async function getPostCssPlugins(dir, supportedBrowsers, disablePostcssPr
         };
     }
     if (typeof config === 'function') {
-        throw new Error(`Your custom PostCSS configuration may not export a function. Please export a plain object instead.\n` + 'Read more: https://nextjs.org/docs/messages/postcss-function');
+        throw Object.defineProperty(new Error(`Your custom PostCSS configuration may not export a function. Please export a plain object instead.\n` + 'Read more: https://nextjs.org/docs/messages/postcss-function'), "__NEXT_ERROR_CODE", {
+            value: "E323",
+            enumerable: false,
+            configurable: true
+        });
     }
     // Warn user about configuration keys which are not respected
     const invalidKey = Object.keys(config).find((key)=>key !== 'plugins');
@@ -93,7 +101,11 @@ export async function getPostCssPlugins(dir, supportedBrowsers, disablePostcssPr
     // Enforce the user provided plugins if the configuration file is present
     let plugins = config.plugins;
     if (plugins == null || typeof plugins !== 'object') {
-        throw new Error(`Your custom PostCSS configuration must export a \`plugins\` key.`);
+        throw Object.defineProperty(new Error(`Your custom PostCSS configuration must export a \`plugins\` key.`), "__NEXT_ERROR_CODE", {
+            value: "E347",
+            enumerable: false,
+            configurable: true
+        });
     }
     if (!Array.isArray(plugins)) {
         // Capture variable so TypeScript is happy
@@ -102,7 +114,11 @@ export async function getPostCssPlugins(dir, supportedBrowsers, disablePostcssPr
             const p = pc[curr];
             if (typeof p === 'undefined') {
                 console.error(getError_NullConfig(curr));
-                throw new Error(genericErrorText);
+                throw Object.defineProperty(new Error(genericErrorText), "__NEXT_ERROR_CODE", {
+                    value: "E394",
+                    enumerable: false,
+                    configurable: true
+                });
             }
             acc.push([
                 curr,
@@ -134,14 +150,26 @@ export async function getPostCssPlugins(dir, supportedBrowsers, disablePostcssPr
                 } else {
                     console.error(`${red(bold('Error'))}: A PostCSS Plugin was passed as an array but did not provide its configuration ('${pluginName}').\n` + 'Read more: https://nextjs.org/docs/messages/postcss-shape');
                 }
-                throw new Error(genericErrorText);
+                throw Object.defineProperty(new Error(genericErrorText), "__NEXT_ERROR_CODE", {
+                    value: "E394",
+                    enumerable: false,
+                    configurable: true
+                });
             }
         } else if (typeof plugin === 'function') {
             console.error(`${red(bold('Error'))}: A PostCSS Plugin was passed as a function using require(), but it must be provided as a ${bold('string')}.\nRead more: https://nextjs.org/docs/messages/postcss-shape`);
-            throw new Error(genericErrorText);
+            throw Object.defineProperty(new Error(genericErrorText), "__NEXT_ERROR_CODE", {
+                value: "E394",
+                enumerable: false,
+                configurable: true
+            });
         } else {
             console.error(`${red(bold('Error'))}: An unknown PostCSS plugin was provided (${plugin}).\n` + 'Read more: https://nextjs.org/docs/messages/postcss-shape');
-            throw new Error(genericErrorText);
+            throw Object.defineProperty(new Error(genericErrorText), "__NEXT_ERROR_CODE", {
+                value: "E394",
+                enumerable: false,
+                configurable: true
+            });
         }
     });
     const resolved = await Promise.all(parsed.map((p)=>loadPlugin(dir, p[0], p[1])));

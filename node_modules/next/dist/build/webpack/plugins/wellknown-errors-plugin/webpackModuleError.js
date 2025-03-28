@@ -15,7 +15,6 @@ const _parseCss = require("./parseCss");
 const _parseScss = require("./parseScss");
 const _parseNotFoundError = require("./parseNotFoundError");
 const _iserror = /*#__PURE__*/ _interop_require_default(require("../../../../lib/is-error"));
-const _parseRSC = require("./parseRSC");
 const _parseNextFontError = require("./parseNextFontError");
 const _parseNextAppLoaderError = require("./parseNextAppLoaderError");
 const _parseNextInvalidImportError = require("./parseNextInvalidImportError");
@@ -120,10 +119,6 @@ async function getModuleBuildError(compiler, compilation, input) {
     const scss = (0, _parseScss.getScssError)(sourceFilename, sourceContent, err);
     if (scss !== false) {
         return scss;
-    }
-    const rsc = (0, _parseRSC.getRscError)(sourceFilename, err, input.module, compilation, compiler);
-    if (rsc !== false) {
-        return rsc;
     }
     const nextFont = (0, _parseNextFontError.getNextFontError)(err, input.module);
     if (nextFont !== false) {

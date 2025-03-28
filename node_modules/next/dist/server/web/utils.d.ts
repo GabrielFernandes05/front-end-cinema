@@ -24,7 +24,6 @@ export declare function toNodeOutgoingHttpHeaders(headers: Headers): OutgoingHtt
 export declare function validateURL(url: string | URL): string;
 /**
  * Normalizes `nxtP` and `nxtI` query param values to remove the prefix.
- * This function does not mutate the input key; it calls the provided function
- * with the normalized key.
+ * This function does not mutate the input key.
  */
-export declare function normalizeNextQueryParam(key: string, onKeyNormalized: (normalizedKey: string) => void): void;
+export declare function normalizeNextQueryParam(key: string): null | string;

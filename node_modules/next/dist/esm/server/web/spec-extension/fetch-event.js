@@ -50,8 +50,12 @@ export class NextFetchEvent extends FetchEvent {
    *
    * Read more: https://nextjs.org/docs/messages/middleware-new-signature
    */ get request() {
-        throw new PageSignatureError({
+        throw Object.defineProperty(new PageSignatureError({
             page: this.sourcePage
+        }), "__NEXT_ERROR_CODE", {
+            value: "E394",
+            enumerable: false,
+            configurable: true
         });
     }
     /**
@@ -59,8 +63,12 @@ export class NextFetchEvent extends FetchEvent {
    *
    * Read more: https://nextjs.org/docs/messages/middleware-new-signature
    */ respondWith() {
-        throw new PageSignatureError({
+        throw Object.defineProperty(new PageSignatureError({
             page: this.sourcePage
+        }), "__NEXT_ERROR_CODE", {
+            value: "E394",
+            enumerable: false,
+            configurable: true
         });
     }
 }

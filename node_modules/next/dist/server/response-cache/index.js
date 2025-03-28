@@ -9,10 +9,10 @@ Object.defineProperty(exports, "default", {
     }
 });
 0 && __export(require("./types"));
-const _types = _export_star(require("./types"), exports);
 const _batcher = require("../../lib/batcher");
 const _scheduler = require("../../lib/scheduler");
 const _utils = require("./utils");
+_export_star(require("./types"), exports);
 function _export_star(from, to) {
     Object.keys(from).forEach(function(k) {
         if (k !== "default" && !Object.prototype.hasOwnProperty.call(to, k)) {
@@ -73,14 +73,7 @@ class ResponseCache {
                     isFallback
                 }) : null;
                 if (cachedResponse && !isOnDemandRevalidate) {
-                    var _cachedResponse_value;
-                    if (((_cachedResponse_value = cachedResponse.value) == null ? void 0 : _cachedResponse_value.kind) === _types.CachedRouteKind.FETCH) {
-                        throw new Error(`invariant: unexpected cachedResponse of kind fetch in response cache`);
-                    }
-                    resolve({
-                        ...cachedResponse,
-                        revalidate: cachedResponse.curRevalidate
-                    });
+                    resolve(cachedResponse);
                     resolved = true;
                     if (!cachedResponse.isStale || context.isPrefetch) {
                         // The cached value is still valid, so we don't need
@@ -115,9 +108,9 @@ class ResponseCache {
                     resolve(resolveValue);
                     resolved = true;
                 }
-                // We want to persist the result only if it has a revalidate value
+                // We want to persist the result only if it has a cache control value
                 // defined.
-                if (typeof resolveValue.revalidate !== 'undefined') {
+                if (resolveValue.cacheControl) {
                     if (this.minimalMode) {
                         this.previousCacheItem = {
                             key: cacheKey,
@@ -126,7 +119,7 @@ class ResponseCache {
                         };
                     } else {
                         await incrementalCache.set(key, resolveValue.value, {
-                            revalidate: resolveValue.revalidate,
+                            cacheControl: resolveValue.cacheControl,
                             isRoutePPREnabled,
                             isFallback
                         });
@@ -134,11 +127,16 @@ class ResponseCache {
                 }
                 return resolveValue;
             } catch (err) {
-                // When a getStaticProps path is erroring we automatically re-set the
-                // existing cache under a new expiration to prevent non-stop retrying.
-                if (cachedResponse) {
+                // When a path is erroring we automatically re-set the existing cache
+                // with new revalidate and expire times to prevent non-stop retrying.
+                if (cachedResponse == null ? void 0 : cachedResponse.cacheControl) {
+                    const newRevalidate = Math.min(Math.max(cachedResponse.cacheControl.revalidate || 3, 3), 30);
+                    const newExpire = cachedResponse.cacheControl.expire === undefined ? undefined : Math.max(newRevalidate + 3, cachedResponse.cacheControl.expire);
                     await incrementalCache.set(key, cachedResponse.value, {
-                        revalidate: Math.min(Math.max(cachedResponse.revalidate || 3, 3), 30),
+                        cacheControl: {
+                            revalidate: newRevalidate,
+                            expire: newExpire
+                        },
                         isRoutePPREnabled,
                         isFallback
                     });

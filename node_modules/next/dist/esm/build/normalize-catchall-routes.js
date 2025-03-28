@@ -1,4 +1,4 @@
-import { isInterceptionRouteAppPath } from '../server/lib/interception-routes';
+import { isInterceptionRouteAppPath } from '../shared/lib/router/utils/interception-routes';
 import { AppPathnameNormalizer } from '../server/normalizers/built/app/app-pathname-normalizer';
 /**
  * This function will transform the appPaths in order to support catch-all routes and parallel routes.

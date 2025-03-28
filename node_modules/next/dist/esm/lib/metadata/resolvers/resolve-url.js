@@ -44,8 +44,8 @@ function resolveUrl(url, metadataBase) {
         metadataBase = createLocalMetadataBase();
     }
     // Handle relative or absolute paths
-    const basePath = metadataBase.pathname || '';
-    const joinedPath = path.posix.join(basePath, url);
+    const pathname = metadataBase.pathname || '';
+    const joinedPath = path.posix.join(pathname, url);
     return new URL(joinedPath, metadataBase);
 }
 // Resolve with `pathname` if `url` is a relative path.

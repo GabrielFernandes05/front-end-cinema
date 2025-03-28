@@ -176,6 +176,7 @@ async function collectNamedSlots(layoutPath) {
 // editors can provide autocompletion for them. However it's currently not
 // possible to provide the same experience for dynamic routes.
 const pluginState = (0, _buildcontext.getProxiedPluginState)({
+    collectedRootParams: {},
     routeTypes: {
         edge: {
             static: '',
@@ -315,8 +316,8 @@ function createRouteDefinitions() {
         staticRouteTypes += pluginState.routeTypes[type].static;
         dynamicRouteTypes += pluginState.routeTypes[type].dynamic;
     }
-    // If both StaticRoutes and DynamicRoutes are empty, fallback to type 'string'.
-    const routeTypesFallback = !staticRouteTypes && !dynamicRouteTypes ? 'string' : '';
+    // If both StaticRoutes and DynamicRoutes are empty, fallback to type 'string & {}'.
+    const routeTypesFallback = !staticRouteTypes && !dynamicRouteTypes ? 'string & {}' : '';
     return `// Type definitions for Next.js routes
 
 /**
@@ -494,6 +495,76 @@ function formatTimespanWithSeconds(seconds) {
     }
     return text + ' (' + descriptive + ')';
 }
+function getRootParamsFromLayouts(layouts) {
+    // Sort layouts by depth (descending)
+    const sortedLayouts = Object.entries(layouts).sort((a, b)=>b[0].split('/').length - a[0].split('/').length);
+    if (!sortedLayouts.length) {
+        return [];
+    }
+    // we assume the shorted layout path is the root layout
+    let rootLayout = sortedLayouts[sortedLayouts.length - 1][0];
+    let rootParams = new Set();
+    let isMultipleRootLayouts = false;
+    for (const [layoutPath, params] of sortedLayouts){
+        const allSegmentsAreDynamic = layoutPath.split('/').slice(1, -1)// match dynamic params but not catch-all or optional catch-all
+        .every((segment)=>/^\[[^[.\]]+\]$/.test(segment));
+        if (allSegmentsAreDynamic) {
+            if (isSubpath(rootLayout, layoutPath)) {
+                // Current path is a subpath of the root layout, update root
+                rootLayout = layoutPath;
+                rootParams = new Set(params);
+            } else {
+                // Found another potential root layout
+                isMultipleRootLayouts = true;
+                // Add any new params
+                for (const param of params){
+                    rootParams.add(param);
+                }
+            }
+        }
+    }
+    // Create result array
+    const result = Array.from(rootParams).map((param)=>({
+            param,
+            optional: isMultipleRootLayouts
+        }));
+    return result;
+}
+function isSubpath(parentLayoutPath, potentialChildLayoutPath) {
+    // we strip off the `layout` part of the path as those will always conflict with being a subpath
+    const parentSegments = parentLayoutPath.split('/').slice(1, -1);
+    const childSegments = potentialChildLayoutPath.split('/').slice(1, -1);
+    // child segments should be shorter or equal to parent segments to be a subpath
+    if (childSegments.length > parentSegments.length || !childSegments.length) return false;
+    // Verify all segment values are equal
+    return childSegments.every((childSegment, index)=>childSegment === parentSegments[index]);
+}
+function createServerDefinitions(rootParams) {
+    return `
+  declare module 'next/server' {
+
+    import type { AsyncLocalStorage as NodeAsyncLocalStorage } from 'async_hooks'
+    declare global {
+      var AsyncLocalStorage: typeof NodeAsyncLocalStorage
+    }
+    export { NextFetchEvent } from 'next/dist/server/web/spec-extension/fetch-event'
+    export { NextRequest } from 'next/dist/server/web/spec-extension/request'
+    export { NextResponse } from 'next/dist/server/web/spec-extension/response'
+    export { NextMiddleware, MiddlewareConfig } from 'next/dist/server/web/types'
+    export { userAgentFromString } from 'next/dist/server/web/spec-extension/user-agent'
+    export { userAgent } from 'next/dist/server/web/spec-extension/user-agent'
+    export { URLPattern } from 'next/dist/compiled/@edge-runtime/primitives/url'
+    export { ImageResponse } from 'next/dist/server/web/spec-extension/image-response'
+    export type { ImageResponseOptions } from 'next/dist/compiled/@vercel/og/types'
+    export { after } from 'next/dist/server/after'
+    export { connection } from 'next/dist/server/request/connection'
+    export type { UnsafeUnwrappedSearchParams } from 'next/dist/server/request/search-params'
+    export type { UnsafeUnwrappedParams } from 'next/dist/server/request/params'
+    export function unstable_rootParams(): Promise<{ ${rootParams.map(({ param, optional })=>// ensure params with dashes are valid keys
+        `${param.includes('-') ? `'${param}'` : param}${optional ? '?' : ''}: string`).join(', ')} }>
+  }
+  `;
+}
 function createCustomCacheLifeDefinitions(cacheLife) {
     let overloads = '';
     const profileNames = Object.keys(cacheLife);
@@ -555,13 +626,13 @@ function createCustomCacheLifeDefinitions(cacheLife) {
     /**
      * Cache this \`"use cache"\` using a custom timespan.
      * \`\`\`
-     *   stale: ... // seconds 
+     *   stale: ... // seconds
      *   revalidate: ... // seconds
      *   expire: ... // seconds
      * \`\`\`
-     * 
+     *
      * This is similar to Cache-Control: max-age=\`stale\`,s-max-age=\`revalidate\`,stale-while-revalidate=\`expire-revalidate\`
-     * 
+     *
      * If a value is left out, the lowest of other cacheLife() calls or the default, is used instead.
      */
     export function unstable_cacheLife(profile: {
@@ -643,7 +714,7 @@ class NextTypesPlugin {
     apply(compiler) {
         // From asset root to dist root
         const assetDirRelative = this.dev ? '..' : this.isEdgeServer ? '..' : '../..';
-        const handleModule = async (mod, assets)=>{
+        const handleModule = async (mod, compilation)=>{
             if (!mod.resource) return;
             const pageExtensionsRegex = new RegExp(`\\.(${this.pageExtensions.join('|')})$`);
             if (!pageExtensionsRegex.test(mod.resource)) return;
@@ -677,26 +748,29 @@ class NextTypesPlugin {
             // so for now we only generate “type guard files” for files that typescript can transform
             if (!IS_IMPORTABLE) return;
             if (IS_LAYOUT) {
+                const rootLayoutPath = (0, _apppaths.normalizeAppPath)((0, _ensureleadingslash.ensureLeadingSlash)((0, _entries.getPageFromPath)(_path.default.relative(this.appDir, mod.resource), this.pageExtensions)));
+                const foundParams = Array.from(rootLayoutPath.matchAll(/\[(.*?)\]/g), (match)=>match[1]);
+                pluginState.collectedRootParams[rootLayoutPath] = foundParams;
                 const slots = await collectNamedSlots(mod.resource);
-                assets[assetPath] = new _webpack.sources.RawSource(createTypeGuardFile(mod.resource, relativeImportPath, {
+                compilation.emitAsset(assetPath, new _webpack.sources.RawSource(createTypeGuardFile(mod.resource, relativeImportPath, {
                     type: 'layout',
                     slots
-                }));
+                })));
             } else if (IS_PAGE) {
-                assets[assetPath] = new _webpack.sources.RawSource(createTypeGuardFile(mod.resource, relativeImportPath, {
+                compilation.emitAsset(assetPath, new _webpack.sources.RawSource(createTypeGuardFile(mod.resource, relativeImportPath, {
                     type: 'page'
-                }));
+                })));
             } else if (IS_ROUTE) {
-                assets[assetPath] = new _webpack.sources.RawSource(createTypeGuardFile(mod.resource, relativeImportPath, {
+                compilation.emitAsset(assetPath, new _webpack.sources.RawSource(createTypeGuardFile(mod.resource, relativeImportPath, {
                     type: 'route'
-                }));
+                })));
             }
         };
         compiler.hooks.compilation.tap(PLUGIN_NAME, (compilation)=>{
             compilation.hooks.processAssets.tapAsync({
                 name: PLUGIN_NAME,
                 stage: _webpack.webpack.Compilation.PROCESS_ASSETS_STAGE_OPTIMIZE_HASH
-            }, async (assets, callback)=>{
+            }, async (_, callback)=>{
                 const promises = [];
                 // Clear routes
                 if (this.isEdgeServer) {
@@ -715,21 +789,28 @@ class NextTypesPlugin {
                         }
                         const chunkModules = compilation.chunkGraph.getChunkModulesIterable(chunk);
                         for (const mod of chunkModules){
-                            promises.push(handleModule(mod, assets));
+                            promises.push(handleModule(mod, compilation));
                             // If this is a concatenation, register each child to the parent ID.
                             const anyModule = mod;
                             if (anyModule.modules) {
                                 anyModule.modules.forEach((concatenatedMod)=>{
-                                    promises.push(handleModule(concatenatedMod, assets));
+                                    promises.push(handleModule(concatenatedMod, compilation));
                                 });
                             }
                         }
                     });
                 });
                 await Promise.all(promises);
+                const rootParams = getRootParamsFromLayouts(pluginState.collectedRootParams);
+                // If we discovered rootParams, we'll override the `next/server` types
+                // since we're able to determine the root params at build time.
+                if (rootParams.length > 0) {
+                    const serverTypesPath = _path.default.join(assetDirRelative, 'types/server.d.ts');
+                    compilation.emitAsset(serverTypesPath, new _webpack.sources.RawSource(createServerDefinitions(rootParams)));
+                }
                 // Support `"moduleResolution": "Node16" | "NodeNext"` with `"type": "module"`
                 const packageJsonAssetPath = _path.default.join(assetDirRelative, 'types/package.json');
-                assets[packageJsonAssetPath] = new _webpack.sources.RawSource('{"type": "module"}');
+                compilation.emitAsset(packageJsonAssetPath, new _webpack.sources.RawSource('{"type": "module"}'));
                 if (this.typedRoutes) {
                     if (this.dev && !this.isEdgeServer) {
                         _shared.devPageFiles.forEach((file)=>{
@@ -737,11 +818,11 @@ class NextTypesPlugin {
                         });
                     }
                     const linkAssetPath = _path.default.join(assetDirRelative, 'types/link.d.ts');
-                    assets[linkAssetPath] = new _webpack.sources.RawSource(createRouteDefinitions());
+                    compilation.emitAsset(linkAssetPath, new _webpack.sources.RawSource(createRouteDefinitions()));
                 }
                 if (this.cacheLifeConfig) {
                     const cacheLifeAssetPath = _path.default.join(assetDirRelative, 'types/cache-life.d.ts');
-                    assets[cacheLifeAssetPath] = new _webpack.sources.RawSource(createCustomCacheLifeDefinitions(this.cacheLifeConfig));
+                    compilation.emitAsset(cacheLifeAssetPath, new _webpack.sources.RawSource(createCustomCacheLifeDefinitions(this.cacheLifeConfig)));
                 }
                 callback();
             });

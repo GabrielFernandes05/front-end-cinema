@@ -1,3 +1,4 @@
+import { getRequestMeta } from '../request-meta';
 /**
  * The I18NProvider is used to match locale aware routes, detect the locale from
  * the pathname and hostname and normalize the pathname by removing the locale
@@ -7,7 +8,11 @@
         var _config_domains;
         this.config = config;
         if (!config.locales.length) {
-            throw new Error('Invariant: No locales provided');
+            throw Object.defineProperty(new Error('Invariant: No locales provided'), "__NEXT_ERROR_CODE", {
+                value: "E510",
+                enumerable: false,
+                configurable: true
+            });
         }
         this.lowerCaseLocales = config.locales.map((locale)=>locale.toLowerCase());
         this.lowerCaseDomains = (_config_domains = config.domains) == null ? void 0 : _config_domains.map((domainLocale)=>{
@@ -48,11 +53,11 @@
    * Pulls the pre-computed locale and inference results from the query
    * object.
    *
+   * @param req the request object
    * @param pathname the pathname that could contain a locale prefix
-   * @param query the query object
    * @returns the locale analysis result
-   */ fromQuery(pathname, query) {
-        const detectedLocale = query.__nextLocale;
+   */ fromRequest(req, pathname) {
+        const detectedLocale = getRequestMeta(req, 'locale');
         // If a locale was detected on the query, analyze the pathname to ensure
         // that the locale matches.
         if (detectedLocale) {
@@ -61,7 +66,11 @@
             // query and strip it from the pathname.
             if (analysis.detectedLocale) {
                 if (analysis.detectedLocale !== detectedLocale) {
-                    throw new Error(`Invariant: The detected locale does not match the locale in the query. Expected to find '${detectedLocale}' in '${pathname}' but found '${analysis.detectedLocale}'}`);
+                    throw Object.defineProperty(new Error(`Invariant: The detected locale does not match the locale in the query. Expected to find '${detectedLocale}' in '${pathname}' but found '${analysis.detectedLocale}'}`), "__NEXT_ERROR_CODE", {
+                        value: "E517",
+                        enumerable: false,
+                        configurable: true
+                    });
                 }
                 pathname = analysis.pathname;
             }
@@ -69,30 +78,8 @@
         return {
             pathname,
             detectedLocale,
-            inferredFromDefault: query.__nextInferredLocaleFromDefault === '1'
+            inferredFromDefault: getRequestMeta(req, 'localeInferredFromDefault') ?? false
         };
-    }
-    /**
-   * Validates that the locale is valid.
-   *
-   * @param locale The locale to validate.
-   * @returns `true` if the locale is valid, `false` otherwise.
-   */ validate(locale) {
-        return this.lowerCaseLocales.includes(locale.toLowerCase());
-    }
-    /**
-   * Validates that the locales in the query object are valid.
-   *
-   * @param query The query object to validate.
-   * @returns `true` if the locale is valid, `false` otherwise.
-   */ validateQuery(query) {
-        if (query.__nextLocale && !this.validate(query.__nextLocale)) {
-            return false;
-        }
-        if (query.__nextDefaultLocale && !this.validate(query.__nextDefaultLocale)) {
-            return false;
-        }
-        return true;
     }
     /**
    * Analyzes the pathname for a locale and returns the pathname without it.

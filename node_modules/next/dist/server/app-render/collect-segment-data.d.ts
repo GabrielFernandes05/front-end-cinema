@@ -1,20 +1,20 @@
-import type { Segment } from './types';
+import type { Segment as FlightRouterStateSegment } from './types';
 import type { ManifestNode } from '../../build/webpack/plugins/flight-manifest-plugin';
-import type { LoadingModuleData } from '../../shared/lib/app-router-context.shared-runtime';
+import type { HeadData, LoadingModuleData } from '../../shared/lib/app-router-context.shared-runtime';
+import type { FallbackRouteParams } from '../request/fallback-params';
 export type RootTreePrefetch = {
     buildId: string;
     tree: TreePrefetch;
-    head: React.ReactNode | null;
+    head: HeadData;
     isHeadPartial: boolean;
     staleTime: number;
 };
 export type TreePrefetch = {
-    token: string;
-    path: string;
+    segment: FlightRouterStateSegment;
     slots: null | {
         [parallelRouteKey: string]: TreePrefetch;
     };
-    extra: [segment: Segment, isRootLayout: boolean];
+    isRootLayout: boolean;
 };
 export type SegmentPrefetch = {
     buildId: string;
@@ -22,4 +22,4 @@ export type SegmentPrefetch = {
     loading: LoadingModuleData | Promise<LoadingModuleData>;
     isPartial: boolean;
 };
-export declare function collectSegmentData(fullPageDataBuffer: Buffer, staleTime: number, clientModules: ManifestNode, serverConsumerManifest: any): Promise<Map<string, Buffer>>;
+export declare function collectSegmentData(shouldAssumePartialData: boolean, fullPageDataBuffer: Buffer, staleTime: number, clientModules: ManifestNode, serverConsumerManifest: any, fallbackRouteParams: FallbackRouteParams | null): Promise<Map<string, Buffer>>;

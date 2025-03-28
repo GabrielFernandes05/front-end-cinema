@@ -1,7 +1,7 @@
 import { compile, pathToRegexp } from 'next/dist/compiled/path-to-regexp';
 import { escapeStringRegexp } from '../../escape-regexp';
 import { parseUrl } from './parse-url';
-import { INTERCEPTION_ROUTE_MARKERS, isInterceptionRouteAppPath } from '../../../../server/lib/interception-routes';
+import { INTERCEPTION_ROUTE_MARKERS, isInterceptionRouteAppPath } from './interception-routes';
 import { NEXT_RSC_UNION_QUERY } from '../../../../client/components/app-router-headers';
 import { getCookieParser } from '../../../../server/api-utils/get-cookie-parser';
 /**
@@ -110,31 +110,64 @@ export function compileNonPath(value, params) {
         validate: false
     })(params).slice(1);
 }
-export function prepareDestination(args) {
-    const query = Object.assign({}, args.query);
-    delete query.__nextLocale;
-    delete query.__nextDefaultLocale;
-    delete query.__nextDataReq;
-    delete query.__nextInferredLocaleFromDefault;
-    delete query[NEXT_RSC_UNION_QUERY];
-    let escapedDestination = args.destination;
+export function parseDestination(args) {
+    let escaped = args.destination;
     for (const param of Object.keys({
         ...args.params,
-        ...query
+        ...args.query
     })){
-        escapedDestination = param ? escapeSegment(escapedDestination, param) : escapedDestination;
+        if (!param) continue;
+        escaped = escapeSegment(escaped, param);
     }
-    const parsedDestination = parseUrl(escapedDestination);
-    const destQuery = parsedDestination.query;
-    const destPath = unescapeSegments("" + parsedDestination.pathname + (parsedDestination.hash || ''));
-    const destHostname = unescapeSegments(parsedDestination.hostname || '');
-    const destPathParamKeys = [];
-    const destHostnameParamKeys = [];
-    pathToRegexp(destPath, destPathParamKeys);
-    pathToRegexp(destHostname, destHostnameParamKeys);
+    const parsed = parseUrl(escaped);
+    let pathname = parsed.pathname;
+    if (pathname) {
+        pathname = unescapeSegments(pathname);
+    }
+    let href = parsed.href;
+    if (href) {
+        href = unescapeSegments(href);
+    }
+    let hostname = parsed.hostname;
+    if (hostname) {
+        hostname = unescapeSegments(hostname);
+    }
+    let hash = parsed.hash;
+    if (hash) {
+        hash = unescapeSegments(hash);
+    }
+    return {
+        ...parsed,
+        pathname,
+        hostname,
+        href,
+        hash
+    };
+}
+export function prepareDestination(args) {
+    const query = Object.assign({}, args.query);
+    delete query[NEXT_RSC_UNION_QUERY];
+    const parsedDestination = parseDestination(args);
+    const { hostname: destHostname, query: destQuery } = parsedDestination;
+    // The following code assumes that the pathname here includes the hash if it's
+    // present.
+    let destPath = parsedDestination.pathname;
+    if (parsedDestination.hash) {
+        destPath = "" + destPath + parsedDestination.hash;
+    }
     const destParams = [];
-    destPathParamKeys.forEach((key)=>destParams.push(key.name));
-    destHostnameParamKeys.forEach((key)=>destParams.push(key.name));
+    const destPathParamKeys = [];
+    pathToRegexp(destPath, destPathParamKeys);
+    for (const key of destPathParamKeys){
+        destParams.push(key.name);
+    }
+    if (destHostname) {
+        const destHostnameParamKeys = [];
+        pathToRegexp(destHostname, destHostnameParamKeys);
+        for (const key of destHostnameParamKeys){
+            destParams.push(key.name);
+        }
+    }
     const destPathCompiler = compile(destPath, // we don't validate while compiling the destination since we should
     // have already validated before we got to this point and validating
     // breaks compiling destinations with named pattern params from the source
@@ -144,9 +177,12 @@ export function prepareDestination(args) {
     {
         validate: false
     });
-    const destHostnameCompiler = compile(destHostname, {
-        validate: false
-    });
+    let destHostnameCompiler;
+    if (destHostname) {
+        destHostnameCompiler = compile(destHostname, {
+            validate: false
+        });
+    }
     // update any params in query values
     for (const [key, strOrArray] of Object.entries(destQuery)){
         // the value needs to start with a forward-slash to be compiled
@@ -187,13 +223,19 @@ export function prepareDestination(args) {
     try {
         newUrl = destPathCompiler(args.params);
         const [pathname, hash] = newUrl.split('#', 2);
-        parsedDestination.hostname = destHostnameCompiler(args.params);
+        if (destHostnameCompiler) {
+            parsedDestination.hostname = destHostnameCompiler(args.params);
+        }
         parsedDestination.pathname = pathname;
         parsedDestination.hash = "" + (hash ? '#' : '') + (hash || '');
         delete parsedDestination.search;
     } catch (err) {
         if (err.message.match(/Expected .*? to not repeat, but got an array/)) {
-            throw new Error("To use a multi-match in the destination you must add `*` at the end of the param name to signify it should repeat. https://nextjs.org/docs/messages/invalid-multi-match");
+            throw Object.defineProperty(new Error("To use a multi-match in the destination you must add `*` at the end of the param name to signify it should repeat. https://nextjs.org/docs/messages/invalid-multi-match"), "__NEXT_ERROR_CODE", {
+                value: "E329",
+                enumerable: false,
+                configurable: true
+            });
         }
         throw err;
     }

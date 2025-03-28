@@ -37,4 +37,5 @@ export interface RequestInit extends globalThis.RequestInit {
         trailingSlash?: boolean;
     };
     signal?: AbortSignal;
+    duplex?: 'half';
 }

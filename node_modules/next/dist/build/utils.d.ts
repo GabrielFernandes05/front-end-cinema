@@ -1,21 +1,21 @@
-import type { NextConfig, NextConfigComplete } from '../server/config-shared';
+import type { NextConfigComplete } from '../server/config-shared';
 import type { ExperimentalPPRConfig } from '../server/lib/experimental/ppr';
 import type { AppBuildManifest } from './webpack/plugins/app-build-manifest-plugin';
-import type { GetStaticPaths, GetStaticPathsResult, ServerRuntime } from '../types';
+import type { ServerRuntime } from '../types';
 import type { BuildManifest } from '../server/get-page-files';
 import type { CustomRoutes } from '../lib/load-custom-routes';
 import type { MiddlewareManifest } from './webpack/plugins/middleware-plugin';
 import type { WebpackLayerName } from '../lib/constants';
-import type { AppPageModule } from '../server/route-modules/app-page/module';
 import '../server/require-hook';
 import '../server/node-polyfill-crypto';
 import '../server/node-environment';
-import { IncrementalCache } from '../server/lib/incremental-cache';
 import type { PageExtensions } from './page-extensions-type';
-import { FallbackMode } from '../lib/fallback';
+import type { FallbackMode } from '../lib/fallback';
 import type { OutgoingHttpHeaders } from 'http';
 import type { AppSegmentConfig } from './segment-config/app/app-segment-config';
 import type { AppSegment } from './segment-config/app/app-segments';
+import type { PrerenderedRoute } from './static-paths/types';
+import type { CacheControl } from '../server/lib/cache-control';
 export type ROUTER_TYPE = 'pages' | 'app';
 export declare function unique<T>(main: ReadonlyArray<T>, sub: ReadonlyArray<T>): T[];
 export declare function difference<T>(main: ReadonlyArray<T> | ReadonlySet<T>, sub: ReadonlyArray<T> | ReadonlySet<T>): T[];
@@ -53,7 +53,7 @@ export interface PageInfo {
      */
     isRoutePPREnabled: boolean;
     ssgPageRoutes: string[] | null;
-    initialRevalidateSeconds: number | false;
+    initialCacheControl: CacheControl | undefined;
     pageDuration: number | undefined;
     ssgPageDurations: number[] | undefined;
     runtime: ServerRuntime;
@@ -82,54 +82,6 @@ export declare function printTreeView(lists: {
 }): Promise<void>;
 export declare function printCustomRoutes({ redirects, rewrites, headers, }: CustomRoutes): void;
 export declare function getJsPageSizeInKb(routerType: ROUTER_TYPE, page: string, distPath: string, buildManifest: BuildManifest, appBuildManifest?: AppBuildManifest, gzipSize?: boolean, cachedStats?: ComputeFilesManifestResult): Promise<[number, number]>;
-type StaticPrerenderedRoute = {
-    path: string;
-    encoded: string;
-    fallbackRouteParams: undefined;
-};
-type FallbackPrerenderedRoute = {
-    path: string;
-    encoded: string;
-    fallbackRouteParams: readonly string[];
-};
-export type PrerenderedRoute = StaticPrerenderedRoute | FallbackPrerenderedRoute;
-export type StaticPathsResult = {
-    fallbackMode: FallbackMode;
-    prerenderedRoutes: PrerenderedRoute[];
-};
-export declare function buildStaticPaths({ page, getStaticPaths, staticPathsResult, configFileName, locales, defaultLocale, appDir, }: {
-    page: string;
-    getStaticPaths?: GetStaticPaths;
-    staticPathsResult?: GetStaticPathsResult;
-    configFileName: string;
-    locales?: string[];
-    defaultLocale?: string;
-    appDir?: boolean;
-}): Promise<StaticPathsResult>;
-export type PartialStaticPathsResult = {
-    [P in keyof StaticPathsResult]: StaticPathsResult[P] | undefined;
-};
-export declare function buildAppStaticPaths({ dir, page, distDir, dynamicIO, authInterrupts, configFileName, segments, isrFlushToDisk, cacheHandler, cacheLifeProfiles, requestHeaders, maxMemoryCacheSize, fetchCacheKeyPrefix, nextConfigOutput, ComponentMod, isRoutePPREnabled, buildId, }: {
-    dir: string;
-    page: string;
-    dynamicIO: boolean;
-    authInterrupts: boolean;
-    configFileName: string;
-    segments: AppSegment[];
-    distDir: string;
-    isrFlushToDisk?: boolean;
-    fetchCacheKeyPrefix?: string;
-    cacheHandler?: string;
-    cacheLifeProfiles?: {
-        [profile: string]: import('../server/use-cache/cache-life').CacheLife;
-    };
-    maxMemoryCacheSize?: number;
-    requestHeaders: IncrementalCache['requestHeaders'];
-    nextConfigOutput: 'standalone' | 'export' | undefined;
-    ComponentMod: AppPageModule;
-    isRoutePPREnabled: boolean | undefined;
-    buildId: string;
-}): Promise<PartialStaticPathsResult>;
 type PageIsStaticResult = {
     isRoutePPREnabled?: boolean;
     isStatic?: boolean;
@@ -139,12 +91,13 @@ type PageIsStaticResult = {
     hasStaticProps?: boolean;
     prerenderedRoutes: PrerenderedRoute[] | undefined;
     prerenderFallbackMode: FallbackMode | undefined;
+    rootParamKeys: readonly string[] | undefined;
     isNextImageImported?: boolean;
     traceIncludes?: string[];
     traceExcludes?: string[];
     appConfig?: AppSegmentConfig;
 };
-export declare function isPageStatic({ dir, page, distDir, configFileName, runtimeEnvConfig, httpAgentOptions, locales, defaultLocale, parentId, pageRuntime, edgeInfo, pageType, dynamicIO, authInterrupts, originalAppPath, isrFlushToDisk, maxMemoryCacheSize, nextConfigOutput, cacheHandler, cacheHandlers, cacheLifeProfiles, pprConfig, buildId, }: {
+export declare function isPageStatic({ dir, page, distDir, configFileName, runtimeEnvConfig, httpAgentOptions, locales, defaultLocale, parentId, pageRuntime, edgeInfo, pageType, dynamicIO, authInterrupts, originalAppPath, isrFlushToDisk, maxMemoryCacheSize, nextConfigOutput, cacheHandler, cacheHandlers, cacheLifeProfiles, pprConfig, buildId, sriEnabled, }: {
     dir: string;
     page: string;
     distDir: string;
@@ -153,7 +106,7 @@ export declare function isPageStatic({ dir, page, distDir, configFileName, runti
     configFileName: string;
     runtimeEnvConfig: any;
     httpAgentOptions: NextConfigComplete['httpAgentOptions'];
-    locales?: string[];
+    locales?: readonly string[];
     defaultLocale?: string;
     parentId?: any;
     edgeInfo?: any;
@@ -170,6 +123,7 @@ export declare function isPageStatic({ dir, page, distDir, configFileName, runti
     nextConfigOutput: 'standalone' | 'export' | undefined;
     pprConfig: ExperimentalPPRConfig | undefined;
     buildId: string;
+    sriEnabled: boolean;
 }): Promise<PageIsStaticResult>;
 type ReducedAppConfig = Pick<AppSegmentConfig, 'revalidate' | 'dynamic' | 'fetchCache' | 'preferredRegion' | 'experimental_ppr' | 'runtime' | 'maxDuration'>;
 /**
@@ -180,19 +134,21 @@ type ReducedAppConfig = Pick<AppSegmentConfig, 'revalidate' | 'dynamic' | 'fetch
  * @returns the reduced app config
  */
 export declare function reduceAppConfig(segments: Pick<AppSegment, 'config'>[]): ReducedAppConfig;
-export declare function hasCustomGetInitialProps({ page, distDir, runtimeEnvConfig, checkingApp, }: {
+export declare function hasCustomGetInitialProps({ page, distDir, runtimeEnvConfig, checkingApp, sriEnabled, }: {
     page: string;
     distDir: string;
     runtimeEnvConfig: any;
     checkingApp: boolean;
+    sriEnabled: boolean;
 }): Promise<boolean>;
-export declare function getDefinedNamedExports({ page, distDir, runtimeEnvConfig, }: {
+export declare function getDefinedNamedExports({ page, distDir, runtimeEnvConfig, sriEnabled, }: {
     page: string;
     distDir: string;
     runtimeEnvConfig: any;
+    sriEnabled: boolean;
 }): Promise<ReadonlyArray<string>>;
 export declare function detectConflictingPaths(combinedPages: string[], ssgPages: Set<string>, additionalGeneratedSSGPaths: Map<string, string[]>): void;
-export declare function copyTracedFiles(dir: string, distDir: string, pageKeys: readonly string[], appPageKeys: readonly string[] | undefined, tracingRoot: string, serverConfig: NextConfig, middlewareManifest: MiddlewareManifest, hasInstrumentationHook: boolean, staticPages: Set<string>): Promise<void>;
+export declare function copyTracedFiles(dir: string, distDir: string, pageKeys: readonly string[], appPageKeys: readonly string[] | undefined, tracingRoot: string, serverConfig: NextConfigComplete, middlewareManifest: MiddlewareManifest, hasNodeMiddleware: boolean, hasInstrumentationHook: boolean, staticPages: Set<string>): Promise<void>;
 export declare function isReservedPage(page: string): boolean;
 export declare function isAppBuiltinNotFoundPage(page: string): boolean;
 export declare function isCustomErrorPage(page: string): page is "/500" | "/404";

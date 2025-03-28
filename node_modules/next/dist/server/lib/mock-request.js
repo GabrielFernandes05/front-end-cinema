@@ -40,7 +40,11 @@ class MockedRequest extends _stream.default.Readable {
         this.socket = new Proxy({}, {
             get: (_target, prop)=>{
                 if (prop !== 'encrypted' && prop !== 'remoteAddress') {
-                    throw new Error('Method not implemented');
+                    throw Object.defineProperty(new Error('Method not implemented'), "__NEXT_ERROR_CODE", {
+                        value: "E52",
+                        enumerable: false,
+                        configurable: true
+                    });
                 }
                 if (prop === 'remoteAddress') return undefined;
                 // For this mock request, always ensure we just respond with the encrypted
@@ -88,25 +92,53 @@ class MockedRequest extends _stream.default.Readable {
     // The following methods are not implemented as they are not used in the
     // Next.js codebase.
     get aborted() {
-        throw new Error('Method not implemented');
+        throw Object.defineProperty(new Error('Method not implemented'), "__NEXT_ERROR_CODE", {
+            value: "E52",
+            enumerable: false,
+            configurable: true
+        });
     }
     get complete() {
-        throw new Error('Method not implemented');
+        throw Object.defineProperty(new Error('Method not implemented'), "__NEXT_ERROR_CODE", {
+            value: "E52",
+            enumerable: false,
+            configurable: true
+        });
     }
     get trailers() {
-        throw new Error('Method not implemented');
+        throw Object.defineProperty(new Error('Method not implemented'), "__NEXT_ERROR_CODE", {
+            value: "E52",
+            enumerable: false,
+            configurable: true
+        });
     }
     get trailersDistinct() {
-        throw new Error('Method not implemented');
+        throw Object.defineProperty(new Error('Method not implemented'), "__NEXT_ERROR_CODE", {
+            value: "E52",
+            enumerable: false,
+            configurable: true
+        });
     }
     get rawTrailers() {
-        throw new Error('Method not implemented');
+        throw Object.defineProperty(new Error('Method not implemented'), "__NEXT_ERROR_CODE", {
+            value: "E52",
+            enumerable: false,
+            configurable: true
+        });
     }
     get rawHeaders() {
-        throw new Error('Method not implemented.');
+        throw Object.defineProperty(new Error('Method not implemented.'), "__NEXT_ERROR_CODE", {
+            value: "E41",
+            enumerable: false,
+            configurable: true
+        });
     }
     setTimeout() {
-        throw new Error('Method not implemented.');
+        throw Object.defineProperty(new Error('Method not implemented.'), "__NEXT_ERROR_CODE", {
+            value: "E41",
+            enumerable: false,
+            configurable: true
+        });
     }
 }
 class MockedResponse extends _stream.default.Writable {
@@ -260,49 +292,109 @@ class MockedResponse extends _stream.default.Writable {
     // The following methods are not implemented as they are not used in the
     // Next.js codebase.
     get strictContentLength() {
-        throw new Error('Method not implemented.');
+        throw Object.defineProperty(new Error('Method not implemented.'), "__NEXT_ERROR_CODE", {
+            value: "E41",
+            enumerable: false,
+            configurable: true
+        });
     }
     writeEarlyHints() {
-        throw new Error('Method not implemented.');
+        throw Object.defineProperty(new Error('Method not implemented.'), "__NEXT_ERROR_CODE", {
+            value: "E41",
+            enumerable: false,
+            configurable: true
+        });
     }
     get req() {
-        throw new Error('Method not implemented.');
+        throw Object.defineProperty(new Error('Method not implemented.'), "__NEXT_ERROR_CODE", {
+            value: "E41",
+            enumerable: false,
+            configurable: true
+        });
     }
     assignSocket() {
-        throw new Error('Method not implemented.');
+        throw Object.defineProperty(new Error('Method not implemented.'), "__NEXT_ERROR_CODE", {
+            value: "E41",
+            enumerable: false,
+            configurable: true
+        });
     }
     detachSocket() {
-        throw new Error('Method not implemented.');
+        throw Object.defineProperty(new Error('Method not implemented.'), "__NEXT_ERROR_CODE", {
+            value: "E41",
+            enumerable: false,
+            configurable: true
+        });
     }
     writeContinue() {
-        throw new Error('Method not implemented.');
+        throw Object.defineProperty(new Error('Method not implemented.'), "__NEXT_ERROR_CODE", {
+            value: "E41",
+            enumerable: false,
+            configurable: true
+        });
     }
     writeProcessing() {
-        throw new Error('Method not implemented.');
+        throw Object.defineProperty(new Error('Method not implemented.'), "__NEXT_ERROR_CODE", {
+            value: "E41",
+            enumerable: false,
+            configurable: true
+        });
     }
     get upgrading() {
-        throw new Error('Method not implemented.');
+        throw Object.defineProperty(new Error('Method not implemented.'), "__NEXT_ERROR_CODE", {
+            value: "E41",
+            enumerable: false,
+            configurable: true
+        });
     }
     get chunkedEncoding() {
-        throw new Error('Method not implemented.');
+        throw Object.defineProperty(new Error('Method not implemented.'), "__NEXT_ERROR_CODE", {
+            value: "E41",
+            enumerable: false,
+            configurable: true
+        });
     }
     get shouldKeepAlive() {
-        throw new Error('Method not implemented.');
+        throw Object.defineProperty(new Error('Method not implemented.'), "__NEXT_ERROR_CODE", {
+            value: "E41",
+            enumerable: false,
+            configurable: true
+        });
     }
     get useChunkedEncodingByDefault() {
-        throw new Error('Method not implemented.');
+        throw Object.defineProperty(new Error('Method not implemented.'), "__NEXT_ERROR_CODE", {
+            value: "E41",
+            enumerable: false,
+            configurable: true
+        });
     }
     get sendDate() {
-        throw new Error('Method not implemented.');
+        throw Object.defineProperty(new Error('Method not implemented.'), "__NEXT_ERROR_CODE", {
+            value: "E41",
+            enumerable: false,
+            configurable: true
+        });
     }
     setTimeout() {
-        throw new Error('Method not implemented.');
+        throw Object.defineProperty(new Error('Method not implemented.'), "__NEXT_ERROR_CODE", {
+            value: "E41",
+            enumerable: false,
+            configurable: true
+        });
     }
     addTrailers() {
-        throw new Error('Method not implemented.');
+        throw Object.defineProperty(new Error('Method not implemented.'), "__NEXT_ERROR_CODE", {
+            value: "E41",
+            enumerable: false,
+            configurable: true
+        });
     }
     setHeaders() {
-        throw new Error('Method not implemented.');
+        throw Object.defineProperty(new Error('Method not implemented.'), "__NEXT_ERROR_CODE", {
+            value: "E41",
+            enumerable: false,
+            configurable: true
+        });
     }
 }
 function createRequestResponseMocks({ url, headers = {}, method = 'GET', bodyReadable, resWriter, socket = null }) {

@@ -13,7 +13,11 @@ export function clearModuleContext(target) {
 export async function getServerField(dir, field) {
     const initialization = await initializations[dir];
     if (!initialization) {
-        throw new Error('Invariant cant propagate server field, no app initialized');
+        throw Object.defineProperty(new Error('Invariant cant propagate server field, no app initialized'), "__NEXT_ERROR_CODE", {
+            value: "E116",
+            enumerable: false,
+            configurable: true
+        });
     }
     const { server } = initialization;
     let wrappedServer = server['server']// NextServer.server is private
@@ -23,7 +27,11 @@ export async function getServerField(dir, field) {
 export async function propagateServerField(dir, field, value) {
     const initialization = await initializations[dir];
     if (!initialization) {
-        throw new Error('Invariant cant propagate server field, no app initialized');
+        throw Object.defineProperty(new Error('Invariant cant propagate server field, no app initialized'), "__NEXT_ERROR_CODE", {
+            value: "E116",
+            enumerable: false,
+            configurable: true
+        });
     }
     const { server } = initialization;
     let wrappedServer = server['server'];
@@ -59,7 +67,11 @@ async function initializeImpl(opts) {
     return {
         requestHandler,
         upgradeHandler,
-        server
+        server,
+        closeUpgraded () {
+            var _opts_bundlerService;
+            (_opts_bundlerService = opts.bundlerService) == null ? void 0 : _opts_bundlerService.close();
+        }
     };
 }
 export async function initialize(opts) {

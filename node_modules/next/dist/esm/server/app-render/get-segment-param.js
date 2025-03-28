@@ -1,4 +1,4 @@
-import { INTERCEPTION_ROUTE_MARKERS } from '../lib/interception-routes';
+import { INTERCEPTION_ROUTE_MARKERS } from '../../shared/lib/router/utils/interception-routes';
 /**
  * Parse dynamic route segment to type of parameter
  */ export function getSegmentParam(segment) {

@@ -2,6 +2,7 @@ import '../../server/web/globals';
 import { adapter } from '../../server/web/adapter';
 import { getRender } from '../webpack/loaders/next-edge-ssr-loader/render';
 import { IncrementalCache } from '../../server/lib/incremental-cache';
+import { initializeCacheHandlers } from '../../server/use-cache/handlers';
 import Document from 'VAR_MODULE_DOCUMENT';
 import * as appMod from 'VAR_MODULE_APP';
 import * as userlandPage from 'VAR_USERLAND';
@@ -19,11 +20,8 @@ import RouteModule from '../../server/route-modules/pages/module';
 // INJECT:pageRouteModuleOptions
 // INJECT:errorRouteModuleOptions
 // INJECT:user500RouteModuleOptions
-const cacheHandlers = {};
-if (!globalThis.__nextCacheHandlers) {
-    ;
-    globalThis.__nextCacheHandlers = cacheHandlers;
-}
+// Initialize the cache handlers interface.
+initializeCacheHandlers();
 const pageMod = {
     ...userlandPage,
     routeModule: new RouteModule({

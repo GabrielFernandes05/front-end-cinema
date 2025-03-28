@@ -18,7 +18,11 @@ function getBinaryName() {
     if (platform === 'linux') {
         return `mkcert-${MKCERT_VERSION}-linux-${arch}`;
     }
-    throw new Error(`Unsupported platform: ${platform}`);
+    throw Object.defineProperty(new Error(`Unsupported platform: ${platform}`), "__NEXT_ERROR_CODE", {
+        value: "E141",
+        enumerable: false,
+        configurable: true
+    });
 }
 async function downloadBinary() {
     try {
@@ -35,7 +39,11 @@ async function downloadBinary() {
         Log.info(`Downloading mkcert package...`);
         const response = await fetch(downloadUrl);
         if (!response.ok || !response.body) {
-            throw new Error(`request failed with status ${response.status}`);
+            throw Object.defineProperty(new Error(`request failed with status ${response.status}`), "__NEXT_ERROR_CODE", {
+                value: "E109",
+                enumerable: false,
+                configurable: true
+            });
         }
         Log.info(`Download response was successful, writing to disk`);
         const binaryWriteStream = fs.createWriteStream(binaryPath);
@@ -72,7 +80,11 @@ async function downloadBinary() {
 export async function createSelfSignedCertificate(host, certDir = 'certificates') {
     try {
         const binaryPath = await downloadBinary();
-        if (!binaryPath) throw new Error('missing mkcert binary');
+        if (!binaryPath) throw Object.defineProperty(new Error('missing mkcert binary'), "__NEXT_ERROR_CODE", {
+            value: "E198",
+            enumerable: false,
+            configurable: true
+        });
         const resolvedCertDir = path.resolve(process.cwd(), `./${certDir}`);
         await fs.promises.mkdir(resolvedCertDir, {
             recursive: true
@@ -107,7 +119,11 @@ export async function createSelfSignedCertificate(host, certDir = 'certificates'
         });
         const caLocation = execSync(`"${binaryPath}" -CAROOT`).toString().trim();
         if (!fs.existsSync(keyPath) || !fs.existsSync(certPath)) {
-            throw new Error('Certificate files not found');
+            throw Object.defineProperty(new Error('Certificate files not found'), "__NEXT_ERROR_CODE", {
+                value: "E131",
+                enumerable: false,
+                configurable: true
+            });
         }
         Log.info(`CA Root certificate created in ${caLocation}`);
         Log.info(`Certificates created in ${resolvedCertDir}`);

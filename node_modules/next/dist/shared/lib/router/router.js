@@ -60,7 +60,11 @@ const _interpolateas = require("./utils/interpolate-as");
 const _handlesmoothscroll = require("./utils/handle-smooth-scroll");
 const _constants = require("../../../lib/constants");
 function buildCancellationError() {
-    return Object.assign(new Error('Route Cancelled'), {
+    return Object.assign(Object.defineProperty(new Error('Route Cancelled'), "__NEXT_ERROR_CODE", {
+        value: "E315",
+        enumerable: false,
+        configurable: true
+    }), {
         cancelled: true
     });
 }
@@ -278,6 +282,8 @@ function fetchNextData(param) {
                 purpose: 'prefetch'
             } : {}, isPrefetch && hasMiddleware ? {
                 'x-middleware-prefetch': '1'
+            } : {}, process.env.NEXT_DEPLOYMENT_ID ? {
+                'x-deployment-id': process.env.NEXT_DEPLOYMENT_ID
             } : {}),
             method: (_params_method = params == null ? void 0 : params.method) != null ? _params_method : 'GET'
         }).then((response)=>{
@@ -325,7 +331,11 @@ function fetchNextData(param) {
                             };
                         }
                     }
-                    const error = new Error("Failed to load static props");
+                    const error = Object.defineProperty(new Error("Failed to load static props"), "__NEXT_ERROR_CODE", {
+                        value: "E124",
+                        enumerable: false,
+                        configurable: true
+                    });
                     /**
              * We should only trigger a server-side transition if this was
              * caused on a client-side transition. Otherwise, we'd get into
@@ -389,7 +399,11 @@ function handleHardNavigation(param) {
     // ensure we don't trigger a hard navigation to the same
     // URL as this can end up with an infinite refresh
     if (url === (0, _addbasepath.addBasePath)((0, _addlocale.addLocale)(router.asPath, router.locale))) {
-        throw new Error("Invariant: attempted to hard navigate to the same URL " + url + " " + location.href);
+        throw Object.defineProperty(new Error("Invariant: attempted to hard navigate to the same URL " + url + " " + location.href), "__NEXT_ERROR_CODE", {
+            value: "E282",
+            enumerable: false,
+            configurable: true
+        });
     }
     window.location.href = url;
 }
@@ -401,7 +415,11 @@ const getCancelledHandler = (param)=>{
     };
     const handleCancelled = ()=>{
         if (cancelled) {
-            const error = new Error('Abort fetching component for route: "' + route + '"');
+            const error = Object.defineProperty(new Error('Abort fetching component for route: "' + route + '"'), "__NEXT_ERROR_CODE", {
+                value: "E483",
+                enumerable: false,
+                configurable: true
+            });
             error.cancelled = true;
             throw error;
         }
@@ -775,7 +793,11 @@ class Router {
         }
         if (!(0, _islocalurl.isLocalURL)(as)) {
             if (process.env.NODE_ENV !== 'production') {
-                throw new Error('Invalid href: "' + url + '" and as: "' + as + '", received relative href and external as' + "\nSee more info: https://nextjs.org/docs/messages/invalid-relative-url-external-as");
+                throw Object.defineProperty(new Error('Invalid href: "' + url + '" and as: "' + as + '", received relative href and external as' + "\nSee more info: https://nextjs.org/docs/messages/invalid-relative-url-external-as"), "__NEXT_ERROR_CODE", {
+                    value: "E380",
+                    enumerable: false,
+                    configurable: true
+                });
             }
             handleHardNavigation({
                 url: as,
@@ -799,7 +821,11 @@ class Router {
                     if (process.env.NODE_ENV !== 'production') {
                         console.warn("" + (shouldInterpolate ? "Interpolating href" : "Mismatching `as` and `href`") + " failed to manually provide " + ("the params: " + missingParams.join(', ') + " in the `href`'s `query`"));
                     }
-                    throw new Error((shouldInterpolate ? "The provided `href` (" + url + ") value is missing query values (" + missingParams.join(', ') + ") to be interpolated properly. " : "The provided `as` value (" + asPathname + ") is incompatible with the `href` value (" + route + "). ") + ("Read more: https://nextjs.org/docs/messages/" + (shouldInterpolate ? 'href-interpolation-failed' : 'incompatible-href-as')));
+                    throw Object.defineProperty(new Error((shouldInterpolate ? "The provided `href` (" + url + ") value is missing query values (" + missingParams.join(', ') + ") to be interpolated properly. " : "The provided `as` value (" + asPathname + ") is incompatible with the `href` value (" + route + "). ") + ("Read more: https://nextjs.org/docs/messages/" + (shouldInterpolate ? 'href-interpolation-failed' : 'incompatible-href-as'))), "__NEXT_ERROR_CODE", {
+                        value: "E344",
+                        enumerable: false,
+                        configurable: true
+                    });
                 }
             } else if (shouldInterpolate) {
                 as = (0, _formaturl.formatWithValidation)(Object.assign({}, parsedAs, {
@@ -930,7 +956,11 @@ class Router {
                         isNotFound: true
                     });
                     if ('type' in routeInfo) {
-                        throw new Error("Unexpected middleware effect on /404");
+                        throw Object.defineProperty(new Error("Unexpected middleware effect on /404"), "__NEXT_ERROR_CODE", {
+                            value: "E158",
+                            enumerable: false,
+                            configurable: true
+                        });
                     }
                 }
             }
@@ -979,7 +1009,11 @@ class Router {
                     isQueryUpdating: isQueryUpdating && !this.isFallback
                 });
                 if ('type' in routeInfo) {
-                    throw new Error("Unexpected middleware effect on " + this.pathname);
+                    throw Object.defineProperty(new Error("Unexpected middleware effect on " + this.pathname), "__NEXT_ERROR_CODE", {
+                        value: "E225",
+                        enumerable: false,
+                        configurable: true
+                    });
                 }
                 if (this.pathname === '/_error' && ((_self___NEXT_DATA___props1 = self.__NEXT_DATA__.props) == null ? void 0 : (_self___NEXT_DATA___props_pageProps1 = _self___NEXT_DATA___props1.pageProps) == null ? void 0 : _self___NEXT_DATA___props_pageProps1.statusCode) === 500 && ((_routeInfo_props1 = routeInfo.props) == null ? void 0 : _routeInfo_props1.pageProps)) {
                     // ensure statusCode is still correct for static 500 page
@@ -1108,7 +1142,11 @@ class Router {
             }
             return routeInfo;
         } catch (routeInfoErr) {
-            return this.handleRouteInfoError((0, _iserror.default)(routeInfoErr) ? routeInfoErr : new Error(routeInfoErr + ''), pathname, query, as, routeProps, true);
+            return this.handleRouteInfoError((0, _iserror.default)(routeInfoErr) ? routeInfoErr : Object.defineProperty(new Error(routeInfoErr + ''), "__NEXT_ERROR_CODE", {
+                value: "E394",
+                enumerable: false,
+                configurable: true
+            }), pathname, query, as, routeProps, true);
         }
     }
     async getRouteInfo(param) {
@@ -1230,7 +1268,11 @@ class Router {
             if (process.env.NODE_ENV !== 'production') {
                 const { isValidElementType } = require('next/dist/compiled/react-is');
                 if (!isValidElementType(routeInfo.Component)) {
-                    throw new Error('The default export is not a React Component in page: "' + pathname + '"');
+                    throw Object.defineProperty(new Error('The default export is not a React Component in page: "' + pathname + '"'), "__NEXT_ERROR_CODE", {
+                        value: "E286",
+                        enumerable: false,
+                        configurable: true
+                    });
                 }
             }
             const wasBailedPrefetch = data == null ? void 0 : (_data_response = data.response) == null ? void 0 : _data_response.headers.get('x-middleware-skip');
@@ -1529,7 +1571,11 @@ class Router {
                 this.clc = null;
             }
             if (cancelled) {
-                const err = new Error('Loading initial props cancelled');
+                const err = Object.defineProperty(new Error('Loading initial props cancelled'), "__NEXT_ERROR_CODE", {
+                    value: "E405",
+                    enumerable: false,
+                    configurable: true
+                });
                 err.cancelled = true;
                 throw err;
             }

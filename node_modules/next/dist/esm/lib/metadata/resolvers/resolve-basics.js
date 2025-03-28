@@ -170,5 +170,11 @@ export const resolveFacebook = (facebook)=>{
         admins: resolveAsArrayOrUndefined(facebook.admins)
     };
 };
+export const resolvePagination = (pagination, metadataBase, context)=>{
+    return {
+        previous: (pagination == null ? void 0 : pagination.previous) ? resolveAlternateUrl(pagination.previous, metadataBase, context) : null,
+        next: (pagination == null ? void 0 : pagination.next) ? resolveAlternateUrl(pagination.next, metadataBase, context) : null
+    };
+};
 
 //# sourceMappingURL=resolve-basics.js.map

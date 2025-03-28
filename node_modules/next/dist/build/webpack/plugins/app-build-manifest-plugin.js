@@ -23,18 +23,14 @@ class AppBuildManifestPlugin {
         this.dev = options.dev;
     }
     apply(compiler) {
-        compiler.hooks.compilation.tap(PLUGIN_NAME, (compilation, { normalModuleFactory })=>{
-            compilation.dependencyFactories.set(_webpack.webpack.dependencies.ModuleDependency, normalModuleFactory);
-            compilation.dependencyTemplates.set(_webpack.webpack.dependencies.ModuleDependency, new _webpack.webpack.dependencies.NullDependency.Template());
-        });
         compiler.hooks.make.tap(PLUGIN_NAME, (compilation)=>{
             compilation.hooks.processAssets.tap({
                 name: PLUGIN_NAME,
                 stage: _webpack.webpack.Compilation.PROCESS_ASSETS_STAGE_ADDITIONS
-            }, (assets)=>this.createAsset(assets, compilation));
+            }, ()=>this.createAsset(compilation));
         });
     }
-    createAsset(assets, compilation) {
+    createAsset(compilation) {
         const manifest = {
             pages: {}
         };
@@ -59,7 +55,7 @@ class AppBuildManifestPlugin {
             ];
         }
         const json = JSON.stringify(manifest, null, 2);
-        assets[_constants.APP_BUILD_MANIFEST] = new _webpack.sources.RawSource(json);
+        compilation.emitAsset(_constants.APP_BUILD_MANIFEST, new _webpack.sources.RawSource(json));
     }
 }
 

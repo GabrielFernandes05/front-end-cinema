@@ -53,20 +53,6 @@ export async function getRuntimeContext(params) {
 export const run = withTaggedErrors(async function runWithTaggedErrors(params) {
     var _params_request_body;
     const runtime = await getRuntimeContext(params);
-    const subreq = params.request.headers[`x-middleware-subrequest`];
-    const subrequests = typeof subreq === 'string' ? subreq.split(':') : [];
-    const MAX_RECURSION_DEPTH = 5;
-    const depth = subrequests.reduce((acc, curr)=>curr === params.name ? acc + 1 : acc, 0);
-    if (depth >= MAX_RECURSION_DEPTH) {
-        return {
-            waitUntil: Promise.resolve(),
-            response: new runtime.context.Response(null, {
-                headers: {
-                    'x-middleware-next': '1'
-                }
-            })
-        };
-    }
     const edgeFunction = (await runtime.context._ENTRIES[`middleware_${params.name}`]).default;
     const cloned = ![
         'HEAD',
@@ -103,7 +89,11 @@ export const run = withTaggedErrors(async function runWithTaggedErrors(params) {
                     result.response.headers.delete(headerName);
                 }
             }));
-        if (!result) throw new Error('Edge function did not return a response');
+        if (!result) throw Object.defineProperty(new Error('Edge function did not return a response'), "__NEXT_ERROR_CODE", {
+            value: "E332",
+            enumerable: false,
+            configurable: true
+        });
         return result;
     } finally{
         var _params_request_body1;

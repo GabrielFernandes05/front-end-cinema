@@ -10,6 +10,7 @@ Object.defineProperty(exports, "__esModule", {
     URLPattern: null,
     after: null,
     connection: null,
+    unstable_rootParams: null,
     userAgent: null,
     userAgentFromString: null
 });
@@ -38,6 +39,9 @@ _export(exports, {
     connection: function() {
         return _connection.connection;
     },
+    unstable_rootParams: function() {
+        return _rootparams.unstable_rootParams;
+    },
     userAgent: function() {
         return _useragent.userAgent;
     },
@@ -52,5 +56,6 @@ const _useragent = require("../spec-extension/user-agent");
 const _urlpattern = require("../spec-extension/url-pattern");
 const _after = require("../../after");
 const _connection = require("../../request/connection");
+const _rootparams = require("../../request/root-params");
 
 //# sourceMappingURL=index.js.map

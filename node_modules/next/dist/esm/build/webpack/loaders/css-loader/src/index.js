@@ -63,17 +63,29 @@ function getModulesOptions(rawOptions, loaderContext) {
     }
     if (modulesOptions.namedExport === true) {
         if (rawOptions.esModule === false) {
-            throw new Error('The "modules.namedExport" option requires the "esModules" option to be enabled');
+            throw Object.defineProperty(new Error('The "modules.namedExport" option requires the "esModules" option to be enabled'), "__NEXT_ERROR_CODE", {
+                value: "E103",
+                enumerable: false,
+                configurable: true
+            });
         }
         if (modulesOptions.exportLocalsConvention !== 'camelCaseOnly') {
-            throw new Error('The "modules.namedExport" option requires the "modules.exportLocalsConvention" option to be "camelCaseOnly"');
+            throw Object.defineProperty(new Error('The "modules.namedExport" option requires the "modules.exportLocalsConvention" option to be "camelCaseOnly"'), "__NEXT_ERROR_CODE", {
+                value: "E23",
+                enumerable: false,
+                configurable: true
+            });
         }
     }
     return modulesOptions;
 }
 function normalizeOptions(rawOptions, loaderContext) {
     if (rawOptions.icss) {
-        loaderContext.emitWarning(new Error('The "icss" option is deprecated, use "modules.compileType: "icss"" instead'));
+        loaderContext.emitWarning(Object.defineProperty(new Error('The "icss" option is deprecated, use "modules.compileType: "icss"" instead'), "__NEXT_ERROR_CODE", {
+            value: "E476",
+            enumerable: false,
+            configurable: true
+        }));
     }
     const modulesOptions = getModulesOptions(rawOptions, loaderContext);
     return {
@@ -220,10 +232,18 @@ export default async function loader(content, map, meta) {
             if (error.file) {
                 this.addDependency(error.file);
             }
-            throw error.name === 'CssSyntaxError' ? new CssSyntaxError(error) : error;
+            throw error.name === 'CssSyntaxError' ? Object.defineProperty(new CssSyntaxError(error), "__NEXT_ERROR_CODE", {
+                value: "E394",
+                enumerable: false,
+                configurable: true
+            }) : error;
         }
         for (const warning of result.warnings()){
-            this.emitWarning(new Warning(warning));
+            this.emitWarning(Object.defineProperty(new Warning(warning), "__NEXT_ERROR_CODE", {
+                value: "E394",
+                enumerable: false,
+                configurable: true
+            }));
         }
         const imports = [
             ...icssPluginImports.sort(sort),

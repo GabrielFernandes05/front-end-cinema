@@ -8,12 +8,10 @@ import * as pageMod from 'VAR_USERLAND';
 import { PAGE_TYPES } from '../../lib/page-types';
 import { setReferenceManifestsSingleton } from '../../server/app-render/encryption-utils';
 import { createServerModuleMap } from '../../server/app-render/action-utils';
+import { initializeCacheHandlers } from '../../server/use-cache/handlers';
 // OPTIONAL_IMPORT:incrementalCacheHandler
-const cacheHandlers = {};
-if (!globalThis.__nextCacheHandlers) {
-    ;
-    globalThis.__nextCacheHandlers = cacheHandlers;
-}
+// Initialize the cache handlers interface.
+initializeCacheHandlers();
 const Document = null;
 const appMod = null;
 const errorMod = null;

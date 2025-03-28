@@ -2,7 +2,11 @@ import mitt from '../../shared/lib/mitt';
 class Span {
     end(endTime) {
         if (this.state.state === 'ended') {
-            throw new Error('Span has already ended');
+            throw Object.defineProperty(new Error('Span has already ended'), "__NEXT_ERROR_CODE", {
+                value: "E17",
+                enumerable: false,
+                configurable: true
+            });
         }
         this.state = {
             state: 'ended',

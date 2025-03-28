@@ -22,11 +22,19 @@ _export(exports, {
 });
 function decodeHex(hexStr) {
     if (hexStr.trim() === '') {
-        throw new Error("can't decode empty hex");
+        throw Object.defineProperty(new Error("can't decode empty hex"), "__NEXT_ERROR_CODE", {
+            value: "E19",
+            enumerable: false,
+            configurable: true
+        });
     }
     const num = parseInt(hexStr, 16);
     if (isNaN(num)) {
-        throw new Error("invalid hex: `" + hexStr + "`");
+        throw Object.defineProperty(new Error("invalid hex: `" + hexStr + "`"), "__NEXT_ERROR_CODE", {
+            value: "E293",
+            enumerable: false,
+            configurable: true
+        });
     }
     return String.fromCodePoint(num);
 }
@@ -68,12 +76,20 @@ function decodeMagicIdentifier(identifier) {
             }
             if (char === '_') {
                 if (buffer !== '') {
-                    throw new Error("invalid hex: `" + buffer + "`");
+                    throw Object.defineProperty(new Error("invalid hex: `" + buffer + "`"), "__NEXT_ERROR_CODE", {
+                        value: "E293",
+                        enumerable: false,
+                        configurable: true
+                    });
                 }
                 mode = 3;
             } else if (char === '$') {
                 if (buffer !== '') {
-                    throw new Error("invalid hex: `" + buffer + "`");
+                    throw Object.defineProperty(new Error("invalid hex: `" + buffer + "`"), "__NEXT_ERROR_CODE", {
+                        value: "E293",
+                        enumerable: false,
+                        configurable: true
+                    });
                 }
                 mode = 0;
             } else {
@@ -81,7 +97,11 @@ function decodeMagicIdentifier(identifier) {
             }
         } else if (mode === 3) {
             if (char === '_') {
-                throw new Error("invalid hex: `" + (buffer + char) + "`");
+                throw Object.defineProperty(new Error("invalid hex: `" + (buffer + char) + "`"), "__NEXT_ERROR_CODE", {
+                    value: "E244",
+                    enumerable: false,
+                    configurable: true
+                });
             } else if (char === '$') {
                 output += decodeHex(buffer);
                 buffer = '';

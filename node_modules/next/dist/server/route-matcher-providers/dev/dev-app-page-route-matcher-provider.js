@@ -59,7 +59,11 @@ class DevAppPageRouteMatcherProvider extends _filecacheroutematcherprovider.File
             // Grab the cached values (and the appPaths).
             const cached = cache.get(filename);
             if (!cached) {
-                throw new Error('Invariant: expected filename to exist in cache');
+                throw Object.defineProperty(new Error('Invariant: expected filename to exist in cache'), "__NEXT_ERROR_CODE", {
+                    value: "E190",
+                    enumerable: false,
+                    configurable: true
+                });
             }
             const { pathname, page, bundlePath } = cached;
             matchers.push(new _apppageroutematcher.AppPageRouteMatcher({

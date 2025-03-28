@@ -6,7 +6,11 @@ import { BailoutToCSRError } from './bailout-to-csr';
  */ export function BailoutToCSR(param) {
     let { reason, children } = param;
     if (typeof window === 'undefined') {
-        throw new BailoutToCSRError(reason);
+        throw Object.defineProperty(new BailoutToCSRError(reason), "__NEXT_ERROR_CODE", {
+            value: "E394",
+            enumerable: false,
+            configurable: true
+        });
     }
     return children;
 }

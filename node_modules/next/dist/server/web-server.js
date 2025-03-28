@@ -13,7 +13,6 @@ const _baseserver = /*#__PURE__*/ _interop_require_wildcard(require("./base-serv
 const _etag = require("./lib/etag");
 const _requestmeta = require("./request-meta");
 const _web1 = /*#__PURE__*/ _interop_require_default(require("./response-cache/web"));
-const _isapiroute = require("../lib/is-api-route");
 const _removetrailingslash = require("../shared/lib/router/utils/remove-trailing-slash");
 const _utils = require("../shared/lib/router/utils");
 const _serverutils = require("./server-utils");
@@ -75,7 +74,11 @@ class NextWebServer extends _baseserver.default {
         super(options), this.handleCatchallRenderRequest = async (req, res, parsedUrl)=>{
             let { pathname, query } = parsedUrl;
             if (!pathname) {
-                throw new Error('pathname is undefined');
+                throw Object.defineProperty(new Error('pathname is undefined'), "__NEXT_ERROR_CODE", {
+                    value: "E408",
+                    enumerable: false,
+                    configurable: true
+                });
             }
             // interpolate query information into page for dynamic route
             // so that rewritten paths are handled properly
@@ -83,13 +86,15 @@ class NextWebServer extends _baseserver.default {
             if (pathname !== normalizedPage) {
                 pathname = normalizedPage;
                 if ((0, _utils.isDynamicRoute)(pathname)) {
-                    const routeRegex = (0, _routeregex.getNamedRouteRegex)(pathname, false);
+                    const routeRegex = (0, _routeregex.getNamedRouteRegex)(pathname, {
+                        prefixRouteKeys: false
+                    });
                     const dynamicRouteMatcher = (0, _routematcher.getRouteMatcher)(routeRegex);
                     const defaultRouteMatches = dynamicRouteMatcher(pathname);
-                    const paramsResult = (0, _serverutils.normalizeDynamicRouteParams)(query, false, routeRegex, defaultRouteMatches);
+                    const paramsResult = (0, _serverutils.normalizeDynamicRouteParams)(query, routeRegex, defaultRouteMatches, false);
                     const normalizedParams = paramsResult.hasValidParams ? paramsResult.params : query;
                     pathname = (0, _serverutils.interpolateDynamicPath)(pathname, normalizedParams, routeRegex);
-                    (0, _serverutils.normalizeVercelUrl)(req, true, Object.keys(routeRegex.routeKeys), true, routeRegex);
+                    (0, _serverutils.normalizeVercelUrl)(req, Object.keys(routeRegex.routeKeys), routeRegex);
                 }
             }
             // next.js core assumes page path without trailing slash
@@ -97,13 +102,10 @@ class NextWebServer extends _baseserver.default {
             if (this.i18nProvider) {
                 const { detectedLocale } = await this.i18nProvider.analyze(pathname);
                 if (detectedLocale) {
-                    parsedUrl.query.__nextLocale = detectedLocale;
+                    (0, _requestmeta.addRequestMeta)(req, 'locale', detectedLocale);
                 }
             }
-            const bubbleNoFallback = !!query._nextBubbleNoFallback;
-            if ((0, _isapiroute.isAPIRoute)(pathname)) {
-                delete query._nextBubbleNoFallback;
-            }
+            const bubbleNoFallback = (0, _requestmeta.getRequestMeta)(req, 'bubbleNoFallback');
             try {
                 await this.render(req, res, pathname, query, parsedUrl, true);
                 return true;
@@ -125,11 +127,9 @@ class NextWebServer extends _baseserver.default {
         return new _incrementalcache.IncrementalCache({
             dev,
             requestHeaders,
-            dynamicIO: Boolean(this.nextConfig.experimental.dynamicIO),
             requestProtocol: 'https',
             allowedRevalidateHeaderKeys: this.nextConfig.experimental.allowedRevalidateHeaderKeys,
             minimalMode: this.minimalMode,
-            fetchCache: true,
             fetchCacheKeyPrefix: this.nextConfig.experimental.fetchCacheKeyPrefix,
             maxMemoryCacheSize: this.nextConfig.cacheMaxMemorySize,
             flushToDisk: false,
@@ -144,7 +144,7 @@ class NextWebServer extends _baseserver.default {
         return page === this.serverOptions.webServerConfig.page;
     }
     getBuildId() {
-        return this.serverOptions.webServerConfig.extendRenderOpts.buildId;
+        return this.serverOptions.buildId;
     }
     getEnabledDirectories() {
         return {
@@ -184,7 +184,11 @@ class NextWebServer extends _baseserver.default {
     renderHTML(req, res, pathname, query, renderOpts) {
         const { renderToHTML } = this.serverOptions.webServerConfig;
         if (!renderToHTML) {
-            throw new Error('Invariant: routeModule should be configured when rendering pages');
+            throw Object.defineProperty(new Error('Invariant: routeModule should be configured when rendering pages'), "__NEXT_ERROR_CODE", {
+                value: "E4",
+                enumerable: false,
+                configurable: true
+            });
         }
         // For edge runtime if the pathname hit as /_not-found entrypoint,
         // override the pathname to /404 for rendering
@@ -196,7 +200,9 @@ class NextWebServer extends _baseserver.default {
         null, Object.assign(renderOpts, {
             disableOptimizedLoading: true,
             runtime: 'experimental-edge'
-        }), undefined, false);
+        }), undefined, false, {
+            buildId: this.serverOptions.buildId
+        });
     }
     async sendRenderResult(_req, res, options) {
         res.setHeader('X-Edge-Runtime', '1');
@@ -277,7 +283,7 @@ class NextWebServer extends _baseserver.default {
     getMiddleware() {
         // The web server does not need to handle middleware. This is done by the
         // upstream proxy (edge runtime or node server).
-        return undefined;
+        return Promise.resolve(undefined);
     }
     getFilesystemPaths() {
         return new Set();

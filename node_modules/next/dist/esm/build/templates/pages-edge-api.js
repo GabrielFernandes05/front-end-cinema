@@ -6,7 +6,11 @@ import { wrapApiHandler } from '../../server/api-utils';
 import handler from 'VAR_USERLAND';
 const page = 'VAR_DEFINITION_PAGE';
 if (typeof handler !== 'function') {
-    throw new Error(`The Edge Function "pages${page}" must export a \`default\` function`);
+    throw Object.defineProperty(new Error(`The Edge Function "pages${page}" must export a \`default\` function`), "__NEXT_ERROR_CODE", {
+        value: "E162",
+        enumerable: false,
+        configurable: true
+    });
 }
 export default function(opts) {
     return adapter({

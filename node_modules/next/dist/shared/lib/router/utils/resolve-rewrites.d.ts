@@ -5,7 +5,7 @@ export default function resolveRewrites(asPath: string, pages: string[], rewrite
     beforeFiles: Rewrite[];
     afterFiles: Rewrite[];
     fallback: Rewrite[];
-}, query: ParsedUrlQuery, resolveHref: (path: string) => string, locales?: string[]): {
+}, query: ParsedUrlQuery, resolveHref: (path: string) => string, locales?: readonly string[]): {
     matchedPage: boolean;
     parsedAs: ParsedRelativeUrl;
     asPath: string;

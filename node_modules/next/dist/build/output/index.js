@@ -32,7 +32,7 @@ const _picocolors = require("../../lib/picocolors");
 const _stripansi = /*#__PURE__*/ _interop_require_default(require("next/dist/compiled/strip-ansi"));
 const _texttable = /*#__PURE__*/ _interop_require_default(require("next/dist/compiled/text-table"));
 const _unistore = /*#__PURE__*/ _interop_require_default(require("next/dist/compiled/unistore"));
-const _formatwebpackmessages = /*#__PURE__*/ _interop_require_default(require("../../client/components/react-dev-overlay/internal/helpers/format-webpack-messages"));
+const _formatwebpackmessages = /*#__PURE__*/ _interop_require_default(require("../../client/components/react-dev-overlay/utils/format-webpack-messages"));
 const _store = require("./store");
 const _constants = require("../../shared/lib/constants");
 function _interop_require_default(obj) {

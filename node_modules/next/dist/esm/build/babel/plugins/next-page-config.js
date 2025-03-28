@@ -25,7 +25,11 @@ export default function nextPageConfig({ types: t }) {
                             if (BabelTypes.isExportNamedDeclaration(exportPath.node) && ((_exportPath_node_specifiers = exportPath.node.specifiers) == null ? void 0 : _exportPath_node_specifiers.some((specifier)=>{
                                 return (t.isIdentifier(specifier.exported) ? specifier.exported.name : specifier.exported.value) === CONFIG_KEY;
                             })) && BabelTypes.isStringLiteral(exportPath.node.source)) {
-                                throw new Error(errorMessage(exportState, 'Expected object but got export from'));
+                                throw Object.defineProperty(new Error(errorMessage(exportState, 'Expected object but got export from')), "__NEXT_ERROR_CODE", {
+                                    value: "E394",
+                                    enumerable: false,
+                                    configurable: true
+                                });
                             }
                         },
                         ExportNamedDeclaration (exportPath, exportState) {
@@ -42,13 +46,21 @@ export default function nextPageConfig({ types: t }) {
                                 if ((t.isIdentifier(specifier.exported) ? specifier.exported.name : specifier.exported.value) === CONFIG_KEY) {
                                     // export {} from 'somewhere'
                                     if (BabelTypes.isStringLiteral(exportPath.node.source)) {
-                                        throw new Error(errorMessage(exportState, `Expected object but got import`));
+                                        throw Object.defineProperty(new Error(errorMessage(exportState, `Expected object but got import`)), "__NEXT_ERROR_CODE", {
+                                            value: "E394",
+                                            enumerable: false,
+                                            configurable: true
+                                        });
                                     // import hello from 'world'
                                     // export { hello as config }
                                     } else if (BabelTypes.isIdentifier(specifier.local)) {
                                         var _exportPath_scope_getBinding1;
                                         if (BabelTypes.isImportSpecifier((_exportPath_scope_getBinding1 = exportPath.scope.getBinding(specifier.local.name)) == null ? void 0 : _exportPath_scope_getBinding1.path.node)) {
-                                            throw new Error(errorMessage(exportState, `Expected object but got import`));
+                                            throw Object.defineProperty(new Error(errorMessage(exportState, `Expected object but got import`)), "__NEXT_ERROR_CODE", {
+                                                value: "E394",
+                                                enumerable: false,
+                                                configurable: true
+                                            });
                                         }
                                     }
                                 }
@@ -65,21 +77,37 @@ export default function nextPageConfig({ types: t }) {
                                 }
                                 if (!BabelTypes.isObjectExpression(init)) {
                                     const got = init ? init.type : 'undefined';
-                                    throw new Error(errorMessage(exportState, `Expected object but got ${got}`));
+                                    throw Object.defineProperty(new Error(errorMessage(exportState, `Expected object but got ${got}`)), "__NEXT_ERROR_CODE", {
+                                        value: "E394",
+                                        enumerable: false,
+                                        configurable: true
+                                    });
                                 }
                                 for (const prop of init.properties){
                                     if (BabelTypes.isSpreadElement(prop)) {
-                                        throw new Error(errorMessage(exportState, `Property spread is not allowed`));
+                                        throw Object.defineProperty(new Error(errorMessage(exportState, `Property spread is not allowed`)), "__NEXT_ERROR_CODE", {
+                                            value: "E394",
+                                            enumerable: false,
+                                            configurable: true
+                                        });
                                     }
                                     const { name } = prop.key;
                                     if (BabelTypes.isIdentifier(prop.key, {
                                         name: 'amp'
                                     })) {
                                         if (!BabelTypes.isObjectProperty(prop)) {
-                                            throw new Error(errorMessage(exportState, `Invalid property "${name}"`));
+                                            throw Object.defineProperty(new Error(errorMessage(exportState, `Invalid property "${name}"`)), "__NEXT_ERROR_CODE", {
+                                                value: "E394",
+                                                enumerable: false,
+                                                configurable: true
+                                            });
                                         }
                                         if (!BabelTypes.isBooleanLiteral(prop.value) && !BabelTypes.isStringLiteral(prop.value)) {
-                                            throw new Error(errorMessage(exportState, `Invalid value for "${name}"`));
+                                            throw Object.defineProperty(new Error(errorMessage(exportState, `Invalid value for "${name}"`)), "__NEXT_ERROR_CODE", {
+                                                value: "E394",
+                                                enumerable: false,
+                                                configurable: true
+                                            });
                                         }
                                         config.amp = prop.value.value;
                                     }

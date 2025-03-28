@@ -4,7 +4,7 @@ import React from 'react';
 import { useUntrackedPathname } from './navigation-untracked';
 import { isNextRouterError } from './is-next-router-error';
 import { handleHardNavError } from './nav-failure-handler';
-import { workAsyncStorage } from '../../server/app-render/work-async-storage.external';
+const workAsyncStorage = typeof window === 'undefined' ? require('../../server/app-render/work-async-storage.external').workAsyncStorage : undefined;
 const styles = {
     error: {
         // https://github.com/sindresorhus/modern-normalize/blob/main/modern-normalize.css#L38-L52
@@ -28,10 +28,12 @@ const styles = {
 // instead of caching the error page
 function HandleISRError(param) {
     let { error } = param;
-    const store = workAsyncStorage.getStore();
-    if ((store == null ? void 0 : store.isRevalidate) || (store == null ? void 0 : store.isStaticGeneration)) {
-        console.error(error);
-        throw error;
+    if (workAsyncStorage) {
+        const store = workAsyncStorage.getStore();
+        if ((store == null ? void 0 : store.isRevalidate) || (store == null ? void 0 : store.isStaticGeneration)) {
+            console.error(error);
+            throw error;
+        }
     }
     return null;
 }
@@ -124,9 +126,18 @@ export function GlobalError(param) {
                         style: styles.error,
                         children: /*#__PURE__*/ _jsxs("div", {
                             children: [
-                                /*#__PURE__*/ _jsx("h2", {
+                                /*#__PURE__*/ _jsxs("h2", {
                                     style: styles.text,
-                                    children: "Application error: a " + (digest ? 'server' : 'client') + "-side exception has occurred (see the " + (digest ? 'server logs' : 'browser console') + " for more information)."
+                                    children: [
+                                        "Application error: a ",
+                                        digest ? 'server' : 'client',
+                                        "-side exception has occurred while loading ",
+                                        window.location.hostname,
+                                        " (see the",
+                                        ' ',
+                                        digest ? 'server logs' : 'browser console',
+                                        " for more information)."
+                                    ]
                                 }),
                                 digest ? /*#__PURE__*/ _jsx("p", {
                                     style: styles.text,

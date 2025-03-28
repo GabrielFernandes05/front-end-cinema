@@ -1,5 +1,6 @@
 import type { FlightRouterState } from '../../../server/app-render/types';
-import { NEXT_ROUTER_PREFETCH_HEADER, NEXT_ROUTER_SEGMENT_PREFETCH_HEADER, NEXT_ROUTER_STATE_TREE_HEADER, NEXT_URL, RSC_HEADER, NEXT_HMR_REFRESH_HEADER } from '../app-router-headers';
+import type { NEXT_ROUTER_SEGMENT_PREFETCH_HEADER } from '../app-router-headers';
+import { NEXT_ROUTER_PREFETCH_HEADER, NEXT_ROUTER_STATE_TREE_HEADER, NEXT_URL, RSC_HEADER, NEXT_HMR_REFRESH_HEADER } from '../app-router-headers';
 import { PrefetchKind } from './router-reducer-types';
 import { type NormalizedFlightData } from '../../flight-data-helpers';
 export interface FetchServerResponseOptions {
@@ -32,5 +33,5 @@ export declare function urlToUrlWithoutFlightMarker(url: string): URL;
  * to decide what to render server-side.
  */
 export declare function fetchServerResponse(url: URL, options: FetchServerResponseOptions): Promise<FetchServerResponseResult>;
-export declare function createFetch(url: URL, headers: RequestHeaders, fetchPriority: 'auto' | 'high' | 'low' | null): Promise<Response>;
+export declare function createFetch(url: URL, headers: RequestHeaders, fetchPriority: 'auto' | 'high' | 'low' | null, signal?: AbortSignal): Promise<Response>;
 export declare function createFromNextReadableStream(flightStream: ReadableStream<Uint8Array>): Promise<unknown>;

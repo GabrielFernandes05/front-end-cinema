@@ -15,7 +15,7 @@ const _isdocker = /*#__PURE__*/ _interop_require_default(require("next/dist/comp
 const _path = /*#__PURE__*/ _interop_require_default(require("path"));
 const _anonymousmeta = require("./anonymous-meta");
 const _ciinfo = /*#__PURE__*/ _interop_require_wildcard(require("../server/ci-info"));
-const _postpayload = require("./post-payload");
+const _posttelemetrypayload = require("./post-telemetry-payload");
 const _projectid = require("./project-id");
 const _ponyfill = require("next/dist/compiled/@edge-runtime/ponyfill");
 const _fs = /*#__PURE__*/ _interop_require_default(require("fs"));
@@ -215,16 +215,14 @@ class Telemetry {
             if (this.isDisabled) {
                 return Promise.resolve();
             }
-            const context = {
-                anonymousId: this.anonymousId,
-                projectId: await this.getProjectId(),
-                sessionId: this.sessionId
-            };
-            const meta = (0, _anonymousmeta.getAnonymousMeta)();
             const postController = new _ponyfill.AbortController();
-            const res = (0, _postpayload._postPayload)(`https://telemetry.nextjs.org/api/v1/record`, {
-                context,
-                meta,
+            const res = (0, _posttelemetrypayload.postNextTelemetryPayload)({
+                context: {
+                    anonymousId: this.anonymousId,
+                    projectId: await this.getProjectId(),
+                    sessionId: this.sessionId
+                },
+                meta: (0, _anonymousmeta.getAnonymousMeta)(),
                 events: events.map(({ eventName, payload })=>({
                         eventName,
                         fields: payload

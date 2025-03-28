@@ -6,6 +6,7 @@ export type ServerInitResult = {
     requestHandler: RequestHandler;
     upgradeHandler: UpgradeHandler;
     server: NextServer;
+    closeUpgraded: () => void;
 };
 export declare function clearAllModuleContexts(): Promise<void> | undefined;
 export declare function clearModuleContext(target: string): Promise<void> | undefined;

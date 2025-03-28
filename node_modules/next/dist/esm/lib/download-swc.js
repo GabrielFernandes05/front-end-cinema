@@ -27,10 +27,18 @@ async function extractBinary(outputDirectory, pkgName, tarFileName) {
                 Log.error(`Failed to download swc package from ${downloadUrl}`);
             }
             if (!ok) {
-                throw new Error(`request failed with status ${res.status}`);
+                throw Object.defineProperty(new Error(`request failed with status ${res.status}`), "__NEXT_ERROR_CODE", {
+                    value: "E109",
+                    enumerable: false,
+                    configurable: true
+                });
             }
             if (!body) {
-                throw new Error('request failed with empty body');
+                throw Object.defineProperty(new Error('request failed with empty body'), "__NEXT_ERROR_CODE", {
+                    value: "E143",
+                    enumerable: false,
+                    configurable: true
+                });
             }
             const cacheWriteStream = fs.createWriteStream(tempFile);
             return body.pipeTo(new WritableStream({

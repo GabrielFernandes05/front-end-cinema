@@ -81,10 +81,10 @@ if (process.env.NEXT_RUNTIME !== 'edge') {
 }
 class AppPageRouteModule extends _routemodule.RouteModule {
     render(req, res, context) {
-        return (0, _apprender.renderToHTMLOrFlight)(req, res, context.page, context.query, context.fallbackRouteParams, context.renderOpts, context.serverComponentsHmrCache, false);
+        return (0, _apprender.renderToHTMLOrFlight)(req, res, context.page, context.query, context.fallbackRouteParams, context.renderOpts, context.serverComponentsHmrCache, false, context.sharedContext);
     }
     warmup(req, res, context) {
-        return (0, _apprender.renderToHTMLOrFlight)(req, res, context.page, context.query, context.fallbackRouteParams, context.renderOpts, context.serverComponentsHmrCache, true);
+        return (0, _apprender.renderToHTMLOrFlight)(req, res, context.page, context.query, context.fallbackRouteParams, context.renderOpts, context.serverComponentsHmrCache, true, context.sharedContext);
     }
 }
 const vendored = {

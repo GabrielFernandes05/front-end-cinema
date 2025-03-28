@@ -2,25 +2,12 @@
 Object.defineProperty(exports, "__esModule", {
     value: true
 });
-0 && (module.exports = {
-    canSegmentBeOverridden: null,
-    matchSegment: null
-});
-function _export(target, all) {
-    for(var name in all)Object.defineProperty(target, name, {
-        enumerable: true,
-        get: all[name]
-    });
-}
-_export(exports, {
-    canSegmentBeOverridden: function() {
-        return canSegmentBeOverridden;
-    },
-    matchSegment: function() {
+Object.defineProperty(exports, "matchSegment", {
+    enumerable: true,
+    get: function() {
         return matchSegment;
     }
 });
-const _getsegmentparam = require("../../server/app-render/get-segment-param");
 const matchSegment = (existingSegment, segment)=>{
     // segment is either Array or string
     if (typeof existingSegment === 'string') {
@@ -34,13 +21,6 @@ const matchSegment = (existingSegment, segment)=>{
         return false;
     }
     return existingSegment[0] === segment[0] && existingSegment[1] === segment[1];
-};
-const canSegmentBeOverridden = (existingSegment, segment)=>{
-    var _getSegmentParam;
-    if (Array.isArray(existingSegment) || !Array.isArray(segment)) {
-        return false;
-    }
-    return ((_getSegmentParam = (0, _getsegmentparam.getSegmentParam)(existingSegment)) == null ? void 0 : _getSegmentParam.param) === segment[0];
 };
 
 if ((typeof exports.default === 'function' || (typeof exports.default === 'object' && exports.default !== null)) && typeof exports.default.__esModule === 'undefined') {

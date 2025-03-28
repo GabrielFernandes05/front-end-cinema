@@ -7,11 +7,19 @@ export class SerializableError extends Error {
 }
 export function isSerializableProps(page, method, input) {
     if (!isPlainObject(input)) {
-        throw new SerializableError(page, method, '', `Props must be returned as a plain object from ${method}: \`{ props: { ... } }\` (received: \`${getObjectClassLabel(input)}\`).`);
+        throw Object.defineProperty(new SerializableError(page, method, '', `Props must be returned as a plain object from ${method}: \`{ props: { ... } }\` (received: \`${getObjectClassLabel(input)}\`).`), "__NEXT_ERROR_CODE", {
+            value: "E394",
+            enumerable: false,
+            configurable: true
+        });
     }
     function visit(visited, value, path) {
         if (visited.has(value)) {
-            throw new SerializableError(page, method, path, `Circular references cannot be expressed in JSON (references: \`${visited.get(value) || '(self)'}\`).`);
+            throw Object.defineProperty(new SerializableError(page, method, path, `Circular references cannot be expressed in JSON (references: \`${visited.get(value) || '(self)'}\`).`), "__NEXT_ERROR_CODE", {
+                value: "E394",
+                enumerable: false,
+                configurable: true
+            });
         }
         visited.set(value, path);
     }
@@ -27,7 +35,11 @@ export function isSerializableProps(page, method, input) {
             return true;
         }
         if (type === 'undefined') {
-            throw new SerializableError(page, method, path, '`undefined` cannot be serialized as JSON. Please use `null` or omit this value.');
+            throw Object.defineProperty(new SerializableError(page, method, path, '`undefined` cannot be serialized as JSON. Please use `null` or omit this value.'), "__NEXT_ERROR_CODE", {
+                value: "E394",
+                enumerable: false,
+                configurable: true
+            });
         }
         if (isPlainObject(value)) {
             visit(refs, value, path);
@@ -38,7 +50,11 @@ export function isSerializableProps(page, method, input) {
             })) {
                 return true;
             }
-            throw new SerializableError(page, method, path, `invariant: Unknown error encountered in Object.`);
+            throw Object.defineProperty(new SerializableError(page, method, path, `invariant: Unknown error encountered in Object.`), "__NEXT_ERROR_CODE", {
+                value: "E394",
+                enumerable: false,
+                configurable: true
+            });
         }
         if (Array.isArray(value)) {
             visit(refs, value, path);
@@ -48,11 +64,19 @@ export function isSerializableProps(page, method, input) {
             })) {
                 return true;
             }
-            throw new SerializableError(page, method, path, `invariant: Unknown error encountered in Array.`);
+            throw Object.defineProperty(new SerializableError(page, method, path, `invariant: Unknown error encountered in Array.`), "__NEXT_ERROR_CODE", {
+                value: "E394",
+                enumerable: false,
+                configurable: true
+            });
         }
         // None of these can be expressed as JSON:
         // const type: "bigint" | "symbol" | "object" | "function"
-        throw new SerializableError(page, method, path, '`' + type + '`' + (type === 'object' ? ` ("${Object.prototype.toString.call(value)}")` : '') + ' cannot be serialized as JSON. Please only return JSON serializable data types.');
+        throw Object.defineProperty(new SerializableError(page, method, path, '`' + type + '`' + (type === 'object' ? ` ("${Object.prototype.toString.call(value)}")` : '') + ' cannot be serialized as JSON. Please only return JSON serializable data types.'), "__NEXT_ERROR_CODE", {
+            value: "E394",
+            enumerable: false,
+            configurable: true
+        });
     }
     return isSerializable(new Map(), input, '');
 }

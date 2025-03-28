@@ -6,6 +6,7 @@ import { isBailoutToCSRError } from '../../shared/lib/lazy-dynamic/bailout-to-cs
 import { isDynamicServerError } from '../../client/components/hooks-server-context';
 import { isNextRouterError } from '../../client/components/is-next-router-error';
 import { getProperError } from '../../lib/is-error';
+import { createDigestWithErrorCode } from '../../lib/error-telemetry-utils';
 /**
  * Returns a digest for well-known Next.js errors, otherwise `undefined`. If a
  * digest is returned this also means that the error does not need to be
@@ -55,7 +56,7 @@ export function createFlightReactServerErrorHandler(shouldFormatError, onReactSe
             });
         }
         onReactServerRenderError(err);
-        return err.digest;
+        return createDigestWithErrorCode(thrownValue, err.digest);
     };
 }
 export function createHTMLReactServerErrorHandler(shouldFormatError, isNextExport, reactServerErrors, silenceLogger, onReactServerRenderError) {
@@ -102,7 +103,7 @@ export function createHTMLReactServerErrorHandler(shouldFormatError, isNextExpor
                 onReactServerRenderError == null ? void 0 : onReactServerRenderError(err);
             }
         }
-        return err.digest;
+        return createDigestWithErrorCode(thrownValue, err.digest);
     };
 }
 export function createHTMLErrorHandler(shouldFormatError, isNextExport, reactServerErrors, allCapturedErrors, silenceLogger, onHTMLRenderSSRError) {
@@ -152,7 +153,7 @@ export function createHTMLErrorHandler(shouldFormatError, isNextExport, reactSer
                 onHTMLRenderSSRError(err, errorInfo);
             }
         }
-        return err.digest;
+        return createDigestWithErrorCode(thrownValue, err.digest);
     };
 }
 export function isUserLandError(err) {

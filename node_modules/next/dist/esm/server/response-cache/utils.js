@@ -23,23 +23,20 @@ export async function fromResponseCacheEntry(cacheEntry) {
     };
 }
 export async function toResponseCacheEntry(response) {
-    var _response_value, _response_value1, _response_value2;
+    var _response_value, _response_value1;
     if (!response) return null;
-    if (((_response_value = response.value) == null ? void 0 : _response_value.kind) === CachedRouteKind.FETCH) {
-        throw new Error('Invariant: unexpected cachedResponse of kind fetch in response cache');
-    }
     return {
         isMiss: response.isMiss,
         isStale: response.isStale,
-        revalidate: response.revalidate,
+        cacheControl: response.cacheControl,
         isFallback: response.isFallback,
-        value: ((_response_value1 = response.value) == null ? void 0 : _response_value1.kind) === CachedRouteKind.PAGES ? {
+        value: ((_response_value = response.value) == null ? void 0 : _response_value.kind) === CachedRouteKind.PAGES ? {
             kind: CachedRouteKind.PAGES,
             html: RenderResult.fromStatic(response.value.html),
             pageData: response.value.pageData,
             headers: response.value.headers,
             status: response.value.status
-        } : ((_response_value2 = response.value) == null ? void 0 : _response_value2.kind) === CachedRouteKind.APP_PAGE ? {
+        } : ((_response_value1 = response.value) == null ? void 0 : _response_value1.kind) === CachedRouteKind.APP_PAGE ? {
             kind: CachedRouteKind.APP_PAGE,
             html: RenderResult.fromStatic(response.value.html),
             rscData: response.value.rscData,
@@ -61,7 +58,11 @@ export function routeKindToIncrementalCacheKind(routeKind) {
         case RouteKind.APP_ROUTE:
             return IncrementalCacheKind.APP_ROUTE;
         default:
-            throw new Error(`Unexpected route kind ${routeKind}`);
+            throw Object.defineProperty(new Error(`Unexpected route kind ${routeKind}`), "__NEXT_ERROR_CODE", {
+                value: "E64",
+                enumerable: false,
+                configurable: true
+            });
     }
 }
 

@@ -5,7 +5,11 @@ export function ensureServerEntryExports(actions) {
     for(let i = 0; i < actions.length; i++){
         const action = actions[i];
         if (typeof action !== 'function') {
-            throw new Error(`A "use server" file can only export async functions, found ${typeof action}.\nRead more: https://nextjs.org/docs/messages/invalid-use-server-value`);
+            throw Object.defineProperty(new Error(`A "use server" file can only export async functions, found ${typeof action}.\nRead more: https://nextjs.org/docs/messages/invalid-use-server-value`), "__NEXT_ERROR_CODE", {
+                value: "E352",
+                enumerable: false,
+                configurable: true
+            });
         }
     }
 }

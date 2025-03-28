@@ -100,7 +100,11 @@ async function handleFetch(originalFetch, request) {
         }
     });
     if (!resp.ok) {
-        throw new Error(`Proxy request failed: ${resp.status}`);
+        throw Object.defineProperty(new Error(`Proxy request failed: ${resp.status}`), "__NEXT_ERROR_CODE", {
+            value: "E146",
+            enumerable: false,
+            configurable: true
+        });
     }
     const proxyResponse = await resp.json();
     const { api } = proxyResponse;
@@ -109,7 +113,11 @@ async function handleFetch(originalFetch, request) {
             return originalFetch(request);
         case 'abort':
         case 'unhandled':
-            throw new Error(`Proxy request aborted [${request.method} ${request.url}]`);
+            throw Object.defineProperty(new Error(`Proxy request aborted [${request.method} ${request.url}]`), "__NEXT_ERROR_CODE", {
+                value: "E145",
+                enumerable: false,
+                configurable: true
+            });
         default:
             break;
     }

@@ -55,7 +55,7 @@ function getEntryFiles(entryFiles, meta, hasInstrumentationHook, opts) {
 }
 function getCreateAssets(params) {
     const { compilation, metadataByEntry, opts } = params;
-    return (assets)=>{
+    return ()=>{
         const middlewareManifest = {
             version: MANIFEST_VERSION,
             middleware: {},
@@ -66,7 +66,7 @@ function getCreateAssets(params) {
         // we only emit this entry for the edge runtime since it doesn't have access to a routes manifest
         // and we don't need to provide the entire route manifest, just the interception routes.
         const interceptionRewrites = JSON.stringify(opts.rewrites.beforeFiles.filter(isInterceptionRouteRewrite));
-        assets[`${INTERCEPTION_ROUTE_REWRITE_MANIFEST}.js`] = new sources.RawSource(`self.__INTERCEPTION_ROUTE_REWRITE_MANIFEST=${JSON.stringify(interceptionRewrites)}`);
+        compilation.emitAsset(`${INTERCEPTION_ROUTE_REWRITE_MANIFEST}.js`, new sources.RawSource(`self.__INTERCEPTION_ROUTE_REWRITE_MANIFEST=${JSON.stringify(interceptionRewrites)}`));
         for (const entrypoint of compilation.entrypoints.values()){
             var _metadata_edgeMiddleware, _metadata_edgeSSR, _metadata_edgeApiFunction, _metadata_edgeSSR1, _metadata_edgeMiddleware1;
             if (!entrypoint.name) {
@@ -115,7 +115,7 @@ function getCreateAssets(params) {
             }
         }
         middlewareManifest.sortedMiddleware = getSortedRoutes(Object.keys(middlewareManifest.middleware));
-        assets[MIDDLEWARE_MANIFEST] = new sources.RawSource(JSON.stringify(middlewareManifest, null, 2));
+        compilation.emitAsset(MIDDLEWARE_MANIFEST, new sources.RawSource(JSON.stringify(middlewareManifest, null, 2)));
     };
 }
 function buildWebpackError({ message, loc, compilation, entryModule, parser }) {
@@ -131,7 +131,7 @@ function buildWebpackError({ message, loc, compilation, entryModule, parser }) {
 function isInMiddlewareLayer(parser) {
     var _parser_state_module;
     const layer = (_parser_state_module = parser.state.module) == null ? void 0 : _parser_state_module.layer;
-    return layer === WEBPACK_LAYERS.middleware || layer === WEBPACK_LAYERS.api;
+    return layer === WEBPACK_LAYERS.middleware || layer === WEBPACK_LAYERS.apiEdge;
 }
 function isNodeJsModule(moduleName) {
     return require('module').builtinModules.includes(moduleName);
@@ -143,7 +143,9 @@ function isDynamicCodeEvaluationAllowed(fileName, middlewareConfig, rootDir) {
         return true;
     }
     const name = fileName.replace(rootDir ?? '', '');
-    return picomatch((middlewareConfig == null ? void 0 : middlewareConfig.unstable_allowDynamic) ?? [])(name);
+    return picomatch((middlewareConfig == null ? void 0 : middlewareConfig.unstable_allowDynamic) ?? [], {
+        dot: true
+    })(name);
 }
 function buildUnsupportedApiError({ apiName, loc, ...rest }) {
     return buildWebpackError({
@@ -291,7 +293,7 @@ function getCodeAnalyzer(params) {
                     },
                     sourceContent: source.toString()
                 });
-                if (!dev && isNodeJsModule(importedModule)) {
+                if (!dev && isNodeJsModule(importedModule) && !SUPPORTED_NATIVE_MODULES.includes(importedModule)) {
                     compilation.warnings.push(buildWebpackError({
                         message: `A Node.js module is loaded ('${importedModule}' at line ${node.loc.start.line}) which is not supported in the Edge Runtime.
 Learn More: https://nextjs.org/docs/messages/node-module-in-edge-runtime`,
@@ -466,9 +468,12 @@ export default class MiddlewarePlugin {
                 compiler,
                 compilation
             });
-            hooks.parser.for('javascript/auto').tap(NAME, codeAnalyzer);
-            hooks.parser.for('javascript/dynamic').tap(NAME, codeAnalyzer);
-            hooks.parser.for('javascript/esm').tap(NAME, codeAnalyzer);
+            // parser hooks aren't available in rspack
+            if (!process.env.NEXT_RSPACK) {
+                hooks.parser.for('javascript/auto').tap(NAME, codeAnalyzer);
+                hooks.parser.for('javascript/dynamic').tap(NAME, codeAnalyzer);
+                hooks.parser.for('javascript/esm').tap(NAME, codeAnalyzer);
+            }
             /**
        * Extract all metadata for the entry points in a Map object.
        */ const metadataByEntry = new Map();
@@ -513,7 +518,7 @@ export function getEdgePolyfilledModules() {
     return records;
 }
 export async function handleWebpackExternalForEdgeRuntime({ request, context, contextInfo, getResolve }) {
-    if ((contextInfo.issuerLayer === WEBPACK_LAYERS.middleware || contextInfo.issuerLayer === WEBPACK_LAYERS.api) && isNodeJsModule(request) && !supportedEdgePolyfills.has(request)) {
+    if ((contextInfo.issuerLayer === WEBPACK_LAYERS.middleware || contextInfo.issuerLayer === WEBPACK_LAYERS.apiEdge) && isNodeJsModule(request) && !supportedEdgePolyfills.has(request)) {
         // allows user to provide and use their polyfills, as we do with buffer.
         try {
             await getResolve()(context, request);

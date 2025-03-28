@@ -1,5 +1,4 @@
 import { jsx as _jsx } from "react/jsx-runtime";
-import React from 'react';
 import { MetaFilter } from './meta';
 function IconDescriptorLink({ icon }) {
     const { url, rel = 'icon', ...props } = icon;

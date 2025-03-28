@@ -1,4 +1,4 @@
-import { type IncrementalCache, type ResponseCacheEntry, type ResponseGenerator, type ResponseCacheBase } from './types';
+import type { ResponseCacheEntry, ResponseGenerator, ResponseCacheBase, IncrementalResponseCache } from './types';
 import type { RouteKind } from '../route-kind';
 export * from './types';
 export default class ResponseCache implements ResponseCacheBase {
@@ -10,7 +10,7 @@ export default class ResponseCache implements ResponseCacheBase {
         routeKind: RouteKind;
         isOnDemandRevalidate?: boolean;
         isPrefetch?: boolean;
-        incrementalCache: IncrementalCache;
+        incrementalCache: IncrementalResponseCache;
         isRoutePPREnabled?: boolean;
         isFallback?: boolean;
     }): Promise<ResponseCacheEntry | null>;

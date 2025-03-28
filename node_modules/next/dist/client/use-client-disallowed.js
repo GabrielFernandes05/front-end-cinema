@@ -10,7 +10,11 @@ Object.defineProperty(exports, "default", {
 });
 const error = new Proxy({}, {
     get (_target) {
-        throw new Error('Using client components is not allowed in this environment.');
+        throw Object.defineProperty(new Error('Using client components is not allowed in this environment.'), "__NEXT_ERROR_CODE", {
+            value: "E44",
+            enumerable: false,
+            configurable: true
+        });
     }
 });
 const _default = new Proxy({}, {

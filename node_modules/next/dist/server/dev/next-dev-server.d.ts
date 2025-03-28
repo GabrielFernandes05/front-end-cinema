@@ -86,7 +86,7 @@ export default class DevServer extends Server {
     protected getPagesManifest(): PagesManifest | undefined;
     protected getAppPathsManifest(): PagesManifest | undefined;
     protected getinterceptionRoutePatterns(): RegExp[];
-    protected getMiddleware(): MiddlewareRoutingItem | undefined;
+    protected getMiddleware(): Promise<MiddlewareRoutingItem | undefined>;
     protected getNextFontManifest(): undefined;
     protected hasMiddleware(): Promise<boolean>;
     protected ensureMiddleware(url: string): Promise<void>;
@@ -119,7 +119,8 @@ export default class DevServer extends Server {
         definition: RouteDefinition | undefined;
         url?: string;
     }): Promise<void>;
-    protected findPageComponents({ page, query, params, isAppPath, appPaths, shouldEnsure, url, }: {
+    protected findPageComponents({ locale, page, query, params, isAppPath, appPaths, shouldEnsure, url, }: {
+        locale: string | undefined;
         page: string;
         query: NextParsedUrlQuery;
         params: Params;

@@ -1,5 +1,5 @@
 import type webpack from 'webpack';
-type MetadataRouteLoaderOptions = {
+export type MetadataRouteLoaderOptions = {
     filePath: string;
     isDynamicRouteExtension: '1' | '0';
 };

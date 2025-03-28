@@ -55,7 +55,11 @@ Object.defineProperty(singletonRouter, 'events', {
 function getRouter() {
     if (!singletonRouter.router) {
         const message = 'No router instance found.\n' + 'You should only use "next/router" on the client side of your app.\n';
-        throw new Error(message);
+        throw Object.defineProperty(new Error(message), "__NEXT_ERROR_CODE", {
+            value: "E394",
+            enumerable: false,
+            configurable: true
+        });
     }
     return singletonRouter.router;
 }
@@ -113,7 +117,11 @@ export { default as withRouter } from './with-router';
  */ export function useRouter() {
     const router = React.useContext(RouterContext);
     if (!router) {
-        throw new Error('NextRouter was not mounted. https://nextjs.org/docs/messages/next-router-not-mounted');
+        throw Object.defineProperty(new Error('NextRouter was not mounted. https://nextjs.org/docs/messages/next-router-not-mounted'), "__NEXT_ERROR_CODE", {
+            value: "E509",
+            enumerable: false,
+            configurable: true
+        });
     }
     return router;
 }

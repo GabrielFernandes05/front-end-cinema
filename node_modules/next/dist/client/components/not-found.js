@@ -25,7 +25,11 @@ const _httpaccessfallback = require("./http-access-fallback/http-access-fallback
  */ const DIGEST = "" + _httpaccessfallback.HTTP_ERROR_FALLBACK_ERROR_CODE + ";404";
 function notFound() {
     // eslint-disable-next-line no-throw-literal
-    const error = new Error(DIGEST);
+    const error = Object.defineProperty(new Error(DIGEST), "__NEXT_ERROR_CODE", {
+        value: "E394",
+        enumerable: false,
+        configurable: true
+    });
     error.digest = DIGEST;
     throw error;
 }

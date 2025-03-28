@@ -11,12 +11,16 @@ export function buildDataRoute(page, buildId) {
     let namedDataRouteRegex;
     let routeKeys;
     if (isDynamicRoute(page)) {
-        const routeRegex = getNamedRouteRegex(dataRoute.replace(/\.json$/, ''), true);
-        dataRouteRegex = normalizeRouteRegex(routeRegex.re.source.replace(/\(\?:\\\/\)\?\$$/, `\\.json$`));
-        namedDataRouteRegex = routeRegex.namedRegex.replace(/\(\?:\/\)\?\$$/, `\\.json$`);
+        const routeRegex = getNamedRouteRegex(dataRoute, {
+            prefixRouteKeys: true,
+            includeSuffix: true,
+            excludeOptionalTrailingSlash: true
+        });
+        dataRouteRegex = normalizeRouteRegex(routeRegex.re.source);
+        namedDataRouteRegex = routeRegex.namedRegex;
         routeKeys = routeRegex.routeKeys;
     } else {
-        dataRouteRegex = normalizeRouteRegex(new RegExp(`^${path.posix.join('/_next/data', escapeStringRegexp(buildId), `${pagePath}.json`)}$`).source);
+        dataRouteRegex = normalizeRouteRegex(new RegExp(`^${path.posix.join('/_next/data', escapeStringRegexp(buildId), `${pagePath}\\.json`)}$`).source);
     }
     return {
         page,

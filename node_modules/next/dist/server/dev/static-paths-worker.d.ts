@@ -1,7 +1,7 @@
 import type { NextConfigComplete } from '../config-shared';
 import '../require-hook';
 import '../node-environment';
-import type { PartialStaticPathsResult } from '../../build/utils';
+import type { StaticPathsResult } from '../../build/static-paths/types';
 import type { IncrementalCache } from '../lib/incremental-cache';
 import { type ExperimentalPPRConfig } from '../lib/experimental/ppr';
 type RuntimeConfig = {
@@ -15,13 +15,13 @@ type RuntimeConfig = {
     };
     dynamicIO: boolean;
 };
-export declare function loadStaticPaths({ dir, distDir, pathname, config, httpAgentOptions, locales, defaultLocale, isAppPath, page, isrFlushToDisk, fetchCacheKeyPrefix, maxMemoryCacheSize, requestHeaders, cacheHandler, cacheLifeProfiles, nextConfigOutput, buildId, authInterrupts, }: {
+export declare function loadStaticPaths({ dir, distDir, pathname, config, httpAgentOptions, locales, defaultLocale, isAppPath, page, isrFlushToDisk, fetchCacheKeyPrefix, maxMemoryCacheSize, requestHeaders, cacheHandler, cacheHandlers, cacheLifeProfiles, nextConfigOutput, buildId, authInterrupts, sriEnabled, }: {
     dir: string;
     distDir: string;
     pathname: string;
     config: RuntimeConfig;
     httpAgentOptions: NextConfigComplete['httpAgentOptions'];
-    locales?: string[];
+    locales?: readonly string[];
     defaultLocale?: string;
     isAppPath: boolean;
     page: string;
@@ -30,11 +30,13 @@ export declare function loadStaticPaths({ dir, distDir, pathname, config, httpAg
     maxMemoryCacheSize?: number;
     requestHeaders: IncrementalCache['requestHeaders'];
     cacheHandler?: string;
+    cacheHandlers?: NextConfigComplete['experimental']['cacheHandlers'];
     cacheLifeProfiles?: {
         [profile: string]: import('../../server/use-cache/cache-life').CacheLife;
     };
     nextConfigOutput: 'standalone' | 'export' | undefined;
     buildId: string;
     authInterrupts: boolean;
-}): Promise<PartialStaticPathsResult>;
+    sriEnabled: boolean;
+}): Promise<Partial<StaticPathsResult>>;
 export {};

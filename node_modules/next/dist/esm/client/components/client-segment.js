@@ -18,7 +18,11 @@ import { InvariantError } from '../../shared/lib/invariant-error';
         // appropriate context. We wrap differently in prerendering vs rendering
         const store = workAsyncStorage.getStore();
         if (!store) {
-            throw new InvariantError('Expected workStore to exist when handling params in a client segment such as a Layout or Template.');
+            throw Object.defineProperty(new InvariantError('Expected workStore to exist when handling params in a client segment such as a Layout or Template.'), "__NEXT_ERROR_CODE", {
+                value: "E600",
+                enumerable: false,
+                configurable: true
+            });
         }
         const { createParamsFromClient } = require('../../server/request/params');
         clientParams = createParamsFromClient(params, store);
@@ -27,7 +31,7 @@ import { InvariantError } from '../../shared/lib/invariant-error';
             params: clientParams
         });
     } else {
-        const { createRenderParamsFromClient } = require('../../server/request/params.browser');
+        const { createRenderParamsFromClient } = require('../request/params.browser');
         const clientParams = createRenderParamsFromClient(params);
         return /*#__PURE__*/ _jsx(Component, {
             ...slots,

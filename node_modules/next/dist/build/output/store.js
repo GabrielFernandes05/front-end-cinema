@@ -173,7 +173,6 @@ store.subscribe((state)=>{
         // Ensure traces are flushed after each compile in development mode
         (0, _trace.flushAllTraces)();
         (0, _swc.teardownTraceSubscriber)();
-        (0, _swc.teardownHeapProfiler)();
         return;
     }
     let timeMessage = '';
@@ -191,7 +190,6 @@ store.subscribe((state)=>{
         // Ensure traces are flushed after each compile in development mode
         (0, _trace.flushAllTraces)();
         (0, _swc.teardownTraceSubscriber)();
-        (0, _swc.teardownHeapProfiler)();
         return;
     }
     if (state.typeChecking) {
@@ -215,7 +213,6 @@ store.subscribe((state)=>{
     // Ensure traces are flushed after each compile in development mode
     (0, _trace.flushAllTraces)();
     (0, _swc.teardownTraceSubscriber)();
-    (0, _swc.teardownHeapProfiler)();
 });
 
 //# sourceMappingURL=store.js.map

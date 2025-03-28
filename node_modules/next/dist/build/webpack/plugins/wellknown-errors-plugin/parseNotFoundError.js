@@ -79,7 +79,7 @@ async function getSourceFrame(input, fileName, compilation) {
                     ignoredSources: (0, _middlewarewebpack.getIgnoredSources)(sourceMap),
                     compilation,
                     moduleId,
-                    modulePath: fileName
+                    moduleURL: fileName
                 },
                 rootDirectory: compilation.options.context,
                 frame: {
@@ -87,7 +87,8 @@ async function getSourceFrame(input, fileName, compilation) {
                     file: fileName,
                     methodName: '',
                     lineNumber: loc.start.line,
-                    column: loc.start.column
+                    // loc is 0-based but columns in stack frames are 1-based.
+                    column: (loc.start.column ?? 0) + 1
                 }
             });
             return {

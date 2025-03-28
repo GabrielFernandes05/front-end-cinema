@@ -10,7 +10,11 @@ export const dynamicParamTypes = {
  */ export function getShortDynamicParamType(type) {
     const short = dynamicParamTypes[type];
     if (!short) {
-        throw new Error('Unknown dynamic param type');
+        throw Object.defineProperty(new Error('Unknown dynamic param type'), "__NEXT_ERROR_CODE", {
+            value: "E378",
+            enumerable: false,
+            configurable: true
+        });
     }
     return short;
 }

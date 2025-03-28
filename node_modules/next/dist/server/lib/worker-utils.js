@@ -23,7 +23,11 @@ const getFreePort = async ()=>{
             if (address && typeof address === 'object') {
                 resolve(address.port);
             } else {
-                reject(new Error('invalid address from server: ' + (address == null ? void 0 : address.toString())));
+                reject(Object.defineProperty(new Error('invalid address from server: ' + (address == null ? void 0 : address.toString())), "__NEXT_ERROR_CODE", {
+                    value: "E327",
+                    enumerable: false,
+                    configurable: true
+                }));
             }
         });
     });

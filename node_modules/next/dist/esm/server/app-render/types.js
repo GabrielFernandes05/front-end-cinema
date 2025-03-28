@@ -23,7 +23,8 @@ export const flightRouterStateSchema = s.tuple([
     s.optional(s.nullable(s.string())),
     s.optional(s.nullable(s.union([
         s.literal('refetch'),
-        s.literal('refresh')
+        s.literal('refresh'),
+        s.literal('inside-shared-layout')
     ]))),
     s.optional(s.boolean())
 ]);

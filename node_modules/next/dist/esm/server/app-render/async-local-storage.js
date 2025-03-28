@@ -1,4 +1,8 @@
-const sharedAsyncLocalStorageNotAvailableError = new Error('Invariant: AsyncLocalStorage accessed in runtime where it is not available');
+const sharedAsyncLocalStorageNotAvailableError = Object.defineProperty(new Error('Invariant: AsyncLocalStorage accessed in runtime where it is not available'), "__NEXT_ERROR_CODE", {
+    value: "E504",
+    enumerable: false,
+    configurable: true
+});
 class FakeAsyncLocalStorage {
     disable() {
         throw sharedAsyncLocalStorageNotAvailableError;

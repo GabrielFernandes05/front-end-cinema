@@ -110,7 +110,11 @@ export class DefaultRouteMatcherManager {
             for (const pathname of sorted){
                 const indexes = reference.get(pathname);
                 if (!Array.isArray(indexes)) {
-                    throw new Error('Invariant: expected to find identity in indexes map');
+                    throw Object.defineProperty(new Error('Invariant: expected to find identity in indexes map'), "__NEXT_ERROR_CODE", {
+                        value: "E271",
+                        enumerable: false,
+                        configurable: true
+                    });
                 }
                 const dynamicMatches = indexes.map((index)=>dynamic[index]);
                 sortedDynamicMatchers.push(...dynamicMatches);
@@ -118,7 +122,11 @@ export class DefaultRouteMatcherManager {
             this.matchers.dynamic = sortedDynamicMatchers;
             // This means that there was a new matcher pushed while we were waiting
             if (this.compilationID !== compilationID) {
-                throw new Error('Invariant: expected compilation to finish before new matchers were added, possible missing await');
+                throw Object.defineProperty(new Error('Invariant: expected compilation to finish before new matchers were added, possible missing await'), "__NEXT_ERROR_CODE", {
+                    value: "E242",
+                    enumerable: false,
+                    configurable: true
+                });
             }
         } catch (err) {
             reject(err);
@@ -176,7 +184,11 @@ export class DefaultRouteMatcherManager {
         // before it was recompiled (an error). We also don't want to affect request
         // times.
         if (this.lastCompilationID !== this.compilationID) {
-            throw new Error('Invariant: expected routes to have been loaded before match');
+            throw Object.defineProperty(new Error('Invariant: expected routes to have been loaded before match'), "__NEXT_ERROR_CODE", {
+                value: "E235",
+                enumerable: false,
+                configurable: true
+            });
         }
         // Ensure that path matching is done with a leading slash.
         pathname = ensureLeadingSlash(pathname);

@@ -19,14 +19,22 @@ export default async function nextFontLoader() {
      */ const { path: relativeFilePathFromRoot, import: functionName, arguments: data, variableName } = JSON.parse(this.resourceQuery.slice(1));
         // Throw error if @next/font is used in _document.js
         if (/pages[\\/]_document\./.test(relativeFilePathFromRoot)) {
-            const err = new Error(`${bold('Cannot')} be used within ${cyan('pages/_document.js')}.`);
+            const err = Object.defineProperty(new Error(`${bold('Cannot')} be used within ${cyan('pages/_document.js')}.`), "__NEXT_ERROR_CODE", {
+                value: "E135",
+                enumerable: false,
+                configurable: true
+            });
             err.name = 'NextFontError';
             callback(err);
             return;
         }
         const { isDev, isServer, assetPrefix, fontLoaderPath, postcss: getPostcss } = this.getOptions();
         if (assetPrefix && !/^\/|https?:\/\//.test(assetPrefix)) {
-            const err = new Error('assetPrefix must start with a leading slash or be an absolute URL(http:// or https://)');
+            const err = Object.defineProperty(new Error('assetPrefix must start with a leading slash or be an absolute URL(http:// or https://)'), "__NEXT_ERROR_CODE", {
+                value: "E72",
+                enumerable: false,
+                configurable: true
+            });
             err.name = 'NextFontError';
             callback(err);
             return;

@@ -27,7 +27,11 @@ export class NodeNextRequest extends BaseNextRequest {
    * @internal
    */ stream() {
         if (this.streaming) {
-            throw new Error('Invariant: NodeNextRequest.stream() can only be called once');
+            throw Object.defineProperty(new Error('Invariant: NodeNextRequest.stream() can only be called once'), "__NEXT_ERROR_CODE", {
+                value: "E467",
+                enumerable: false,
+                configurable: true
+            });
         }
         this.streaming = true;
         return new ReadableStream({

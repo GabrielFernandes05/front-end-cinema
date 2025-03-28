@@ -9,7 +9,7 @@ export default function Background({ Propriedades = "", children }: BackgroundPr
 
 
     return (
-        <div className={`w-screen h-screen bg-zinc-950 ${Propriedades}`}>
+        <div className={`w-screen min-h-screen bg-zinc-950 ${Propriedades}`}>
             <Navmenu></Navmenu>
             {children}
         </div>

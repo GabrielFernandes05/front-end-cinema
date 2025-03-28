@@ -65,8 +65,12 @@ function createWriterFromResponse(res, waitUntilForEnd) {
                 }
             } catch (err) {
                 res.end();
-                throw new Error('failed to write chunk to response', {
+                throw Object.defineProperty(new Error('failed to write chunk to response', {
                     cause: err
+                }), "__NEXT_ERROR_CODE", {
+                    value: "E321",
+                    enumerable: false,
+                    configurable: true
                 });
             }
         },
@@ -101,8 +105,12 @@ export async function pipeToNodeResponse(readable, res, waitUntilForEnd) {
     } catch (err) {
         // If this isn't related to an abort error, re-throw it.
         if (isAbortError(err)) return;
-        throw new Error('failed to pipe response', {
+        throw Object.defineProperty(new Error('failed to pipe response', {
             cause: err
+        }), "__NEXT_ERROR_CODE", {
+            value: "E180",
+            enumerable: false,
+            configurable: true
         });
     }
 }

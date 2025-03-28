@@ -78,6 +78,12 @@ function transform(source, inputSourceMap, loaderOptions, filename, target, pare
         target,
         filename
     });
+    if (!babelConfig) {
+        return {
+            code: source,
+            map: inputSourceMap
+        };
+    }
     getConfigSpan.stop();
     const normalizeSpan = parentSpan.traceChild('babel-turbo-normalize-file');
     const file = (0, _util.consumeIterator)((0, _corelibnormalizefile.default)(babelConfig.passes, (0, _corelibnormalizeopts.default)(babelConfig), source));

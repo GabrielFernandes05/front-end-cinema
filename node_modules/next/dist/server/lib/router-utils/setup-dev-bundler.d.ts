@@ -32,7 +32,7 @@ export type ServerFields = {
     } | undefined;
     hasAppNotFound?: boolean;
     interceptionRoutes?: ReturnType<typeof import('./filesystem').buildCustomRoute>[];
-    setAppIsrStatus?: (key: string, value: boolean) => void;
+    setIsrStatus?: (key: string, value: boolean) => void;
     resetFetch?: () => void;
 };
 export declare function propagateServerField(opts: SetupOpts, field: PropagateToWorkersField, args: any): Promise<void>;

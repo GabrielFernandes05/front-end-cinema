@@ -40,6 +40,7 @@ const _bailouttocsr = require("../../shared/lib/lazy-dynamic/bailout-to-csr");
 const _hooksservercontext = require("../../client/components/hooks-server-context");
 const _isnextroutererror = require("../../client/components/is-next-router-error");
 const _iserror = require("../../lib/is-error");
+const _errortelemetryutils = require("../../lib/error-telemetry-utils");
 function _interop_require_default(obj) {
     return obj && obj.__esModule ? obj : {
         default: obj
@@ -90,7 +91,7 @@ function createFlightReactServerErrorHandler(shouldFormatError, onReactServerRen
             });
         }
         onReactServerRenderError(err);
-        return err.digest;
+        return (0, _errortelemetryutils.createDigestWithErrorCode)(thrownValue, err.digest);
     };
 }
 function createHTMLReactServerErrorHandler(shouldFormatError, isNextExport, reactServerErrors, silenceLogger, onReactServerRenderError) {
@@ -137,7 +138,7 @@ function createHTMLReactServerErrorHandler(shouldFormatError, isNextExport, reac
                 onReactServerRenderError == null ? void 0 : onReactServerRenderError(err);
             }
         }
-        return err.digest;
+        return (0, _errortelemetryutils.createDigestWithErrorCode)(thrownValue, err.digest);
     };
 }
 function createHTMLErrorHandler(shouldFormatError, isNextExport, reactServerErrors, allCapturedErrors, silenceLogger, onHTMLRenderSSRError) {
@@ -187,7 +188,7 @@ function createHTMLErrorHandler(shouldFormatError, isNextExport, reactServerErro
                 onHTMLRenderSSRError(err, errorInfo);
             }
         }
-        return err.digest;
+        return (0, _errortelemetryutils.createDigestWithErrorCode)(thrownValue, err.digest);
     };
 }
 function isUserLandError(err) {

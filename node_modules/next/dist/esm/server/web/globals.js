@@ -47,16 +47,28 @@ function __import_unsupported(moduleName) {
             if (prop === 'then') {
                 return {};
             }
-            throw new Error(getUnsupportedModuleErrorMessage(moduleName));
+            throw Object.defineProperty(new Error(getUnsupportedModuleErrorMessage(moduleName)), "__NEXT_ERROR_CODE", {
+                value: "E394",
+                enumerable: false,
+                configurable: true
+            });
         },
         construct () {
-            throw new Error(getUnsupportedModuleErrorMessage(moduleName));
+            throw Object.defineProperty(new Error(getUnsupportedModuleErrorMessage(moduleName)), "__NEXT_ERROR_CODE", {
+                value: "E394",
+                enumerable: false,
+                configurable: true
+            });
         },
         apply (_target, _this, args) {
             if (typeof args[0] === 'function') {
                 return args[0](proxy);
             }
-            throw new Error(getUnsupportedModuleErrorMessage(moduleName));
+            throw Object.defineProperty(new Error(getUnsupportedModuleErrorMessage(moduleName)), "__NEXT_ERROR_CODE", {
+                value: "E394",
+                enumerable: false,
+                configurable: true
+            });
         }
     });
     return new Proxy({}, {
@@ -64,6 +76,9 @@ function __import_unsupported(moduleName) {
     });
 }
 function enhanceGlobals() {
+    if (process.env.NEXT_RUNTIME !== 'edge') {
+        return;
+    }
     // The condition is true when the "process" module is provided
     if (process !== global.process) {
         // prefer local process but global.process has correct "env"

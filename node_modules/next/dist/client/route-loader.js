@@ -96,7 +96,11 @@ function prefetchViaDom(href, as, link) {
         link.rel = "prefetch";
         link.crossOrigin = process.env.__NEXT_CROSS_ORIGIN;
         link.onload = resolve;
-        link.onerror = ()=>reject(markAssetError(new Error("Failed to prefetch: " + href)));
+        link.onerror = ()=>reject(markAssetError(Object.defineProperty(new Error("Failed to prefetch: " + href), "__NEXT_ERROR_CODE", {
+                value: "E268",
+                enumerable: false,
+                configurable: true
+            })));
         // `href` should always be last:
         link.href = href;
         document.head.appendChild(link);
@@ -109,7 +113,11 @@ function appendScript(src, script) {
         // 1. Setup success/failure hooks in case the browser synchronously
         //    executes when `src` is set.
         script.onload = resolve;
-        script.onerror = ()=>reject(markAssetError(new Error("Failed to load script: " + src)));
+        script.onerror = ()=>reject(markAssetError(Object.defineProperty(new Error("Failed to load script: " + src), "__NEXT_ERROR_CODE", {
+                value: "E74",
+                enumerable: false,
+                configurable: true
+            })));
         // 2. Configure the cross-origin attribute before setting `src` in case the
         //    browser begins to fetch.
         script.crossOrigin = process.env.__NEXT_CROSS_ORIGIN;
@@ -164,7 +172,11 @@ function getClientBuildManifest() {
             cb && cb();
         };
     });
-    return resolvePromiseWithTimeout(onBuildManifest, MS_MAX_IDLE_DELAY, markAssetError(new Error('Failed to load client build manifest')));
+    return resolvePromiseWithTimeout(onBuildManifest, MS_MAX_IDLE_DELAY, markAssetError(Object.defineProperty(new Error('Failed to load client build manifest'), "__NEXT_ERROR_CODE", {
+        value: "E273",
+        enumerable: false,
+        configurable: true
+    })));
 }
 function getFilesForRoute(assetPrefix, route) {
     if (process.env.NODE_ENV === 'development') {
@@ -179,7 +191,11 @@ function getFilesForRoute(assetPrefix, route) {
     }
     return getClientBuildManifest().then((manifest)=>{
         if (!(route in manifest)) {
-            throw markAssetError(new Error("Failed to lookup route: " + route));
+            throw markAssetError(Object.defineProperty(new Error("Failed to lookup route: " + route), "__NEXT_ERROR_CODE", {
+                value: "E446",
+                enumerable: false,
+                configurable: true
+            }));
         }
         const allFiles = manifest[route].map((entry)=>assetPrefix + '/_next/' + (0, _encodeuripath.encodeURIPath)(entry));
         return {
@@ -221,7 +237,11 @@ function createRouteLoader(assetPrefix) {
             credentials: 'same-origin'
         }).then((res)=>{
             if (!res.ok) {
-                throw new Error("Failed to load stylesheet: " + href);
+                throw Object.defineProperty(new Error("Failed to load stylesheet: " + href), "__NEXT_ERROR_CODE", {
+                    value: "E189",
+                    enumerable: false,
+                    configurable: true
+                });
             }
             return res.text().then((text)=>({
                     href: href,
@@ -282,7 +302,11 @@ function createRouteLoader(assetPrefix) {
                             entrypoint,
                             styles: res[1]
                         }));
-                }), MS_MAX_IDLE_DELAY, markAssetError(new Error("Route did not complete loading: " + route))).then((param)=>{
+                }), MS_MAX_IDLE_DELAY, markAssetError(Object.defineProperty(new Error("Route did not complete loading: " + route), "__NEXT_ERROR_CODE", {
+                    value: "E12",
+                    enumerable: false,
+                    configurable: true
+                }))).then((param)=>{
                     let { entrypoint, styles } = param;
                     const res = Object.assign({
                         styles: styles

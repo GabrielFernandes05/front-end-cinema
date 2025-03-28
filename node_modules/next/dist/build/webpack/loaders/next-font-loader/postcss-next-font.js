@@ -54,7 +54,11 @@ function _interop_require_default(obj) {
                 }
             }
             if (!fontFamily) {
-                throw new Error("Font loaders must return one or more @font-face's");
+                throw Object.defineProperty(new Error("Font loaders must return one or more @font-face's"), "__NEXT_ERROR_CODE", {
+                    value: "E428",
+                    enumerable: false,
+                    configurable: true
+                });
             }
             // Add fallback @font-face with the provided override values
             let adjustFontFallbackFamily;

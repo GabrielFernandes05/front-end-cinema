@@ -43,12 +43,20 @@ import { normalizeSourceMap, normalizeSourceMapAfterPostcss } from './utils';
                 this.addDependency(error.file);
             }
             if (error.name === 'CssSyntaxError') {
-                throw new SyntaxError(error);
+                throw Object.defineProperty(new SyntaxError(error), "__NEXT_ERROR_CODE", {
+                    value: "E394",
+                    enumerable: false,
+                    configurable: true
+                });
             }
             throw error;
         }
         for (const warning of result.warnings()){
-            this.emitWarning(new Warning(warning));
+            this.emitWarning(Object.defineProperty(new Warning(warning), "__NEXT_ERROR_CODE", {
+                value: "E394",
+                enumerable: false,
+                configurable: true
+            }));
         }
         for (const message of result.messages){
             // eslint-disable-next-line default-case

@@ -16,13 +16,11 @@ import { warnOnce } from '../../../shared/lib/utils/warn-once';
 import { MissingSlotContext } from '../../../shared/lib/app-router-context.shared-runtime';
 class HTTPAccessFallbackErrorBoundary extends React.Component {
     componentDidCatch() {
-        if (process.env.NODE_ENV === 'development' && this.props.missingSlots && // A missing children slot is the typical not-found case, so no need to warn
+        if (process.env.NODE_ENV === 'development' && this.props.missingSlots && this.props.missingSlots.size > 0 && // A missing children slot is the typical not-found case, so no need to warn
         !this.props.missingSlots.has('children')) {
             let warningMessage = 'No default component was found for a parallel route rendered on this page. Falling back to nearest NotFound boundary.\n' + 'Learn more: https://nextjs.org/docs/app/building-your-application/routing/parallel-routes#defaultjs\n\n';
-            if (this.props.missingSlots.size > 0) {
-                const formattedSlots = Array.from(this.props.missingSlots).sort((a, b)=>a.localeCompare(b)).map((slot)=>"@" + slot).join(', ');
-                warningMessage += 'Missing slots: ' + formattedSlots;
-            }
+            const formattedSlots = Array.from(this.props.missingSlots).sort((a, b)=>a.localeCompare(b)).map((slot)=>"@" + slot).join(', ');
+            warningMessage += 'Missing slots: ' + formattedSlots;
             warnOnce(warningMessage);
         }
     }
@@ -76,7 +74,7 @@ class HTTPAccessFallbackErrorBoundary extends React.Component {
                         content: "noindex"
                     }),
                     process.env.NODE_ENV === 'development' && /*#__PURE__*/ _jsx("meta", {
-                        name: "next-error",
+                        name: "boundary-next-error",
                         content: getAccessFallbackErrorTypeByStatus(triggeredStatus)
                     }),
                     errorComponents[triggeredStatus]

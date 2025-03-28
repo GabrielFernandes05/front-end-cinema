@@ -102,7 +102,11 @@ function convertDynamicParamTypeToSyntax(dynamicParamTypeShort, param) {
         case 'di':
             return `[${param}]`;
         default:
-            throw new Error('Unknown dynamic param type');
+            throw Object.defineProperty(new Error('Unknown dynamic param type'), "__NEXT_ERROR_CODE", {
+                value: "E378",
+                enumerable: false,
+                configurable: true
+            });
     }
 }
 function getEntryKey(compilerType, pageBundleType, page) {
@@ -210,7 +214,9 @@ class Invalidator {
                 this.rebuildAgain.delete(key);
             }
         }
-        this.invalidate(rebuild);
+        if (rebuild.length > 0) {
+            this.invalidate(rebuild);
+        }
     }
     willRebuild(compilerKey) {
         return this.rebuildAgain.has(compilerKey);
@@ -266,7 +272,7 @@ async function findPagePathData(rootDir, page, extensions, pagesDir, appDir) {
         }));
         let bundlePath = normalizedPagePath;
         let pageKey = _path.posix.normalize(pageUrl);
-        if (isInstrumentation) {
+        if (isInstrumentation || (0, _utils.isMiddlewareFile)(normalizedPagePath)) {
             bundlePath = bundlePath.replace('/src', '');
             pageKey = page.replace('/src', '');
         }
@@ -470,7 +476,11 @@ function onDemandEntryHandler({ hotReloader, maxInactiveAge, multiCompiler, next
             const isInsideAppDir = !!appDir && route.filename.startsWith(appDir);
             if (typeof isApp === 'boolean' && isApp !== isInsideAppDir) {
                 Error.stackTraceLimit = 15;
-                throw new Error(`Ensure bailed, found path "${route.page}" does not match ensure type (${isApp ? 'app' : 'pages'})`);
+                throw Object.defineProperty(new Error(`Ensure bailed, found path "${route.page}" does not match ensure type (${isApp ? 'app' : 'pages'})`), "__NEXT_ERROR_CODE", {
+                    value: "E419",
+                    enumerable: false,
+                    configurable: true
+                });
             }
             const pageBundleType = getPageBundleType(route.bundlePath);
             const addEntry = (compilerType)=>{
@@ -521,9 +531,13 @@ function onDemandEntryHandler({ hotReloader, maxInactiveAge, multiCompiler, next
             });
             const added = new Map();
             const isServerComponent = isInsideAppDir && staticInfo.rsc !== _constants.RSC_MODULE_TYPES.client;
+            let pageRuntime = staticInfo.runtime;
+            if ((0, _utils.isMiddlewareFile)(page) && !nextConfig.experimental.nodeMiddleware) {
+                pageRuntime = 'edge';
+            }
             (0, _entries.runDependingOnPageType)({
                 page: route.page,
-                pageRuntime: staticInfo.runtime,
+                pageRuntime,
                 pageType: pageBundleType,
                 onClient: ()=>{
                     // Skip adding the client entry for app / Server Components.

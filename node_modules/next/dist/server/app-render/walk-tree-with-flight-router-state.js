@@ -15,8 +15,9 @@ const _createflightrouterstatefromloadertree = require("./create-flight-router-s
 const _hasloadingcomponentintree = require("./has-loading-component-in-tree");
 const _segment = require("../../shared/lib/segment");
 const _createcomponenttree = require("./create-component-tree");
-async function walkTreeWithFlightRouterState({ createSegmentPath, loaderTreeToFilter, parentParams, isFirst, flightRouterState, parentRendered, rscPayloadHead, injectedCSS, injectedJS, injectedFontPreloadTags, rootLayoutIncluded, getMetadataReady, ctx, preloadCallbacks }) {
-    const { renderOpts: { nextFontManifest, experimental }, query, isPrefetch, getDynamicParamFromSegment } = ctx;
+const _getsegmentparam = require("./get-segment-param");
+async function walkTreeWithFlightRouterState({ loaderTreeToFilter, parentParams, flightRouterState, parentIsInsideSharedLayout, rscHead, injectedCSS, injectedJS, injectedFontPreloadTags, rootLayoutIncluded, getViewportReady, getMetadataReady, ctx, preloadCallbacks, StreamingMetadataOutlet }) {
+    const { renderOpts: { nextFontManifest, experimental }, query, isPrefetch, getDynamicParamFromSegment, parsedRequestHeaders } = ctx;
     const [segment, parallelRoutes, modules] = loaderTreeToFilter;
     const parallelRoutesKeys = Object.keys(parallelRoutes);
     const { layout } = modules;
@@ -46,53 +47,79 @@ async function walkTreeWithFlightRouterState({ createSegmentPath, loaderTreeToFi
     // to ensure prefetches are quick and inexpensive. If there's no `loading` component anywhere in the tree being rendered,
     // the prefetch will be short-circuited to avoid requesting a potentially very expensive subtree. If there's a `loading`
     // somewhere in the tree, we'll recursively render the component tree up until we encounter that loading component, and then stop.
-    const shouldSkipComponentTree = !experimental.isRoutePPREnabled && isPrefetch && !Boolean(modules.loading) && !(0, _hasloadingcomponentintree.hasLoadingComponentInTree)(loaderTreeToFilter);
-    if (!parentRendered && renderComponentsOnThisLevel) {
-        const overriddenSegment = flightRouterState && (0, _matchsegments.canSegmentBeOverridden)(actualSegment, flightRouterState[0]) ? flightRouterState[0] : actualSegment;
+    // Check if we're inside the "new" part of the navigation — inside the
+    // shared layout. In the case of a prefetch, this can be true even if the
+    // segment matches, because the client might send a matching segment to
+    // indicate that it already has the data in its cache. But in order to find
+    // the correct loading boundary, we still need to track where the shared
+    // layout begins.
+    //
+    // TODO: We should rethink the protocol for dynamic requests. It might not
+    // make sense for the client to send a FlightRouterState, since that type is
+    // overloaded with other concerns.
+    const isInsideSharedLayout = renderComponentsOnThisLevel || parentIsInsideSharedLayout || flightRouterState[3] === 'inside-shared-layout';
+    if (isInsideSharedLayout && !experimental.isRoutePPREnabled && // If PPR is disabled, and this is a request for the route tree, then we
+    // never render any components. Only send the router state.
+    (parsedRequestHeaders.isRouteTreePrefetchRequest || // Otherwise, check for the presence of a `loading` component.
+    isPrefetch && !Boolean(modules.loading) && !(0, _hasloadingcomponentintree.hasLoadingComponentInTree)(loaderTreeToFilter))) {
+        // Send only the router state.
+        // TODO: Even for a dynamic route, we should cache these responses,
+        // because they do not contain any render data (neither segment data nor
+        // the head). They can be made even more cacheable once we move the route
+        // params into a separate data structure.
+        const overriddenSegment = flightRouterState && // TODO: Why does canSegmentBeOverridden exist? Why don't we always just
+        // use `actualSegment`? Is it to avoid overwriting some state that's
+        // tracked by the client? Dig deeper to see if we can simplify this.
+        canSegmentBeOverridden(actualSegment, flightRouterState[0]) ? flightRouterState[0] : actualSegment;
         const routerState = (0, _createflightrouterstatefromloadertree.createFlightRouterStateFromLoaderTree)(// Create router state using the slice of the loaderTree
         loaderTreeToFilter, getDynamicParamFromSegment, query);
-        if (shouldSkipComponentTree) {
-            // Send only the router state
-            return [
+        return [
+            [
+                overriddenSegment,
+                routerState,
+                null,
                 [
-                    overriddenSegment,
-                    routerState,
                     null,
-                    // TODO: It's possible that all the segment data was prefetched during
-                    // a navigation, but the head was not. Should we send it down
-                    // here anyway?
-                    null,
-                    false
-                ]
-            ];
-        } else {
-            // Create component tree using the slice of the loaderTree
-            const seedData = await (0, _createcomponenttree.createComponentTree)(// This ensures flightRouterPath is valid and filters down the tree
-            {
-                ctx,
-                createSegmentPath,
-                loaderTree: loaderTreeToFilter,
-                parentParams: currentParams,
-                firstItem: isFirst,
-                injectedCSS,
-                injectedJS,
-                injectedFontPreloadTags,
-                // This is intentionally not "rootLayoutIncludedAtThisLevelOrAbove" as createComponentTree starts at the current level and does a check for "rootLayoutAtThisLevel" too.
-                rootLayoutIncluded,
-                getMetadataReady,
-                preloadCallbacks,
-                authInterrupts: experimental.authInterrupts
-            });
-            return [
-                [
-                    overriddenSegment,
-                    routerState,
-                    seedData,
-                    rscPayloadHead,
-                    false
-                ]
-            ];
-        }
+                    null
+                ],
+                false
+            ]
+        ];
+    }
+    if (renderComponentsOnThisLevel) {
+        const overriddenSegment = flightRouterState && // TODO: Why does canSegmentBeOverridden exist? Why don't we always just
+        // use `actualSegment`? Is it to avoid overwriting some state that's
+        // tracked by the client? Dig deeper to see if we can simplify this.
+        canSegmentBeOverridden(actualSegment, flightRouterState[0]) ? flightRouterState[0] : actualSegment;
+        const routerState = (0, _createflightrouterstatefromloadertree.createFlightRouterStateFromLoaderTree)(// Create router state using the slice of the loaderTree
+        loaderTreeToFilter, getDynamicParamFromSegment, query);
+        // Create component tree using the slice of the loaderTree
+        const seedData = await (0, _createcomponenttree.createComponentTree)(// This ensures flightRouterPath is valid and filters down the tree
+        {
+            ctx,
+            loaderTree: loaderTreeToFilter,
+            parentParams: currentParams,
+            injectedCSS,
+            injectedJS,
+            injectedFontPreloadTags,
+            // This is intentionally not "rootLayoutIncludedAtThisLevelOrAbove" as createComponentTree starts at the current level and does a check for "rootLayoutAtThisLevel" too.
+            rootLayoutIncluded,
+            getViewportReady,
+            getMetadataReady,
+            preloadCallbacks,
+            authInterrupts: experimental.authInterrupts,
+            StreamingMetadata: null,
+            StreamingMetadataOutlet
+        });
+        return [
+            [
+                overriddenSegment,
+                routerState,
+                seedData,
+                rscHead,
+                false
+            ]
+        ];
     }
     // If we are not rendering on this level we need to check if the current
     // segment has a layout. If so, we need to track all the used CSS to make
@@ -109,32 +136,21 @@ async function walkTreeWithFlightRouterState({ createSegmentPath, loaderTreeToFi
     // Walk through all parallel routes.
     for (const parallelRouteKey of parallelRoutesKeys){
         const parallelRoute = parallelRoutes[parallelRouteKey];
-        const currentSegmentPath = isFirst ? [
-            parallelRouteKey
-        ] : [
-            actualSegment,
-            parallelRouteKey
-        ];
         const subPaths = await walkTreeWithFlightRouterState({
             ctx,
-            createSegmentPath: (child)=>{
-                return createSegmentPath([
-                    ...currentSegmentPath,
-                    ...child
-                ]);
-            },
             loaderTreeToFilter: parallelRoute,
             parentParams: currentParams,
             flightRouterState: flightRouterState && flightRouterState[1][parallelRouteKey],
-            parentRendered: parentRendered || renderComponentsOnThisLevel,
-            isFirst: false,
-            rscPayloadHead,
+            parentIsInsideSharedLayout: isInsideSharedLayout,
+            rscHead,
             injectedCSS: injectedCSSWithCurrentLayout,
             injectedJS: injectedJSWithCurrentLayout,
             injectedFontPreloadTags: injectedFontPreloadTagsWithCurrentLayout,
             rootLayoutIncluded: rootLayoutIncludedAtThisLevelOrAbove,
+            getViewportReady,
             getMetadataReady,
-            preloadCallbacks
+            preloadCallbacks,
+            StreamingMetadataOutlet
         });
         for (const subPath of subPaths){
             // we don't need to send over default routes in the flight data
@@ -151,5 +167,15 @@ async function walkTreeWithFlightRouterState({ createSegmentPath, loaderTreeToFi
     }
     return paths;
 }
+/*
+ * This function is used to determine if an existing segment can be overridden
+ * by the incoming segment.
+ */ const canSegmentBeOverridden = (existingSegment, segment)=>{
+    var _getSegmentParam;
+    if (Array.isArray(existingSegment) || !Array.isArray(segment)) {
+        return false;
+    }
+    return ((_getSegmentParam = (0, _getsegmentparam.getSegmentParam)(existingSegment)) == null ? void 0 : _getSegmentParam.param) === segment[0];
+};
 
 //# sourceMappingURL=walk-tree-with-flight-router-state.js.map

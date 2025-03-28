@@ -59,9 +59,13 @@ export function normalizeZodErrors(error) {
     });
 }
 export function formatZodError(prefix, error) {
-    return new Error(fromZodError(error, {
+    return Object.defineProperty(new Error(fromZodError(error, {
         prefix: prefix
-    }).toString());
+    }).toString()), "__NEXT_ERROR_CODE", {
+        value: "E394",
+        enumerable: false,
+        configurable: true
+    });
 }
 export function reportZodError(prefix, error) {
     Log.error(formatZodError(prefix, error).message);

@@ -65,7 +65,11 @@ async function fetchPkgInfo(pkg) {
     if (!registry) registry = (0, _getregistry.getRegistry)();
     const res = await fetch(`${registry}${pkg}`);
     if (!res.ok) {
-        throw new Error(`Failed to fetch registry info for ${pkg}, got status ${res.status}`);
+        throw Object.defineProperty(new Error(`Failed to fetch registry info for ${pkg}, got status ${res.status}`), "__NEXT_ERROR_CODE", {
+            value: "E172",
+            enumerable: false,
+            configurable: true
+        });
     }
     const data = await res.json();
     const versionData = data.versions[_packagejson.default.version];

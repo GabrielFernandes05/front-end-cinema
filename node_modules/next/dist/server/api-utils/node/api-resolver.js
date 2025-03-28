@@ -99,7 +99,11 @@ function isValidData(str) {
 }
 function setDraftMode(res, options) {
     if (!isValidData(options.previewModeId)) {
-        throw new Error('invariant: invalid previewModeId');
+        throw Object.defineProperty(new Error('invariant: invalid previewModeId'), "__NEXT_ERROR_CODE", {
+            value: "E169",
+            enumerable: false,
+            configurable: true
+        });
     }
     const expires = options.enable ? undefined : new Date(0);
     // To delete a cookie, set `expires` to a date in the past:
@@ -123,13 +127,25 @@ function setDraftMode(res, options) {
 }
 function setPreviewData(res, data, options) {
     if (!isValidData(options.previewModeId)) {
-        throw new Error('invariant: invalid previewModeId');
+        throw Object.defineProperty(new Error('invariant: invalid previewModeId'), "__NEXT_ERROR_CODE", {
+            value: "E169",
+            enumerable: false,
+            configurable: true
+        });
     }
     if (!isValidData(options.previewModeEncryptionKey)) {
-        throw new Error('invariant: invalid previewModeEncryptionKey');
+        throw Object.defineProperty(new Error('invariant: invalid previewModeEncryptionKey'), "__NEXT_ERROR_CODE", {
+            value: "E334",
+            enumerable: false,
+            configurable: true
+        });
     }
     if (!isValidData(options.previewModeSigningKey)) {
-        throw new Error('invariant: invalid previewModeSigningKey');
+        throw Object.defineProperty(new Error('invariant: invalid previewModeSigningKey'), "__NEXT_ERROR_CODE", {
+            value: "E436",
+            enumerable: false,
+            configurable: true
+        });
     }
     const jsonwebtoken = require('next/dist/compiled/jsonwebtoken');
     const { encryptWithSecret } = require('../../crypto-utils');
@@ -144,7 +160,11 @@ function setPreviewData(res, data, options) {
     // limit preview mode cookie to 2KB since we shouldn't store too much
     // data here and browsers drop cookies over 4KB
     if (payload.length > 2048) {
-        throw new Error(`Preview data is limited to 2KB currently, reduce how much data you are storing as preview data to continue`);
+        throw Object.defineProperty(new Error(`Preview data is limited to 2KB currently, reduce how much data you are storing as preview data to continue`), "__NEXT_ERROR_CODE", {
+            value: "E465",
+            enumerable: false,
+            configurable: true
+        });
     }
     const { serialize } = require('next/dist/compiled/cookie');
     const previous = res.getHeader('Set-Cookie');
@@ -181,7 +201,11 @@ function setPreviewData(res, data, options) {
 }
 async function revalidate(urlPath, opts, req, context) {
     if (typeof urlPath !== 'string' || !urlPath.startsWith('/')) {
-        throw new Error(`Invalid urlPath provided to revalidate(), must be a path e.g. /blog/post-1, received ${urlPath}`);
+        throw Object.defineProperty(new Error(`Invalid urlPath provided to revalidate(), must be a path e.g. /blog/post-1, received ${urlPath}`), "__NEXT_ERROR_CODE", {
+            value: "E153",
+            enumerable: false,
+            configurable: true
+        });
     }
     const revalidateHeaders = {
         [_constants.PRERENDER_REVALIDATE_HEADER]: context.previewModeId,
@@ -190,12 +214,14 @@ async function revalidate(urlPath, opts, req, context) {
         } : {}
     };
     const allowedRevalidateHeaderKeys = [
-        ...context.allowedRevalidateHeaderKeys || [],
-        ...context.trustHostHeader ? [
-            'cookie',
-            'x-vercel-protection-bypass'
-        ] : []
+        ...context.allowedRevalidateHeaderKeys || []
     ];
+    if (context.trustHostHeader || context.dev) {
+        allowedRevalidateHeaderKeys.push('cookie');
+    }
+    if (context.trustHostHeader) {
+        allowedRevalidateHeaderKeys.push('x-vercel-protection-bypass');
+    }
     for (const key of Object.keys(req.headers)){
         if (allowedRevalidateHeaderKeys.includes(key)) {
             revalidateHeaders[key] = req.headers[key];
@@ -211,8 +237,12 @@ async function revalidate(urlPath, opts, req, context) {
             // a non-200 status code can be returned from a successful revalidate
             // e.g. notFound: true returns 404 status code but is successful
             const cacheHeader = res.headers.get('x-vercel-cache') || res.headers.get('x-nextjs-cache');
-            if ((cacheHeader == null ? void 0 : cacheHeader.toUpperCase()) !== 'REVALIDATED' && !(res.status === 404 && opts.unstable_onlyGenerated)) {
-                throw new Error(`Invalid response ${res.status}`);
+            if ((cacheHeader == null ? void 0 : cacheHeader.toUpperCase()) !== 'REVALIDATED' && res.status !== 200 && !(res.status === 404 && opts.unstable_onlyGenerated)) {
+                throw Object.defineProperty(new Error(`Invalid response ${res.status}`), "__NEXT_ERROR_CODE", {
+                    value: "E175",
+                    enumerable: false,
+                    configurable: true
+                });
             }
         } else if (context.revalidate) {
             await context.revalidate({
@@ -221,10 +251,18 @@ async function revalidate(urlPath, opts, req, context) {
                 opts
             });
         } else {
-            throw new Error(`Invariant: required internal revalidate method not passed to api-utils`);
+            throw Object.defineProperty(new Error(`Invariant: required internal revalidate method not passed to api-utils`), "__NEXT_ERROR_CODE", {
+                value: "E174",
+                enumerable: false,
+                configurable: true
+            });
         }
     } catch (err) {
-        throw new Error(`Failed to revalidate ${urlPath}: ${(0, _iserror.default)(err) ? err.message : err}`);
+        throw Object.defineProperty(new Error(`Failed to revalidate ${urlPath}: ${(0, _iserror.default)(err) ? err.message : err}`), "__NEXT_ERROR_CODE", {
+            value: "E240",
+            enumerable: false,
+            configurable: true
+        });
     }
 }
 async function apiResolver(req, res, query, resolverModule, apiContext, propagateError, dev, page, onError) {
@@ -300,7 +338,11 @@ async function apiResolver(req, res, query, resolverModule, apiContext, propagat
         if (process.env.NODE_ENV !== 'production') {
             if (typeof apiRouteResult !== 'undefined') {
                 if (apiRouteResult instanceof Response) {
-                    throw new Error('API route returned a Response object in the Node.js runtime, this is not supported. Please use `runtime: "edge"` instead: https://nextjs.org/docs/api-routes/edge-api-routes');
+                    throw Object.defineProperty(new Error('API route returned a Response object in the Node.js runtime, this is not supported. Please use `runtime: "edge"` instead: https://nextjs.org/docs/api-routes/edge-api-routes'), "__NEXT_ERROR_CODE", {
+                        value: "E36",
+                        enumerable: false,
+                        configurable: true
+                    });
                 }
                 console.warn(`API handler should not return a value, received ${typeof apiRouteResult}.`);
             }

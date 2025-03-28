@@ -57,7 +57,7 @@ class PagesManifestPlugin {
         this.isEdgeRuntime = isEdgeRuntime;
         this.appDirEnabled = appDirEnabled;
     }
-    async createAssets(compilation, assets) {
+    async createAssets(compilation) {
         const entrypoints = compilation.entrypoints;
         const pages = {};
         const appPaths = {};
@@ -113,10 +113,10 @@ class PagesManifestPlugin {
             });
         } else {
             const pagesManifestPath = (!this.dev && !this.isEdgeRuntime ? '../' : '') + _constants.PAGES_MANIFEST;
-            assets[pagesManifestPath] = new _webpack.sources.RawSource(JSON.stringify({
+            compilation.emitAsset(pagesManifestPath, new _webpack.sources.RawSource(JSON.stringify({
                 ...edgeServerPages,
                 ...nodeServerPages
-            }, null, 2));
+            }, null, 2)));
         }
         if (this.appDirEnabled) {
             if (this.distDir) {
@@ -126,10 +126,10 @@ class PagesManifestPlugin {
                     ...nodeServerAppPaths
                 });
             } else {
-                assets[(!this.dev && !this.isEdgeRuntime ? '../' : '') + _constants.APP_PATHS_MANIFEST] = new _webpack.sources.RawSource(JSON.stringify({
+                compilation.emitAsset((!this.dev && !this.isEdgeRuntime ? '../' : '') + _constants.APP_PATHS_MANIFEST, new _webpack.sources.RawSource(JSON.stringify({
                     ...edgeServerAppPaths,
                     ...nodeServerAppPaths
-                }, null, 2));
+                }, null, 2)));
             }
         }
     }
@@ -138,7 +138,7 @@ class PagesManifestPlugin {
             compilation.hooks.processAssets.tapPromise({
                 name: 'NextJsPagesManifest',
                 stage: _webpack.webpack.Compilation.PROCESS_ASSETS_STAGE_ADDITIONS
-            }, (assets)=>this.createAssets(compilation, assets));
+            }, ()=>this.createAssets(compilation));
         });
     }
 }

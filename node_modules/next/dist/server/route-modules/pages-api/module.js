@@ -27,7 +27,11 @@ class PagesAPIRouteModule extends _routemodule.RouteModule {
     constructor(options){
         super(options);
         if (typeof options.userland.default !== 'function') {
-            throw new Error(`Page ${options.definition.page} does not export a default function.`);
+            throw Object.defineProperty(new Error(`Page ${options.definition.page} does not export a default function.`), "__NEXT_ERROR_CODE", {
+                value: "E379",
+                enumerable: false,
+                configurable: true
+            });
         }
         this.apiResolverWrapped = (0, _apiutils.wrapApiHandler)(options.definition.page, _apiresolver.apiResolver);
     }
@@ -44,7 +48,8 @@ class PagesAPIRouteModule extends _routemodule.RouteModule {
             trustHostHeader: context.trustHostHeader,
             allowedRevalidateHeaderKeys: context.allowedRevalidateHeaderKeys,
             hostname: context.hostname,
-            multiZoneDraftMode: context.multiZoneDraftMode
+            multiZoneDraftMode: context.multiZoneDraftMode,
+            dev: context.dev
         }, context.minimalMode, context.dev, context.page, context.onError);
     }
 }

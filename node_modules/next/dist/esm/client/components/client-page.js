@@ -19,7 +19,11 @@ import { InvariantError } from '../../shared/lib/invariant-error';
         // appropriate context. We wrap differently in prerendering vs rendering
         const store = workAsyncStorage.getStore();
         if (!store) {
-            throw new InvariantError('Expected workStore to exist when handling searchParams in a client Page.');
+            throw Object.defineProperty(new InvariantError('Expected workStore to exist when handling searchParams in a client Page.'), "__NEXT_ERROR_CODE", {
+                value: "E564",
+                enumerable: false,
+                configurable: true
+            });
         }
         const { createSearchParamsFromClient } = require('../../server/request/search-params');
         clientSearchParams = createSearchParamsFromClient(searchParams, store);
@@ -30,9 +34,9 @@ import { InvariantError } from '../../shared/lib/invariant-error';
             searchParams: clientSearchParams
         });
     } else {
-        const { createRenderSearchParamsFromClient } = require('../../server/request/search-params.browser');
+        const { createRenderSearchParamsFromClient } = require('../request/search-params.browser');
         const clientSearchParams = createRenderSearchParamsFromClient(searchParams);
-        const { createRenderParamsFromClient } = require('../../server/request/params.browser');
+        const { createRenderParamsFromClient } = require('../request/params.browser');
         const clientParams = createRenderParamsFromClient(params);
         return /*#__PURE__*/ _jsx(Component, {
             params: clientParams,

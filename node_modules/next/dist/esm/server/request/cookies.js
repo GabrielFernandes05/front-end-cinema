@@ -15,8 +15,12 @@ export function cookies() {
     const workUnitStore = workUnitAsyncStorage.getStore();
     if (workStore) {
         if (workUnitStore && workUnitStore.phase === 'after' && !isRequestAPICallableInsideAfter()) {
-            throw new Error(// TODO(after): clarify that this only applies to pages?
-            `Route ${workStore.route} used "cookies" inside "after(...)". This is not supported. If you need this data inside an "after" callback, use "cookies" outside of the callback. See more info here: https://nextjs.org/docs/canary/app/api-reference/functions/after`);
+            throw Object.defineProperty(new Error(// TODO(after): clarify that this only applies to pages?
+            `Route ${workStore.route} used "cookies" inside "after(...)". This is not supported. If you need this data inside an "after" callback, use "cookies" outside of the callback. See more info here: https://nextjs.org/docs/canary/app/api-reference/functions/after`), "__NEXT_ERROR_CODE", {
+                value: "E88",
+                enumerable: false,
+                configurable: true
+            });
         }
         if (workStore.forceStatic) {
             // When using forceStatic we override all other logic and always just return an empty
@@ -26,13 +30,25 @@ export function cookies() {
         }
         if (workUnitStore) {
             if (workUnitStore.type === 'cache') {
-                throw new Error(`Route ${workStore.route} used "cookies" inside "use cache". Accessing Dynamic data sources inside a cache scope is not supported. If you need this data inside a cached function use "cookies" outside of the cached function and pass the required dynamic data in as an argument. See more info here: https://nextjs.org/docs/messages/next-request-in-use-cache`);
+                throw Object.defineProperty(new Error(`Route ${workStore.route} used "cookies" inside "use cache". Accessing Dynamic data sources inside a cache scope is not supported. If you need this data inside a cached function use "cookies" outside of the cached function and pass the required dynamic data in as an argument. See more info here: https://nextjs.org/docs/messages/next-request-in-use-cache`), "__NEXT_ERROR_CODE", {
+                    value: "E398",
+                    enumerable: false,
+                    configurable: true
+                });
             } else if (workUnitStore.type === 'unstable-cache') {
-                throw new Error(`Route ${workStore.route} used "cookies" inside a function cached with "unstable_cache(...)". Accessing Dynamic data sources inside a cache scope is not supported. If you need this data inside a cached function use "cookies" outside of the cached function and pass the required dynamic data in as an argument. See more info here: https://nextjs.org/docs/app/api-reference/functions/unstable_cache`);
+                throw Object.defineProperty(new Error(`Route ${workStore.route} used "cookies" inside a function cached with "unstable_cache(...)". Accessing Dynamic data sources inside a cache scope is not supported. If you need this data inside a cached function use "cookies" outside of the cached function and pass the required dynamic data in as an argument. See more info here: https://nextjs.org/docs/app/api-reference/functions/unstable_cache`), "__NEXT_ERROR_CODE", {
+                    value: "E157",
+                    enumerable: false,
+                    configurable: true
+                });
             }
         }
         if (workStore.dynamicShouldError) {
-            throw new StaticGenBailoutError(`Route ${workStore.route} with \`dynamic = "error"\` couldn't be rendered statically because it used \`cookies\`. See more info here: https://nextjs.org/docs/app/building-your-application/rendering/static-and-dynamic#dynamic-rendering`);
+            throw Object.defineProperty(new StaticGenBailoutError(`Route ${workStore.route} with \`dynamic = "error"\` couldn't be rendered statically because it used \`cookies\`. See more info here: https://nextjs.org/docs/app/building-your-application/rendering/static-and-dynamic#dynamic-rendering`), "__NEXT_ERROR_CODE", {
+                value: "E549",
+                enumerable: false,
+                configurable: true
+            });
         }
         if (workUnitStore) {
             if (workUnitStore.type === 'prerender') {
@@ -368,11 +384,14 @@ function syncIODev(route, expression) {
     // In all cases we warn normally
     warnForSyncAccess(route, expression);
 }
-const noop = ()=>{};
-const warnForSyncAccess = process.env.__NEXT_DISABLE_SYNC_DYNAMIC_API_WARNINGS ? noop : createDedupedByCallsiteServerErrorLoggerDev(createCookiesAccessError);
+const warnForSyncAccess = createDedupedByCallsiteServerErrorLoggerDev(createCookiesAccessError);
 function createCookiesAccessError(route, expression) {
     const prefix = route ? `Route "${route}" ` : 'This route ';
-    return new Error(`${prefix}used ${expression}. ` + `\`cookies()\` should be awaited before using its value. ` + `Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis`);
+    return Object.defineProperty(new Error(`${prefix}used ${expression}. ` + `\`cookies()\` should be awaited before using its value. ` + `Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis`), "__NEXT_ERROR_CODE", {
+        value: "E223",
+        enumerable: false,
+        configurable: true
+    });
 }
 function polyfilledResponseCookiesIterator() {
     return this.getAll().map((c)=>[

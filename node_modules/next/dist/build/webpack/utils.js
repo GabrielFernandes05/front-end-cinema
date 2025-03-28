@@ -5,6 +5,7 @@ Object.defineProperty(exports, "__esModule", {
 0 && (module.exports = {
     forEachEntryModule: null,
     formatBarrelOptimizedResource: null,
+    getCompilationSpan: null,
     getModuleReferencesInOrder: null,
     traverseModules: null
 });
@@ -21,6 +22,9 @@ _export(exports, {
     formatBarrelOptimizedResource: function() {
         return formatBarrelOptimizedResource;
     },
+    getCompilationSpan: function() {
+        return getCompilationSpan;
+    },
     getModuleReferencesInOrder: function() {
         return getModuleReferencesInOrder;
     },
@@ -28,7 +32,9 @@ _export(exports, {
         return traverseModules;
     }
 });
-const _ismetadataroute = require("../../lib/metadata/is-metadata-route");
+const _entries = require("../entries");
+const _profilingplugin = require("./plugins/profiling-plugin");
+const _rspackprofilingplugin = require("./plugins/rspack-profiling-plugin");
 function traverseModules(compilation, callback, filterChunkGroup) {
     compilation.chunkGroups.forEach((chunkGroup)=>{
         if (filterChunkGroup && !filterChunkGroup(chunkGroup)) {
@@ -52,8 +58,7 @@ function forEachEntryModule(compilation, callback) {
     for (const [name, entry] of compilation.entries.entries()){
         var _entry_dependencies;
         // Skip for entries under pages/
-        if (name.startsWith('pages/') || // Skip for metadata route handlers
-        name.startsWith('app/') && (0, _ismetadataroute.isMetadataRoute)(name)) {
+        if (name.startsWith('pages/')) {
             continue;
         }
         // Check if the page entry is a server component or not.
@@ -61,12 +66,12 @@ function forEachEntryModule(compilation, callback) {
         // Ensure only next-app-loader entries are handled.
         if (!entryDependency || !entryDependency.request) continue;
         const request = entryDependency.request;
-        if (!request.startsWith('next-edge-ssr-loader?') && !request.startsWith('next-edge-app-route-loader?') && !request.startsWith('next-app-loader?')) continue;
+        if (!request.startsWith('next-edge-ssr-loader?') && !request.startsWith('next-edge-app-route-loader?') && !request.startsWith(`${(0, _entries.getAppLoader)()}?`)) continue;
         let entryModule = compilation.moduleGraph.getResolvedModule(entryDependency);
         if (request.startsWith('next-edge-ssr-loader?') || request.startsWith('next-edge-app-route-loader?')) {
             entryModule.dependencies.forEach((dependency)=>{
                 const modRequest = dependency.request;
-                if (modRequest == null ? void 0 : modRequest.includes('next-app-loader')) {
+                if (modRequest == null ? void 0 : modRequest.includes((0, _entries.getAppLoader)())) {
                     entryModule = compilation.moduleGraph.getResolvedModule(dependency);
                 }
             });
@@ -81,6 +86,9 @@ function formatBarrelOptimizedResource(resource, matchResource) {
     return `${resource}@${matchResource}`;
 }
 function getModuleReferencesInOrder(module1, moduleGraph) {
+    if ('getOutgoingConnectionsInOrder' in moduleGraph && typeof moduleGraph.getOutgoingConnectionsInOrder === 'function') {
+        return moduleGraph.getOutgoingConnectionsInOrder(module1);
+    }
     const connections = [];
     for (const connection of moduleGraph.getOutgoingConnections(module1)){
         if (connection.dependency && connection.module) {
@@ -92,6 +100,10 @@ function getModuleReferencesInOrder(module1, moduleGraph) {
     }
     connections.sort((a, b)=>a.index - b.index);
     return connections.map((c)=>c.connection);
+}
+function getCompilationSpan(compilation) {
+    const compilationSpans = process.env.NEXT_RSPACK ? _rspackprofilingplugin.compilationSpans : _profilingplugin.spans;
+    return compilationSpans.get(compilation);
 }
 
 //# sourceMappingURL=utils.js.map

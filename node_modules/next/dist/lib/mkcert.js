@@ -74,7 +74,11 @@ function getBinaryName() {
     if (platform === 'linux') {
         return `mkcert-${MKCERT_VERSION}-linux-${arch}`;
     }
-    throw new Error(`Unsupported platform: ${platform}`);
+    throw Object.defineProperty(new Error(`Unsupported platform: ${platform}`), "__NEXT_ERROR_CODE", {
+        value: "E141",
+        enumerable: false,
+        configurable: true
+    });
 }
 async function downloadBinary() {
     try {
@@ -91,7 +95,11 @@ async function downloadBinary() {
         _log.info(`Downloading mkcert package...`);
         const response = await fetch(downloadUrl);
         if (!response.ok || !response.body) {
-            throw new Error(`request failed with status ${response.status}`);
+            throw Object.defineProperty(new Error(`request failed with status ${response.status}`), "__NEXT_ERROR_CODE", {
+                value: "E109",
+                enumerable: false,
+                configurable: true
+            });
         }
         _log.info(`Download response was successful, writing to disk`);
         const binaryWriteStream = _nodefs.default.createWriteStream(binaryPath);
@@ -128,7 +136,11 @@ async function downloadBinary() {
 async function createSelfSignedCertificate(host, certDir = 'certificates') {
     try {
         const binaryPath = await downloadBinary();
-        if (!binaryPath) throw new Error('missing mkcert binary');
+        if (!binaryPath) throw Object.defineProperty(new Error('missing mkcert binary'), "__NEXT_ERROR_CODE", {
+            value: "E198",
+            enumerable: false,
+            configurable: true
+        });
         const resolvedCertDir = _nodepath.default.resolve(process.cwd(), `./${certDir}`);
         await _nodefs.default.promises.mkdir(resolvedCertDir, {
             recursive: true
@@ -163,7 +175,11 @@ async function createSelfSignedCertificate(host, certDir = 'certificates') {
         });
         const caLocation = (0, _nodechild_process.execSync)(`"${binaryPath}" -CAROOT`).toString().trim();
         if (!_nodefs.default.existsSync(keyPath) || !_nodefs.default.existsSync(certPath)) {
-            throw new Error('Certificate files not found');
+            throw Object.defineProperty(new Error('Certificate files not found'), "__NEXT_ERROR_CODE", {
+                value: "E131",
+                enumerable: false,
+                configurable: true
+            });
         }
         _log.info(`CA Root certificate created in ${caLocation}`);
         _log.info(`Certificates created in ${resolvedCertDir}`);

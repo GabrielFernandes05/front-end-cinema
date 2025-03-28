@@ -70,7 +70,7 @@ async function createStaticMetadataFromRoute(resolvedDir, { segment, metadataRes
                 hasStaticMetadataFiles = true;
                 const { name, ext } = _path.default.parse(manifestFile[0]);
                 const extension = staticManifestExtension.includes(ext.slice(1)) ? ext.slice(1) : 'webmanifest';
-                staticImagesMetadata.manifest = JSON.stringify(`/${name}.${extension}`);
+                staticImagesMetadata.manifest = JSON.stringify(`${basePath}/${name}.${extension}`);
             }
             return;
         }

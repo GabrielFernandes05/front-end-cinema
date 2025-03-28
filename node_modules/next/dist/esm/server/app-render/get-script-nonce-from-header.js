@@ -22,7 +22,11 @@ export function getScriptNonceFromHeader(cspHeaderValue) {
     // Technically, the spec requires a base64'd value, but this is just an
     // extra layer.
     if (ESCAPE_REGEX.test(nonce)) {
-        throw new Error('Nonce value from Content-Security-Policy contained HTML escape characters.\nLearn more: https://nextjs.org/docs/messages/nonce-contained-invalid-characters');
+        throw Object.defineProperty(new Error('Nonce value from Content-Security-Policy contained HTML escape characters.\nLearn more: https://nextjs.org/docs/messages/nonce-contained-invalid-characters'), "__NEXT_ERROR_CODE", {
+            value: "E440",
+            enumerable: false,
+            configurable: true
+        });
     }
     return nonce;
 }

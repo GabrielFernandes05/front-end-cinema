@@ -1,5 +1,5 @@
 import { HMR_ACTIONS_SENT_TO_BROWSER } from '../../../../server/dev/hot-reloader-types';
-import { getSocketUrl } from '../internal/helpers/get-socket-url';
+import { getSocketUrl } from '../utils/get-socket-url';
 let source;
 const eventCallbacks = [];
 export function addMessageListener(callback) {

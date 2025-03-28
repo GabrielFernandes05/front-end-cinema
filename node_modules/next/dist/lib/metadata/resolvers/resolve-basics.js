@@ -8,6 +8,7 @@ Object.defineProperty(exports, "__esModule", {
     resolveAppleWebApp: null,
     resolveFacebook: null,
     resolveItunes: null,
+    resolvePagination: null,
     resolveRobots: null,
     resolveThemeColor: null,
     resolveVerification: null
@@ -33,6 +34,9 @@ _export(exports, {
     },
     resolveItunes: function() {
         return resolveItunes;
+    },
+    resolvePagination: function() {
+        return resolvePagination;
     },
     resolveRobots: function() {
         return resolveRobots;
@@ -214,6 +218,12 @@ const resolveFacebook = (facebook)=>{
     return {
         appId: facebook.appId,
         admins: (0, _utils.resolveAsArrayOrUndefined)(facebook.admins)
+    };
+};
+const resolvePagination = (pagination, metadataBase, context)=>{
+    return {
+        previous: (pagination == null ? void 0 : pagination.previous) ? resolveAlternateUrl(pagination.previous, metadataBase, context) : null,
+        next: (pagination == null ? void 0 : pagination.next) ? resolveAlternateUrl(pagination.next, metadataBase, context) : null
     };
 };
 

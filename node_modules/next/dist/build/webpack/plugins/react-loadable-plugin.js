@@ -137,31 +137,30 @@ class ReactLoadablePlugin {
         this.runtimeAsset = opts.runtimeAsset;
         this.dev = opts.dev;
     }
-    createAssets(compiler, compilation, assets) {
+    createAssets(compiler, compilation) {
         const projectSrcDir = this.pagesOrAppDir ? _path.default.dirname(this.pagesOrAppDir) : undefined;
         const shouldCreateDynamicCssManifest = !this.dev && this.isPagesDir;
         const { reactLoadableManifest, dynamicCssManifest } = buildManifest(compiler, compilation, projectSrcDir, this.dev, shouldCreateDynamicCssManifest);
-        assets[this.filename] = new _webpack.sources.RawSource(JSON.stringify(reactLoadableManifest, null, 2));
+        compilation.emitAsset(this.filename, new _webpack.sources.RawSource(JSON.stringify(reactLoadableManifest, null, 2)));
         if (this.runtimeAsset) {
-            assets[this.runtimeAsset] = new _webpack.sources.RawSource(`self.__REACT_LOADABLE_MANIFEST=${JSON.stringify(JSON.stringify(reactLoadableManifest))}`);
+            compilation.emitAsset(this.runtimeAsset, new _webpack.sources.RawSource(`self.__REACT_LOADABLE_MANIFEST=${JSON.stringify(JSON.stringify(reactLoadableManifest))}`));
         }
         // This manifest prevents removing server rendered <link> tags after client
         // navigation. This is only needed under Pages dir && Production && Webpack.
         // x-ref: https://github.com/vercel/next.js/pull/72959
         if (shouldCreateDynamicCssManifest) {
-            assets[`${_constants.DYNAMIC_CSS_MANIFEST}.json`] = new _webpack.sources.RawSource(JSON.stringify(dynamicCssManifest, null, 2));
+            compilation.emitAsset(`${_constants.DYNAMIC_CSS_MANIFEST}.json`, new _webpack.sources.RawSource(JSON.stringify(dynamicCssManifest, null, 2)));
             // This is for edge runtime.
-            assets[`server/${_constants.DYNAMIC_CSS_MANIFEST}.js`] = new _webpack.sources.RawSource(`self.__DYNAMIC_CSS_MANIFEST=${JSON.stringify(JSON.stringify(dynamicCssManifest))}`);
+            compilation.emitAsset(`server/${_constants.DYNAMIC_CSS_MANIFEST}.js`, new _webpack.sources.RawSource(`self.__DYNAMIC_CSS_MANIFEST=${JSON.stringify(JSON.stringify(dynamicCssManifest))}`));
         }
-        return assets;
     }
     apply(compiler) {
         compiler.hooks.make.tap('ReactLoadableManifest', (compilation)=>{
             compilation.hooks.processAssets.tap({
                 name: 'ReactLoadableManifest',
                 stage: _webpack.webpack.Compilation.PROCESS_ASSETS_STAGE_ADDITIONS
-            }, (assets)=>{
-                this.createAssets(compiler, compilation, assets);
+            }, ()=>{
+                this.createAssets(compiler, compilation);
             });
         });
     }

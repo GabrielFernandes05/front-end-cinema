@@ -33,7 +33,7 @@ import { SearchParamsContext, PathParamsContext } from '../shared/lib/hooks-clie
 import { getTracer } from './lib/trace/tracer';
 import { RenderSpan } from './lib/trace/constants';
 import { ReflectAdapter } from './web/spec-extension/adapters/reflect';
-import { formatRevalidate } from './lib/revalidate';
+import { getCacheControlHeader } from './lib/cache-control';
 import { getErrorSource } from '../shared/lib/error-source';
 let tryGetPreviewData;
 let warn;
@@ -49,7 +49,11 @@ if (process.env.NEXT_RUNTIME !== 'edge') {
 }
 function noRouter() {
     const message = 'No router instance found. you should only use "next/router" inside the client side of your app. https://nextjs.org/docs/messages/no-router-instance';
-    throw new Error(message);
+    throw Object.defineProperty(new Error(message), "__NEXT_ERROR_CODE", {
+        value: "E394",
+        enumerable: false,
+        configurable: true
+    });
 }
 async function renderToString(element) {
     const renderStream = await ReactDOMServerPages.renderToReadableStream(element);
@@ -140,7 +144,11 @@ function checkRedirectValues(redirect, req, method) {
         errors.push(`\`basePath\` should be undefined or a false, received ${basePathType}`);
     }
     if (errors.length > 0) {
-        throw new Error(`Invalid redirect object returned from ${method} for ${req.url}\n` + errors.join(' and ') + '\n' + `See more info here: https://nextjs.org/docs/messages/invalid-redirect-gssp`);
+        throw Object.defineProperty(new Error(`Invalid redirect object returned from ${method} for ${req.url}\n` + errors.join(' and ') + '\n' + `See more info here: https://nextjs.org/docs/messages/invalid-redirect-gssp`), "__NEXT_ERROR_CODE", {
+            value: "E185",
+            enumerable: false,
+            configurable: true
+        });
     }
 }
 export function errorToJSON(err) {
@@ -166,7 +174,7 @@ function serializeError(dev, err) {
         statusCode: 500
     };
 }
-export async function renderToHTMLImpl(req, res, pathname, query, renderOpts, extra) {
+export async function renderToHTMLImpl(req, res, pathname, query, renderOpts, extra, sharedContext, renderContext) {
     // Adds support for reading `cookies` in `getServerSideProps` when SSR.
     setLazyProp({
         req: req
@@ -185,8 +193,8 @@ export async function renderToHTMLImpl(req, res, pathname, query, renderOpts, ex
         }
     }
     // if deploymentId is provided we append it to all asset requests
-    if (renderOpts.deploymentId) {
-        metadata.assetQueryString += `${metadata.assetQueryString ? '&' : '?'}dpl=${renderOpts.deploymentId}`;
+    if (sharedContext.deploymentId) {
+        metadata.assetQueryString += `${metadata.assetQueryString ? '&' : '?'}dpl=${sharedContext.deploymentId}`;
     }
     // don't modify original query object
     query = Object.assign({}, query);
@@ -196,8 +204,8 @@ export async function renderToHTMLImpl(req, res, pathname, query, renderOpts, ex
     let Document = extra.Document;
     let Component = renderOpts.Component;
     const OriginComponent = Component;
-    const isFallback = !!query.__nextFallback;
-    const notFoundSrcPage = query.__nextNotFoundSrcPage;
+    const isFallback = renderContext.isFallback ?? false;
+    const notFoundSrcPage = renderContext.developmentNotFoundSourcePage;
     // next internal queries should be stripped out
     stripInternalQueries(query);
     const isSSG = !!getStaticProps;
@@ -216,44 +224,84 @@ export async function renderToHTMLImpl(req, res, pathname, query, renderOpts, ex
     // ensure we set cache header so it's not rendered on-demand
     // every request
     if (isAutoExport && !dev && isExperimentalCompile) {
-        res.setHeader('Cache-Control', formatRevalidate({
+        res.setHeader('Cache-Control', getCacheControlHeader({
             revalidate: false,
-            expireTime
+            expire: expireTime
         }));
         isAutoExport = false;
     }
     if (hasPageGetInitialProps && isSSG) {
-        throw new Error(SSG_GET_INITIAL_PROPS_CONFLICT + ` ${pathname}`);
+        throw Object.defineProperty(new Error(SSG_GET_INITIAL_PROPS_CONFLICT + ` ${pathname}`), "__NEXT_ERROR_CODE", {
+            value: "E262",
+            enumerable: false,
+            configurable: true
+        });
     }
     if (hasPageGetInitialProps && getServerSideProps) {
-        throw new Error(SERVER_PROPS_GET_INIT_PROPS_CONFLICT + ` ${pathname}`);
+        throw Object.defineProperty(new Error(SERVER_PROPS_GET_INIT_PROPS_CONFLICT + ` ${pathname}`), "__NEXT_ERROR_CODE", {
+            value: "E262",
+            enumerable: false,
+            configurable: true
+        });
     }
     if (getServerSideProps && isSSG) {
-        throw new Error(SERVER_PROPS_SSG_CONFLICT + ` ${pathname}`);
+        throw Object.defineProperty(new Error(SERVER_PROPS_SSG_CONFLICT + ` ${pathname}`), "__NEXT_ERROR_CODE", {
+            value: "E262",
+            enumerable: false,
+            configurable: true
+        });
     }
     if (getServerSideProps && renderOpts.nextConfigOutput === 'export') {
-        throw new Error('getServerSideProps cannot be used with "output: export". See more info here: https://nextjs.org/docs/advanced-features/static-html-export');
+        throw Object.defineProperty(new Error('getServerSideProps cannot be used with "output: export". See more info here: https://nextjs.org/docs/advanced-features/static-html-export'), "__NEXT_ERROR_CODE", {
+            value: "E369",
+            enumerable: false,
+            configurable: true
+        });
     }
     if (getStaticPaths && !pageIsDynamic) {
-        throw new Error(`getStaticPaths is only allowed for dynamic SSG pages and was found on '${pathname}'.` + `\nRead more: https://nextjs.org/docs/messages/non-dynamic-getstaticpaths-usage`);
+        throw Object.defineProperty(new Error(`getStaticPaths is only allowed for dynamic SSG pages and was found on '${pathname}'.` + `\nRead more: https://nextjs.org/docs/messages/non-dynamic-getstaticpaths-usage`), "__NEXT_ERROR_CODE", {
+            value: "E187",
+            enumerable: false,
+            configurable: true
+        });
     }
     if (!!getStaticPaths && !isSSG) {
-        throw new Error(`getStaticPaths was added without a getStaticProps in ${pathname}. Without getStaticProps, getStaticPaths does nothing`);
+        throw Object.defineProperty(new Error(`getStaticPaths was added without a getStaticProps in ${pathname}. Without getStaticProps, getStaticPaths does nothing`), "__NEXT_ERROR_CODE", {
+            value: "E447",
+            enumerable: false,
+            configurable: true
+        });
     }
     if (isSSG && pageIsDynamic && !getStaticPaths) {
-        throw new Error(`getStaticPaths is required for dynamic SSG pages and is missing for '${pathname}'.` + `\nRead more: https://nextjs.org/docs/messages/invalid-getstaticpaths-value`);
+        throw Object.defineProperty(new Error(`getStaticPaths is required for dynamic SSG pages and is missing for '${pathname}'.` + `\nRead more: https://nextjs.org/docs/messages/invalid-getstaticpaths-value`), "__NEXT_ERROR_CODE", {
+            value: "E255",
+            enumerable: false,
+            configurable: true
+        });
     }
     let asPath = renderOpts.resolvedAsPath || req.url;
     if (dev) {
         const { isValidElementType } = require('next/dist/compiled/react-is');
         if (!isValidElementType(Component)) {
-            throw new Error(`The default export is not a React Component in page: "${pathname}"`);
+            throw Object.defineProperty(new Error(`The default export is not a React Component in page: "${pathname}"`), "__NEXT_ERROR_CODE", {
+                value: "E286",
+                enumerable: false,
+                configurable: true
+            });
         }
         if (!isValidElementType(App)) {
-            throw new Error(`The default export is not a React Component in page: "/_app"`);
+            throw Object.defineProperty(new Error(`The default export is not a React Component in page: "/_app"`), "__NEXT_ERROR_CODE", {
+                value: "E464",
+                enumerable: false,
+                configurable: true
+            });
         }
         if (!isValidElementType(Document)) {
-            throw new Error(`The default export is not a React Component in page: "/_document"`);
+            throw Object.defineProperty(new Error(`The default export is not a React Component in page: "/_document"`), "__NEXT_ERROR_CODE", {
+                value: "E511",
+                enumerable: false,
+                configurable: true
+            });
         }
         if (isAutoExport || isFallback) {
             // remove query values except ones that will be set during export
@@ -267,10 +315,21 @@ export async function renderToHTMLImpl(req, res, pathname, query, renderOpts, ex
             req.url = pathname;
         }
         if (pathname === '/404' && (hasPageGetInitialProps || getServerSideProps)) {
-            throw new Error(`\`pages/404\` ${STATIC_STATUS_PAGE_GET_INITIAL_PROPS_ERROR}`);
+            throw Object.defineProperty(new Error(`\`pages/404\` ${STATIC_STATUS_PAGE_GET_INITIAL_PROPS_ERROR}`), "__NEXT_ERROR_CODE", {
+                value: "E134",
+                enumerable: false,
+                configurable: true
+            });
         }
         if (STATIC_STATUS_PAGES.includes(pathname) && (hasPageGetInitialProps || getServerSideProps)) {
-            throw new Error(`\`pages${pathname}\` ${STATIC_STATUS_PAGE_GET_INITIAL_PROPS_ERROR}`);
+            throw Object.defineProperty(new Error(`\`pages${pathname}\` ${STATIC_STATUS_PAGE_GET_INITIAL_PROPS_ERROR}`), "__NEXT_ERROR_CODE", {
+                value: "E125",
+                enumerable: false,
+                configurable: true
+            });
+        }
+        if (renderOpts == null ? void 0 : renderOpts.setIsrStatus) {
+            renderOpts.setIsrStatus(asPath, isSSG || isAutoExport ? true : null);
         }
     }
     for (const methodName of [
@@ -279,7 +338,11 @@ export async function renderToHTMLImpl(req, res, pathname, query, renderOpts, ex
         'getStaticPaths'
     ]){
         if (Component == null ? void 0 : Component[methodName]) {
-            throw new Error(`page ${pathname} ${methodName} ${GSSP_COMPONENT_MEMBER_ERROR}`);
+            throw Object.defineProperty(new Error(`page ${pathname} ${methodName} ${GSSP_COMPONENT_MEMBER_ERROR}`), "__NEXT_ERROR_CODE", {
+                value: "E417",
+                enumerable: false,
+                configurable: true
+            });
         }
     }
     await Loadable.preloadAll() // Make sure all dynamic imports are loaded
@@ -458,7 +521,9 @@ export async function renderToHTMLImpl(req, res, pathname, query, renderOpts, ex
                         preview: true,
                         previewData: previewData
                     } : undefined,
-                    locales: renderOpts.locales,
+                    locales: [
+                        ...renderOpts.locales ?? []
+                    ],
                     locale: renderOpts.locale,
                     defaultLocale: renderOpts.defaultLocale,
                     revalidateReason: renderOpts.isOnDemandRevalidate ? 'on-demand' : isBuildTimeSSG ? 'build' : 'stale'
@@ -472,30 +537,54 @@ export async function renderToHTMLImpl(req, res, pathname, query, renderOpts, ex
             throw staticPropsError;
         }
         if (data == null) {
-            throw new Error(GSP_NO_RETURNED_VALUE);
+            throw Object.defineProperty(new Error(GSP_NO_RETURNED_VALUE), "__NEXT_ERROR_CODE", {
+                value: "E394",
+                enumerable: false,
+                configurable: true
+            });
         }
         const invalidKeys = Object.keys(data).filter((key)=>key !== 'revalidate' && key !== 'props' && key !== 'redirect' && key !== 'notFound');
         if (invalidKeys.includes('unstable_revalidate')) {
-            throw new Error(UNSTABLE_REVALIDATE_RENAME_ERROR);
+            throw Object.defineProperty(new Error(UNSTABLE_REVALIDATE_RENAME_ERROR), "__NEXT_ERROR_CODE", {
+                value: "E394",
+                enumerable: false,
+                configurable: true
+            });
         }
         if (invalidKeys.length) {
-            throw new Error(invalidKeysMsg('getStaticProps', invalidKeys));
+            throw Object.defineProperty(new Error(invalidKeysMsg('getStaticProps', invalidKeys)), "__NEXT_ERROR_CODE", {
+                value: "E394",
+                enumerable: false,
+                configurable: true
+            });
         }
         if (process.env.NODE_ENV !== 'production') {
             if (typeof data.notFound !== 'undefined' && typeof data.redirect !== 'undefined') {
-                throw new Error(`\`redirect\` and \`notFound\` can not both be returned from ${isSSG ? 'getStaticProps' : 'getServerSideProps'} at the same time. Page: ${pathname}\nSee more info here: https://nextjs.org/docs/messages/gssp-mixed-not-found-redirect`);
+                throw Object.defineProperty(new Error(`\`redirect\` and \`notFound\` can not both be returned from ${isSSG ? 'getStaticProps' : 'getServerSideProps'} at the same time. Page: ${pathname}\nSee more info here: https://nextjs.org/docs/messages/gssp-mixed-not-found-redirect`), "__NEXT_ERROR_CODE", {
+                    value: "E454",
+                    enumerable: false,
+                    configurable: true
+                });
             }
         }
         if ('notFound' in data && data.notFound) {
             if (pathname === '/404') {
-                throw new Error(`The /404 page can not return notFound in "getStaticProps", please remove it to continue!`);
+                throw Object.defineProperty(new Error(`The /404 page can not return notFound in "getStaticProps", please remove it to continue!`), "__NEXT_ERROR_CODE", {
+                    value: "E121",
+                    enumerable: false,
+                    configurable: true
+                });
             }
             metadata.isNotFound = true;
         }
         if ('redirect' in data && data.redirect && typeof data.redirect === 'object') {
             checkRedirectValues(data.redirect, req, 'getStaticProps');
             if (isBuildTimeSSG) {
-                throw new Error(`\`redirect\` can not be returned from getStaticProps during prerendering (${req.url})\n` + `See more info here: https://nextjs.org/docs/messages/gsp-redirect-during-prerender`);
+                throw Object.defineProperty(new Error(`\`redirect\` can not be returned from getStaticProps during prerendering (${req.url})\n` + `See more info here: https://nextjs.org/docs/messages/gsp-redirect-during-prerender`), "__NEXT_ERROR_CODE", {
+                    value: "E497",
+                    enumerable: false,
+                    configurable: true
+                });
             }
             ;
             data.props = {
@@ -510,18 +599,34 @@ export async function renderToHTMLImpl(req, res, pathname, query, renderOpts, ex
         }
         if ((dev || isBuildTimeSSG) && !metadata.isNotFound && !isSerializableProps(pathname, 'getStaticProps', data.props)) {
             // this fn should throw an error instead of ever returning `false`
-            throw new Error('invariant: getStaticProps did not return valid props. Please report this.');
+            throw Object.defineProperty(new Error('invariant: getStaticProps did not return valid props. Please report this.'), "__NEXT_ERROR_CODE", {
+                value: "E129",
+                enumerable: false,
+                configurable: true
+            });
         }
         let revalidate;
         if ('revalidate' in data) {
             if (data.revalidate && renderOpts.nextConfigOutput === 'export') {
-                throw new Error('ISR cannot be used with "output: export". See more info here: https://nextjs.org/docs/advanced-features/static-html-export');
+                throw Object.defineProperty(new Error('ISR cannot be used with "output: export". See more info here: https://nextjs.org/docs/advanced-features/static-html-export'), "__NEXT_ERROR_CODE", {
+                    value: "E201",
+                    enumerable: false,
+                    configurable: true
+                });
             }
             if (typeof data.revalidate === 'number') {
                 if (!Number.isInteger(data.revalidate)) {
-                    throw new Error(`A page's revalidate option must be seconds expressed as a natural number for ${req.url}. Mixed numbers, such as '${data.revalidate}', cannot be used.` + `\nTry changing the value to '${Math.ceil(data.revalidate)}' or using \`Math.ceil()\` if you're computing the value.`);
+                    throw Object.defineProperty(new Error(`A page's revalidate option must be seconds expressed as a natural number for ${req.url}. Mixed numbers, such as '${data.revalidate}', cannot be used.` + `\nTry changing the value to '${Math.ceil(data.revalidate)}' or using \`Math.ceil()\` if you're computing the value.`), "__NEXT_ERROR_CODE", {
+                        value: "E438",
+                        enumerable: false,
+                        configurable: true
+                    });
                 } else if (data.revalidate <= 0) {
-                    throw new Error(`A page's revalidate option can not be less than or equal to zero for ${req.url}. A revalidate option of zero means to revalidate after _every_ request, and implies stale data cannot be tolerated.` + `\n\nTo never revalidate, you can set revalidate to \`false\` (only ran once at build-time).` + `\nTo revalidate as soon as possible, you can set the value to \`1\`.`);
+                    throw Object.defineProperty(new Error(`A page's revalidate option can not be less than or equal to zero for ${req.url}. A revalidate option of zero means to revalidate after _every_ request, and implies stale data cannot be tolerated.` + `\n\nTo never revalidate, you can set revalidate to \`false\` (only ran once at build-time).` + `\nTo revalidate as soon as possible, you can set the value to \`1\`.`), "__NEXT_ERROR_CODE", {
+                        value: "E311",
+                        enumerable: false,
+                        configurable: true
+                    });
                 } else {
                     if (data.revalidate > 31536000) {
                         // if it's greater than a year for some reason error
@@ -538,15 +643,22 @@ export async function renderToHTMLImpl(req, res, pathname, query, renderOpts, ex
                 // By default, we never revalidate.
                 revalidate = false;
             } else {
-                throw new Error(`A page's revalidate option must be seconds expressed as a natural number. Mixed numbers and strings cannot be used. Received '${JSON.stringify(data.revalidate)}' for ${req.url}`);
+                throw Object.defineProperty(new Error(`A page's revalidate option must be seconds expressed as a natural number. Mixed numbers and strings cannot be used. Received '${JSON.stringify(data.revalidate)}' for ${req.url}`), "__NEXT_ERROR_CODE", {
+                    value: "E161",
+                    enumerable: false,
+                    configurable: true
+                });
             }
         } else {
             // By default, we never revalidate.
             revalidate = false;
         }
         props.pageProps = Object.assign({}, props.pageProps, 'props' in data ? data.props : undefined);
-        // pass up revalidate and props for export
-        metadata.revalidate = revalidate;
+        // pass up cache control and props for export
+        metadata.cacheControl = {
+            revalidate,
+            expire: undefined
+        };
         metadata.pageData = props;
         // this must come after revalidate is added to renderResultMeta
         if (metadata.isNotFound) {
@@ -569,7 +681,11 @@ export async function renderToHTMLImpl(req, res, pathname, query, renderOpts, ex
                     if (!canAccessRes) {
                         const message = `You should not access 'res' after getServerSideProps resolves.` + `\nRead more: https://nextjs.org/docs/messages/gssp-no-mutating-res`;
                         if (deferredContent) {
-                            throw new Error(message);
+                            throw Object.defineProperty(new Error(message), "__NEXT_ERROR_CODE", {
+                                value: "E394",
+                                enumerable: false,
+                                configurable: true
+                            });
                         } else {
                             warn(message);
                         }
@@ -600,12 +716,20 @@ export async function renderToHTMLImpl(req, res, pathname, query, renderOpts, ex
                         preview: true,
                         previewData: previewData
                     } : undefined,
-                    locales: renderOpts.locales,
+                    // We create a copy here to avoid having the types of
+                    // `getServerSideProps` change. This ensures that users can't
+                    // mutate this array and have it poison the reference.
+                    locales: [
+                        ...renderOpts.locales ?? []
+                    ],
                     locale: renderOpts.locale,
                     defaultLocale: renderOpts.defaultLocale
                 }));
             canAccessRes = false;
-            metadata.revalidate = 0;
+            metadata.cacheControl = {
+                revalidate: 0,
+                expire: undefined
+            };
         } catch (serverSidePropsError) {
             // remove not found error code to prevent triggering legacy
             // 404 rendering
@@ -615,24 +739,44 @@ export async function renderToHTMLImpl(req, res, pathname, query, renderOpts, ex
             throw serverSidePropsError;
         }
         if (data == null) {
-            throw new Error(GSSP_NO_RETURNED_VALUE);
+            throw Object.defineProperty(new Error(GSSP_NO_RETURNED_VALUE), "__NEXT_ERROR_CODE", {
+                value: "E394",
+                enumerable: false,
+                configurable: true
+            });
         }
         if (data.props instanceof Promise) {
             deferredContent = true;
         }
         const invalidKeys = Object.keys(data).filter((key)=>key !== 'props' && key !== 'redirect' && key !== 'notFound');
         if (data.unstable_notFound) {
-            throw new Error(`unstable_notFound has been renamed to notFound, please update the field to continue. Page: ${pathname}`);
+            throw Object.defineProperty(new Error(`unstable_notFound has been renamed to notFound, please update the field to continue. Page: ${pathname}`), "__NEXT_ERROR_CODE", {
+                value: "E516",
+                enumerable: false,
+                configurable: true
+            });
         }
         if (data.unstable_redirect) {
-            throw new Error(`unstable_redirect has been renamed to redirect, please update the field to continue. Page: ${pathname}`);
+            throw Object.defineProperty(new Error(`unstable_redirect has been renamed to redirect, please update the field to continue. Page: ${pathname}`), "__NEXT_ERROR_CODE", {
+                value: "E284",
+                enumerable: false,
+                configurable: true
+            });
         }
         if (invalidKeys.length) {
-            throw new Error(invalidKeysMsg('getServerSideProps', invalidKeys));
+            throw Object.defineProperty(new Error(invalidKeysMsg('getServerSideProps', invalidKeys)), "__NEXT_ERROR_CODE", {
+                value: "E394",
+                enumerable: false,
+                configurable: true
+            });
         }
         if ('notFound' in data && data.notFound) {
             if (pathname === '/404') {
-                throw new Error(`The /404 page can not return notFound in "getStaticProps", please remove it to continue!`);
+                throw Object.defineProperty(new Error(`The /404 page can not return notFound in "getStaticProps", please remove it to continue!`), "__NEXT_ERROR_CODE", {
+                    value: "E121",
+                    enumerable: false,
+                    configurable: true
+                });
             }
             metadata.isNotFound = true;
             return new RenderResult(null, {
@@ -657,7 +801,11 @@ export async function renderToHTMLImpl(req, res, pathname, query, renderOpts, ex
         }
         if ((dev || isBuildTimeSSG) && !isSerializableProps(pathname, 'getServerSideProps', data.props)) {
             // this fn should throw an error instead of ever returning `false`
-            throw new Error('invariant: getServerSideProps did not return valid props. Please report this.');
+            throw Object.defineProperty(new Error('invariant: getServerSideProps did not return valid props. Please report this.'), "__NEXT_ERROR_CODE", {
+                value: "E31",
+                enumerable: false,
+                configurable: true
+            });
         }
         props.pageProps = Object.assign({}, props.pageProps, data.props);
         metadata.pageData = props;
@@ -721,7 +869,11 @@ export async function renderToHTMLImpl(req, res, pathname, query, renderOpts, ex
             if (BuiltinFunctionalDocument) {
                 Document = BuiltinFunctionalDocument;
             } else {
-                throw new Error('`getInitialProps` in Document component is not supported with the Edge Runtime.');
+                throw Object.defineProperty(new Error('`getInitialProps` in Document component is not supported with the Edge Runtime.'), "__NEXT_ERROR_CODE", {
+                    value: "E386",
+                    enumerable: false,
+                    configurable: true
+                });
             }
         }
         async function loadDocumentInitialProps(renderShell) {
@@ -732,9 +884,7 @@ export async function renderToHTMLImpl(req, res, pathname, query, renderOpts, ex
                         renderShell(App, Component);
                     }
                     const html = await renderToString(/*#__PURE__*/ _jsx(Body, {
-                        children: /*#__PURE__*/ _jsx(ErrorDebug, {
-                            error: ctx.err
-                        })
+                        children: /*#__PURE__*/ _jsx(ErrorDebug, {})
                     }));
                     return {
                         html,
@@ -742,7 +892,11 @@ export async function renderToHTMLImpl(req, res, pathname, query, renderOpts, ex
                     };
                 }
                 if (dev && (props.router || props.Component)) {
-                    throw new Error(`'router' and 'Component' can not be returned in getInitialProps from _app.js https://nextjs.org/docs/messages/cant-override-next-props`);
+                    throw Object.defineProperty(new Error(`'router' and 'Component' can not be returned in getInitialProps from _app.js https://nextjs.org/docs/messages/cant-override-next-props`), "__NEXT_ERROR_CODE", {
+                        value: "E230",
+                        enumerable: false,
+                        configurable: true
+                    });
                 }
                 const { App: EnhancedApp, Component: EnhancedComponent } = enhanceComponents(options, App, Component);
                 const stream = await renderShell(EnhancedApp, EnhancedComponent);
@@ -762,7 +916,11 @@ export async function renderToHTMLImpl(req, res, pathname, query, renderOpts, ex
             if (isResSent(res) && !isSSG) return null;
             if (!docProps || typeof docProps.html !== 'string') {
                 const message = `"${getDisplayName(Document)}.getInitialProps()" should resolve to an object with a "html" prop set with a valid html string`;
-                throw new Error(message);
+                throw Object.defineProperty(new Error(message), "__NEXT_ERROR_CODE", {
+                    value: "E394",
+                    enumerable: false,
+                    configurable: true
+                });
             }
             return {
                 docProps,
@@ -773,9 +931,7 @@ export async function renderToHTMLImpl(req, res, pathname, query, renderOpts, ex
             const EnhancedApp = _App || App;
             const EnhancedComponent = _Component || Component;
             return ctx.err && ErrorDebug ? /*#__PURE__*/ _jsx(Body, {
-                children: /*#__PURE__*/ _jsx(ErrorDebug, {
-                    error: ctx.err
-                })
+                children: /*#__PURE__*/ _jsx(ErrorDebug, {})
             }) : /*#__PURE__*/ _jsx(Body, {
                 children: /*#__PURE__*/ _jsx(AppContainerWithIsomorphicFiberStructure, {
                     children: renderPageTree(EnhancedApp, EnhancedComponent, {
@@ -870,13 +1026,13 @@ export async function renderToHTMLImpl(req, res, pathname, query, renderOpts, ex
     }
     const hybridAmp = ampState.hybrid;
     const docComponentsRendered = {};
-    const { assetPrefix, buildId, customServer, defaultLocale, disableOptimizedLoading, domainLocales, locale, locales, runtimeConfig } = renderOpts;
+    const { assetPrefix, defaultLocale, disableOptimizedLoading, domainLocales, locale, locales, runtimeConfig } = renderOpts;
     const htmlProps = {
         __NEXT_DATA__: {
             props,
             page: pathname,
             query,
-            buildId,
+            buildId: sharedContext.buildId,
             assetPrefix: assetPrefix === '' ? undefined : assetPrefix,
             runtimeConfig,
             nextExport: nextExport === true ? true : undefined,
@@ -887,7 +1043,7 @@ export async function renderToHTMLImpl(req, res, pathname, query, renderOpts, ex
             err: renderOpts.err ? serializeError(dev, renderOpts.err) : undefined,
             gsp: !!getStaticProps ? true : undefined,
             gssp: !!getServerSideProps ? true : undefined,
-            customServer,
+            customServer: sharedContext.customServer,
             gip: hasPageGetInitialProps ? true : undefined,
             appGip: !defaultAppGetInitialProps ? true : undefined,
             locale,
@@ -973,8 +1129,8 @@ export async function renderToHTMLImpl(req, res, pathname, query, renderOpts, ex
         metadata
     });
 }
-export const renderToHTML = (req, res, pathname, query, renderOpts)=>{
-    return renderToHTMLImpl(req, res, pathname, query, renderOpts, renderOpts);
+export const renderToHTML = (req, res, pathname, query, renderOpts, sharedContext, renderContext)=>{
+    return renderToHTMLImpl(req, res, pathname, query, renderOpts, renderOpts, sharedContext, renderContext);
 };
 
 //# sourceMappingURL=render.js.map

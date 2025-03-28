@@ -133,7 +133,11 @@ async function loadGetInitialProps(App, ctx) {
         var _App_prototype;
         if ((_App_prototype = App.prototype) == null ? void 0 : _App_prototype.getInitialProps) {
             const message = '"' + getDisplayName(App) + '.getInitialProps()" is defined as an instance method - visit https://nextjs.org/docs/messages/get-initial-props-as-an-instance-method for more information.';
-            throw new Error(message);
+            throw Object.defineProperty(new Error(message), "__NEXT_ERROR_CODE", {
+                value: "E394",
+                enumerable: false,
+                configurable: true
+            });
         }
     }
     // when called from _app `ctx` is nested in `ctx`
@@ -153,7 +157,11 @@ async function loadGetInitialProps(App, ctx) {
     }
     if (!props) {
         const message = '"' + getDisplayName(App) + '.getInitialProps()" should resolve to an object. But found "' + props + '" instead.';
-        throw new Error(message);
+        throw Object.defineProperty(new Error(message), "__NEXT_ERROR_CODE", {
+            value: "E394",
+            enumerable: false,
+            configurable: true
+        });
     }
     if (process.env.NODE_ENV !== 'production') {
         if (Object.keys(props).length === 0 && !ctx.ctx) {

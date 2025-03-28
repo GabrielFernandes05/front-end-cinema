@@ -15,7 +15,11 @@ export class WebNextRequest extends BaseNextRequest {
         }
     }
     async parseBody(_limit) {
-        throw new Error('parseBody is not implemented in the web runtime');
+        throw Object.defineProperty(new Error('parseBody is not implemented in the web runtime'), "__NEXT_ERROR_CODE", {
+            value: "E213",
+            enumerable: false,
+            configurable: true
+        });
     }
 }
 export class WebNextResponse extends BaseNextResponse {
@@ -85,7 +89,11 @@ export class WebNextResponse extends BaseNextResponse {
     }
     onClose(callback) {
         if (this.closeController.isClosed) {
-            throw new InvariantError('Cannot call onClose on a WebNextResponse that is already closed');
+            throw Object.defineProperty(new InvariantError('Cannot call onClose on a WebNextResponse that is already closed'), "__NEXT_ERROR_CODE", {
+                value: "E599",
+                enumerable: false,
+                configurable: true
+            });
         }
         return this.closeController.onClose(callback);
     }

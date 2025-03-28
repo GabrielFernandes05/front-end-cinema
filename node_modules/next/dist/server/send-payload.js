@@ -23,7 +23,7 @@ _export(exports, {
 const _utils = require("../shared/lib/utils");
 const _etag = require("./lib/etag");
 const _fresh = /*#__PURE__*/ _interop_require_default(require("next/dist/compiled/fresh"));
-const _revalidate = require("./lib/revalidate");
+const _cachecontrol = require("./lib/cache-control");
 const _approuterheaders = require("../client/components/app-router-headers");
 function _interop_require_default(obj) {
     return obj && obj.__esModule ? obj : {
@@ -48,7 +48,7 @@ function sendEtagResponse(req, res, etag) {
     }
     return false;
 }
-async function sendRenderResult({ req, res, result, type, generateEtags, poweredByHeader, revalidate, expireTime }) {
+async function sendRenderResult({ req, res, result, type, generateEtags, poweredByHeader, cacheControl }) {
     if ((0, _utils.isResSent)(res)) {
         return;
     }
@@ -57,11 +57,8 @@ async function sendRenderResult({ req, res, result, type, generateEtags, powered
     }
     // If cache control is already set on the response we don't
     // override it to allow users to customize it via next.config
-    if (typeof revalidate !== 'undefined' && !res.getHeader('Cache-Control')) {
-        res.setHeader('Cache-Control', (0, _revalidate.formatRevalidate)({
-            revalidate,
-            expireTime
-        }));
+    if (cacheControl && !res.getHeader('Cache-Control')) {
+        res.setHeader('Cache-Control', (0, _cachecontrol.getCacheControlHeader)(cacheControl));
     }
     const payload = result.isDynamic ? null : result.toUnchunkedString();
     if (generateEtags && payload !== null) {

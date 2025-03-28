@@ -30,7 +30,11 @@ SOFTWARE.
             sources: candidate.sources.map(prepend)
         });
     } else {
-        throw new Error('expected string|object');
+        throw Object.defineProperty(new Error('expected string|object'), "__NEXT_ERROR_CODE", {
+            value: "E489",
+            enumerable: false,
+            configurable: true
+        });
     }
 }
 /**
@@ -43,7 +47,11 @@ SOFTWARE.
             sources: candidate.sources.map(remove)
         });
     } else {
-        throw new Error('expected string|object');
+        throw Object.defineProperty(new Error('expected string|object'), "__NEXT_ERROR_CODE", {
+            value: "E489",
+            enumerable: false,
+            configurable: true
+        });
     }
 }
 

@@ -8,7 +8,9 @@ Object.defineProperty(exports, "getClientStyleLoader", {
         return getClientStyleLoader;
     }
 });
+const _getrspack = require("../../../../../../shared/lib/get-rspack");
 function getClientStyleLoader({ hasAppDir, isAppDir, isDevelopment, assetPrefix }) {
+    const isRspack = Boolean(process.env.NEXT_RSPACK);
     const shouldEnableApp = typeof isAppDir === 'boolean' ? isAppDir : hasAppDir;
     // Keep next-style-loader for development mode in `pages/`
     if (isDevelopment && !shouldEnableApp) {
@@ -34,7 +36,7 @@ function getClientStyleLoader({ hasAppDir, isAppDir, isDevelopment, assetPrefix 
             }
         };
     }
-    const MiniCssExtractPlugin = require('../../../../plugins/mini-css-extract-plugin').default;
+    const MiniCssExtractPlugin = isRspack ? (0, _getrspack.getRspackCore)().rspack.CssExtractRspackPlugin : require('../../../../plugins/mini-css-extract-plugin').default;
     return {
         loader: MiniCssExtractPlugin.loader,
         options: {

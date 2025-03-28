@@ -105,14 +105,22 @@ function setReferenceManifestsSingleton({ page, clientReferenceManifest, serverA
 function getServerModuleMap() {
     const serverActionsManifestSingleton = globalThis[SERVER_ACTION_MANIFESTS_SINGLETON];
     if (!serverActionsManifestSingleton) {
-        throw new _invarianterror.InvariantError('Missing manifest for Server Actions.');
+        throw Object.defineProperty(new _invarianterror.InvariantError('Missing manifest for Server Actions.'), "__NEXT_ERROR_CODE", {
+            value: "E606",
+            enumerable: false,
+            configurable: true
+        });
     }
     return serverActionsManifestSingleton.serverModuleMap;
 }
 function getClientReferenceManifestForRsc() {
     const serverActionsManifestSingleton = globalThis[SERVER_ACTION_MANIFESTS_SINGLETON];
     if (!serverActionsManifestSingleton) {
-        throw new _invarianterror.InvariantError('Missing manifest for Server Actions.');
+        throw Object.defineProperty(new _invarianterror.InvariantError('Missing manifest for Server Actions.'), "__NEXT_ERROR_CODE", {
+            value: "E606",
+            enumerable: false,
+            configurable: true
+        });
     }
     const { clientReferenceManifestsPerPage } = serverActionsManifestSingleton;
     const workStore = _workasyncstorageexternal.workAsyncStorage.getStore();
@@ -129,7 +137,11 @@ function getClientReferenceManifestForRsc() {
     }
     const clientReferenceManifest = clientReferenceManifestsPerPage[workStore.route];
     if (!clientReferenceManifest) {
-        throw new _invarianterror.InvariantError(`Missing Client Reference Manifest for ${workStore.route}.`);
+        throw Object.defineProperty(new _invarianterror.InvariantError(`Missing Client Reference Manifest for ${workStore.route}.`), "__NEXT_ERROR_CODE", {
+            value: "E570",
+            enumerable: false,
+            configurable: true
+        });
     }
     return clientReferenceManifest;
 }
@@ -139,11 +151,19 @@ async function getActionEncryptionKey() {
     }
     const serverActionsManifestSingleton = globalThis[SERVER_ACTION_MANIFESTS_SINGLETON];
     if (!serverActionsManifestSingleton) {
-        throw new _invarianterror.InvariantError('Missing manifest for Server Actions.');
+        throw Object.defineProperty(new _invarianterror.InvariantError('Missing manifest for Server Actions.'), "__NEXT_ERROR_CODE", {
+            value: "E606",
+            enumerable: false,
+            configurable: true
+        });
     }
     const rawKey = process.env.NEXT_SERVER_ACTIONS_ENCRYPTION_KEY || serverActionsManifestSingleton.serverActionsManifest.encryptionKey;
     if (rawKey === undefined) {
-        throw new _invarianterror.InvariantError('Missing encryption key for Server Actions');
+        throw Object.defineProperty(new _invarianterror.InvariantError('Missing encryption key for Server Actions'), "__NEXT_ERROR_CODE", {
+            value: "E571",
+            enumerable: false,
+            configurable: true
+        });
     }
     __next_loaded_action_key = await crypto.subtle.importKey('raw', stringToUint8Array(atob(rawKey)), 'AES-GCM', true, [
         'encrypt',

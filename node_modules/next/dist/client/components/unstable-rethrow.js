@@ -1,4 +1,10 @@
-"use strict";
+/**
+ * This function should be used to rethrow internal Next.js errors so that they can be handled by the framework.
+ * When wrapping an API that uses errors to interrupt control flow, you should use this function before you do any error handling.
+ * This function will rethrow the error if it is a Next.js error so it can be handled, otherwise it will do nothing.
+ *
+ * Read more: [Next.js Docs: `unstable_rethrow`](https://nextjs.org/docs/app/api-reference/functions/unstable_rethrow)
+ */ "use strict";
 Object.defineProperty(exports, "__esModule", {
     value: true
 });
@@ -8,18 +14,7 @@ Object.defineProperty(exports, "unstable_rethrow", {
         return unstable_rethrow;
     }
 });
-const _isdynamicusageerror = require("../../export/helpers/is-dynamic-usage-error");
-const _ispostpone = require("../../server/lib/router-utils/is-postpone");
-const _bailouttocsr = require("../../shared/lib/lazy-dynamic/bailout-to-csr");
-const _isnextroutererror = require("./is-next-router-error");
-function unstable_rethrow(error) {
-    if ((0, _isnextroutererror.isNextRouterError)(error) || (0, _bailouttocsr.isBailoutToCSRError)(error) || (0, _isdynamicusageerror.isDynamicUsageError)(error) || (0, _ispostpone.isPostpone)(error)) {
-        throw error;
-    }
-    if (error instanceof Error && 'cause' in error) {
-        unstable_rethrow(error.cause);
-    }
-}
+const unstable_rethrow = typeof window === 'undefined' ? require('./unstable-rethrow.server').unstable_rethrow : require('./unstable-rethrow.browser').unstable_rethrow;
 
 if ((typeof exports.default === 'function' || (typeof exports.default === 'object' && exports.default !== null)) && typeof exports.default.__esModule === 'undefined') {
   Object.defineProperty(exports.default, '__esModule', { value: true });

@@ -59,6 +59,10 @@ export interface RequestMeta {
      */
     serverComponentsHmrCache?: ServerComponentsHmrCache;
     /**
+     * Equals the segment path that was used for the prefetch RSC request.
+     */
+    segmentPrefetchRSCRequest?: string;
+    /**
      * True when the request is for the prefetch flight data.
      */
     isPrefetchRSCRequest?: true;
@@ -66,6 +70,11 @@ export interface RequestMeta {
      * True when the request is for the flight data.
      */
     isRSCRequest?: true;
+    /**
+     * True when the request is for the `/_next/data` route using the pages
+     * router.
+     */
+    isNextDataReq?: true;
     /**
      * Postponed state to use for resumption. If present it's assumed that the
      * request is for a page that has postponed (there are no guarantees that the
@@ -82,6 +91,10 @@ export interface RequestMeta {
      * The previous revalidate before rendering 404 page for notFound: true
      */
     notFoundRevalidate?: number | false;
+    /**
+     * In development, the original source page that returned a 404.
+     */
+    developmentNotFoundSourcePage?: string;
     /**
      * The path we routed to and should be invoked
      */
@@ -110,6 +123,28 @@ export interface RequestMeta {
      * Whether the default route matches were set on the request during routing.
      */
     didSetDefaultRouteMatches?: boolean;
+    /**
+     * Whether the request is for the custom error page.
+     */
+    customErrorRender?: true;
+    /**
+     * Whether to bubble up the NoFallbackError to the caller when a 404 is
+     * returned.
+     */
+    bubbleNoFallback?: true;
+    /**
+     * True when the request had locale information inferred from the default
+     * locale.
+     */
+    localeInferredFromDefault?: true;
+    /**
+     * The locale that was inferred or explicitly set for the request.
+     */
+    locale?: string;
+    /**
+     * The default locale that was inferred or explicitly set for the request.
+     */
+    defaultLocale?: string;
 }
 /**
  * Gets the request metadata. If no key is provided, the entire metadata object
@@ -147,31 +182,10 @@ export declare function addRequestMeta<K extends keyof RequestMeta>(request: Nex
  */
 export declare function removeRequestMeta<K extends keyof RequestMeta>(request: NextIncomingMessage, key: K): RequestMeta;
 type NextQueryMetadata = {
-    __nextNotFoundSrcPage?: string;
-    __nextDefaultLocale?: string;
-    __nextFallback?: 'true';
     /**
-     * The locale that was inferred or explicitly set for the request.
-     *
-     * When this property is mutated, it's important to also update the request
-     * metadata for `_nextInferredDefaultLocale` to ensure that the correct
-     * behavior is applied.
+     * The `_rsc` query parameter used for cache busting to ensure that the RSC
+     * requests do not get cached by the browser explicitly.
      */
-    __nextLocale?: string;
-    /**
-     * `1` when the request did not have a locale in the pathname part of the
-     * URL but the default locale was inferred from either the domain or the
-     * configuration.
-     */
-    __nextInferredLocaleFromDefault?: '1';
-    __nextSsgPath?: string;
-    _nextBubbleNoFallback?: '1';
-    /**
-     * When set to `1`, the request is for the `/_next/data` route using the pages
-     * router.
-     */
-    __nextDataReq?: '1';
-    __nextCustomErrorRender?: '1';
     [NEXT_RSC_UNION_QUERY]?: string;
 };
 export type NextParsedUrlQuery = ParsedUrlQuery & NextQueryMetadata & {
@@ -180,5 +194,4 @@ export type NextParsedUrlQuery = ParsedUrlQuery & NextQueryMetadata & {
 export interface NextUrlWithParsedQuery extends UrlWithParsedQuery {
     query: NextParsedUrlQuery;
 }
-export declare function getNextInternalQuery(query: NextParsedUrlQuery): NextQueryMetadata;
 export {};

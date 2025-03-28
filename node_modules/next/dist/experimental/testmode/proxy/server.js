@@ -66,7 +66,11 @@ async function createProxyServer({ onFetch }) {
     const address = server.address();
     if (!address || typeof address !== 'object') {
         server.close();
-        throw new Error('Failed to create a proxy server');
+        throw Object.defineProperty(new Error('Failed to create a proxy server'), "__NEXT_ERROR_CODE", {
+            value: "E107",
+            enumerable: false,
+            configurable: true
+        });
     }
     const port = address.port;
     const fetchWith = (input, init, testData)=>{

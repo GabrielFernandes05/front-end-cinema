@@ -19,7 +19,10 @@ type Actions = {
         };
     };
 };
-type ActionIdNamePair = [id: string, name: string];
+type ActionIdNamePair = {
+    id: string;
+    exportedName: string;
+};
 export type ActionManifest = {
     encryptionKey: string;
     node: Actions;
@@ -74,7 +77,7 @@ export declare class FlightClientEntryPlugin {
         createdActionIds: Set<string>;
         fromClient?: boolean;
     }): Promise<any>;
-    addEntry(compilation: any, context: string, dependency: webpack.Dependency, options: webpack.EntryOptions): Promise<any>;
-    createActionAssets(compilation: webpack.Compilation, assets: webpack.Compilation['assets']): Promise<void>;
+    addEntry(compilation: webpack.Compilation, context: string, dependency: webpack.Dependency, options: webpack.EntryOptions): Promise<any>;
+    createActionAssets(compilation: webpack.Compilation): Promise<void>;
 }
 export {};

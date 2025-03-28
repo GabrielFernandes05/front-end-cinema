@@ -18,13 +18,11 @@ const _warnonce = require("../../../shared/lib/utils/warn-once");
 const _approutercontextsharedruntime = require("../../../shared/lib/app-router-context.shared-runtime");
 class HTTPAccessFallbackErrorBoundary extends _react.default.Component {
     componentDidCatch() {
-        if (process.env.NODE_ENV === 'development' && this.props.missingSlots && // A missing children slot is the typical not-found case, so no need to warn
+        if (process.env.NODE_ENV === 'development' && this.props.missingSlots && this.props.missingSlots.size > 0 && // A missing children slot is the typical not-found case, so no need to warn
         !this.props.missingSlots.has('children')) {
             let warningMessage = 'No default component was found for a parallel route rendered on this page. Falling back to nearest NotFound boundary.\n' + 'Learn more: https://nextjs.org/docs/app/building-your-application/routing/parallel-routes#defaultjs\n\n';
-            if (this.props.missingSlots.size > 0) {
-                const formattedSlots = Array.from(this.props.missingSlots).sort((a, b)=>a.localeCompare(b)).map((slot)=>"@" + slot).join(', ');
-                warningMessage += 'Missing slots: ' + formattedSlots;
-            }
+            const formattedSlots = Array.from(this.props.missingSlots).sort((a, b)=>a.localeCompare(b)).map((slot)=>"@" + slot).join(', ');
+            warningMessage += 'Missing slots: ' + formattedSlots;
             (0, _warnonce.warnOnce)(warningMessage);
         }
     }
@@ -78,7 +76,7 @@ class HTTPAccessFallbackErrorBoundary extends _react.default.Component {
                         content: "noindex"
                     }),
                     process.env.NODE_ENV === 'development' && /*#__PURE__*/ (0, _jsxruntime.jsx)("meta", {
-                        name: "next-error",
+                        name: "boundary-next-error",
                         content: (0, _httpaccessfallback.getAccessFallbackErrorTypeByStatus)(triggeredStatus)
                     }),
                     errorComponents[triggeredStatus]

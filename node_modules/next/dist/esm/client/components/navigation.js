@@ -4,7 +4,7 @@ import { SearchParamsContext, PathnameContext, PathParamsContext } from '../../s
 import { getSegmentValue } from './router-reducer/reducers/get-segment-value';
 import { PAGE_SEGMENT_KEY, DEFAULT_SEGMENT_KEY } from '../../shared/lib/segment';
 import { ReadonlyURLSearchParams } from './navigation.react-server';
-import { useDynamicRouteParams } from '../../server/app-render/dynamic-rendering';
+const useDynamicRouteParams = typeof window === 'undefined' ? require('../../server/app-render/dynamic-rendering').useDynamicRouteParams : undefined;
 /**
  * A [Client Component](https://nextjs.org/docs/app/building-your-application/rendering/client-components) hook
  * that lets you *read* the current URL's search parameters.
@@ -66,7 +66,7 @@ export function useSearchParams() {
  * Read more: [Next.js Docs: `usePathname`](https://nextjs.org/docs/app/api-reference/functions/use-pathname)
  */ // Client components API
 export function usePathname() {
-    useDynamicRouteParams('usePathname()');
+    useDynamicRouteParams == null ? void 0 : useDynamicRouteParams('usePathname()');
     // In the case where this is `null`, the compat types added in `next-env.d.ts`
     // will add a new overload that changes the return type to include `null`.
     return useContext(PathnameContext);
@@ -94,7 +94,11 @@ export { ServerInsertedHTMLContext, useServerInsertedHTML } from '../../shared/l
 export function useRouter() {
     const router = useContext(AppRouterContext);
     if (router === null) {
-        throw new Error('invariant expected app router to be mounted');
+        throw Object.defineProperty(new Error('invariant expected app router to be mounted'), "__NEXT_ERROR_CODE", {
+            value: "E238",
+            enumerable: false,
+            configurable: true
+        });
     }
     return router;
 }
@@ -116,7 +120,7 @@ export function useRouter() {
  * Read more: [Next.js Docs: `useParams`](https://nextjs.org/docs/app/api-reference/functions/use-params)
  */ // Client components API
 export function useParams() {
-    useDynamicRouteParams('useParams()');
+    useDynamicRouteParams == null ? void 0 : useDynamicRouteParams('useParams()');
     return useContext(PathParamsContext);
 }
 /** Get the canonical parameters from the current level to the leaf node. */ // Client components API
@@ -169,11 +173,11 @@ function getSelectedLayoutSegmentPath(tree, parallelRouteKey, first, segmentPath
  */ // Client components API
 export function useSelectedLayoutSegments(parallelRouteKey) {
     if (parallelRouteKey === void 0) parallelRouteKey = 'children';
-    useDynamicRouteParams('useSelectedLayoutSegments()');
+    useDynamicRouteParams == null ? void 0 : useDynamicRouteParams('useSelectedLayoutSegments()');
     const context = useContext(LayoutRouterContext);
     // @ts-expect-error This only happens in `pages`. Type is overwritten in navigation.d.ts
     if (!context) return null;
-    return getSelectedLayoutSegmentPath(context.tree, parallelRouteKey);
+    return getSelectedLayoutSegmentPath(context.parentTree, parallelRouteKey);
 }
 /**
  * A [Client Component](https://nextjs.org/docs/app/building-your-application/rendering/client-components) hook
@@ -195,7 +199,7 @@ export function useSelectedLayoutSegments(parallelRouteKey) {
  */ // Client components API
 export function useSelectedLayoutSegment(parallelRouteKey) {
     if (parallelRouteKey === void 0) parallelRouteKey = 'children';
-    useDynamicRouteParams('useSelectedLayoutSegment()');
+    useDynamicRouteParams == null ? void 0 : useDynamicRouteParams('useSelectedLayoutSegment()');
     const selectedLayoutSegments = useSelectedLayoutSegments(parallelRouteKey);
     if (!selectedLayoutSegments || selectedLayoutSegments.length === 0) {
         return null;

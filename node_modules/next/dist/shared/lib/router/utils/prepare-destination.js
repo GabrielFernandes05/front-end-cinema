@@ -5,6 +5,7 @@ Object.defineProperty(exports, "__esModule", {
 0 && (module.exports = {
     compileNonPath: null,
     matchHas: null,
+    parseDestination: null,
     prepareDestination: null
 });
 function _export(target, all) {
@@ -20,6 +21,9 @@ _export(exports, {
     matchHas: function() {
         return matchHas;
     },
+    parseDestination: function() {
+        return parseDestination;
+    },
     prepareDestination: function() {
         return prepareDestination;
     }
@@ -27,7 +31,7 @@ _export(exports, {
 const _pathtoregexp = require("next/dist/compiled/path-to-regexp");
 const _escaperegexp = require("../../escape-regexp");
 const _parseurl = require("./parse-url");
-const _interceptionroutes = require("../../../../server/lib/interception-routes");
+const _interceptionroutes = require("./interception-routes");
 const _approuterheaders = require("../../../../client/components/app-router-headers");
 const _getcookieparser = require("../../../../server/api-utils/get-cookie-parser");
 /**
@@ -136,31 +140,64 @@ function compileNonPath(value, params) {
         validate: false
     })(params).slice(1);
 }
-function prepareDestination(args) {
-    const query = Object.assign({}, args.query);
-    delete query.__nextLocale;
-    delete query.__nextDefaultLocale;
-    delete query.__nextDataReq;
-    delete query.__nextInferredLocaleFromDefault;
-    delete query[_approuterheaders.NEXT_RSC_UNION_QUERY];
-    let escapedDestination = args.destination;
+function parseDestination(args) {
+    let escaped = args.destination;
     for (const param of Object.keys({
         ...args.params,
-        ...query
+        ...args.query
     })){
-        escapedDestination = param ? escapeSegment(escapedDestination, param) : escapedDestination;
+        if (!param) continue;
+        escaped = escapeSegment(escaped, param);
     }
-    const parsedDestination = (0, _parseurl.parseUrl)(escapedDestination);
-    const destQuery = parsedDestination.query;
-    const destPath = unescapeSegments("" + parsedDestination.pathname + (parsedDestination.hash || ''));
-    const destHostname = unescapeSegments(parsedDestination.hostname || '');
-    const destPathParamKeys = [];
-    const destHostnameParamKeys = [];
-    (0, _pathtoregexp.pathToRegexp)(destPath, destPathParamKeys);
-    (0, _pathtoregexp.pathToRegexp)(destHostname, destHostnameParamKeys);
+    const parsed = (0, _parseurl.parseUrl)(escaped);
+    let pathname = parsed.pathname;
+    if (pathname) {
+        pathname = unescapeSegments(pathname);
+    }
+    let href = parsed.href;
+    if (href) {
+        href = unescapeSegments(href);
+    }
+    let hostname = parsed.hostname;
+    if (hostname) {
+        hostname = unescapeSegments(hostname);
+    }
+    let hash = parsed.hash;
+    if (hash) {
+        hash = unescapeSegments(hash);
+    }
+    return {
+        ...parsed,
+        pathname,
+        hostname,
+        href,
+        hash
+    };
+}
+function prepareDestination(args) {
+    const query = Object.assign({}, args.query);
+    delete query[_approuterheaders.NEXT_RSC_UNION_QUERY];
+    const parsedDestination = parseDestination(args);
+    const { hostname: destHostname, query: destQuery } = parsedDestination;
+    // The following code assumes that the pathname here includes the hash if it's
+    // present.
+    let destPath = parsedDestination.pathname;
+    if (parsedDestination.hash) {
+        destPath = "" + destPath + parsedDestination.hash;
+    }
     const destParams = [];
-    destPathParamKeys.forEach((key)=>destParams.push(key.name));
-    destHostnameParamKeys.forEach((key)=>destParams.push(key.name));
+    const destPathParamKeys = [];
+    (0, _pathtoregexp.pathToRegexp)(destPath, destPathParamKeys);
+    for (const key of destPathParamKeys){
+        destParams.push(key.name);
+    }
+    if (destHostname) {
+        const destHostnameParamKeys = [];
+        (0, _pathtoregexp.pathToRegexp)(destHostname, destHostnameParamKeys);
+        for (const key of destHostnameParamKeys){
+            destParams.push(key.name);
+        }
+    }
     const destPathCompiler = (0, _pathtoregexp.compile)(destPath, // we don't validate while compiling the destination since we should
     // have already validated before we got to this point and validating
     // breaks compiling destinations with named pattern params from the source
@@ -170,9 +207,12 @@ function prepareDestination(args) {
     {
         validate: false
     });
-    const destHostnameCompiler = (0, _pathtoregexp.compile)(destHostname, {
-        validate: false
-    });
+    let destHostnameCompiler;
+    if (destHostname) {
+        destHostnameCompiler = (0, _pathtoregexp.compile)(destHostname, {
+            validate: false
+        });
+    }
     // update any params in query values
     for (const [key, strOrArray] of Object.entries(destQuery)){
         // the value needs to start with a forward-slash to be compiled
@@ -213,13 +253,19 @@ function prepareDestination(args) {
     try {
         newUrl = destPathCompiler(args.params);
         const [pathname, hash] = newUrl.split('#', 2);
-        parsedDestination.hostname = destHostnameCompiler(args.params);
+        if (destHostnameCompiler) {
+            parsedDestination.hostname = destHostnameCompiler(args.params);
+        }
         parsedDestination.pathname = pathname;
         parsedDestination.hash = "" + (hash ? '#' : '') + (hash || '');
         delete parsedDestination.search;
     } catch (err) {
         if (err.message.match(/Expected .*? to not repeat, but got an array/)) {
-            throw new Error("To use a multi-match in the destination you must add `*` at the end of the param name to signify it should repeat. https://nextjs.org/docs/messages/invalid-multi-match");
+            throw Object.defineProperty(new Error("To use a multi-match in the destination you must add `*` at the end of the param name to signify it should repeat. https://nextjs.org/docs/messages/invalid-multi-match"), "__NEXT_ERROR_CODE", {
+                value: "E329",
+                enumerable: false,
+                configurable: true
+            });
         }
         throw err;
     }

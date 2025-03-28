@@ -1,4 +1,4 @@
-import { isInterceptionRouteAppPath } from '../../../../server/lib/interception-routes';
+import { isInterceptionRouteAppPath } from '../../../../shared/lib/router/utils/interception-routes';
 export function hasInterceptionRouteInCurrentTree(param) {
     let [segment, parallelRoutes] = param;
     // If we have a dynamic segment, it's marked as an interception route by the presence of the `i` suffix.

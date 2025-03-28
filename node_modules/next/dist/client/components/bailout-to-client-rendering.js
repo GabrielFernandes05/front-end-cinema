@@ -13,7 +13,11 @@ const _workasyncstorageexternal = require("../../server/app-render/work-async-st
 function bailoutToClientRendering(reason) {
     const workStore = _workasyncstorageexternal.workAsyncStorage.getStore();
     if (workStore == null ? void 0 : workStore.forceStatic) return;
-    if (workStore == null ? void 0 : workStore.isStaticGeneration) throw new _bailouttocsr.BailoutToCSRError(reason);
+    if (workStore == null ? void 0 : workStore.isStaticGeneration) throw Object.defineProperty(new _bailouttocsr.BailoutToCSRError(reason), "__NEXT_ERROR_CODE", {
+        value: "E394",
+        enumerable: false,
+        configurable: true
+    });
 }
 
 if ((typeof exports.default === 'function' || (typeof exports.default === 'object' && exports.default !== null)) && typeof exports.default.__esModule === 'undefined') {

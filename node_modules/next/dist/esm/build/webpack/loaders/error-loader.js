@@ -9,7 +9,11 @@ const ErrorLoader = function() {
     const resource = ((_this__module = this._module) == null ? void 0 : (_this__module_issuer = _this__module.issuer) == null ? void 0 : _this__module_issuer.resource) ?? null;
     const context = this.rootContext ?? ((_this__compiler = this._compiler) == null ? void 0 : _this__compiler.context);
     const issuer = resource ? context ? path.relative(context, resource) : resource : null;
-    const err = new Error(reason + (issuer ? `\nLocation: ${cyan(issuer)}` : ''));
+    const err = Object.defineProperty(new Error(reason + (issuer ? `\nLocation: ${cyan(issuer)}` : '')), "__NEXT_ERROR_CODE", {
+        value: "E339",
+        enumerable: false,
+        configurable: true
+    });
     this.emitError(err);
 };
 export default ErrorLoader;

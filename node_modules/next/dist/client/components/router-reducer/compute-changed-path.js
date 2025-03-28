@@ -24,7 +24,7 @@ _export(exports, {
         return getSelectedParams;
     }
 });
-const _interceptionroutes = require("../../../server/lib/interception-routes");
+const _interceptionroutes = require("../../../shared/lib/router/utils/interception-routes");
 const _segment = require("../../../shared/lib/segment");
 const _matchsegments = require("../match-segments");
 const removeLeadingSlash = (segment)=>{

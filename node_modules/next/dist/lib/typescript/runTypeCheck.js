@@ -76,7 +76,11 @@ async function runTypeCheck(ts, baseDir, distDir, tsConfigPath, cacheDir, isAppD
         }
     }
     if (firstError) {
-        throw new _compileerror.CompileError((0, _diagnosticFormatter.getFormattedDiagnostic)(ts, baseDir, distDir, firstError, isAppDirEnabled));
+        throw Object.defineProperty(new _compileerror.CompileError((0, _diagnosticFormatter.getFormattedDiagnostic)(ts, baseDir, distDir, firstError, isAppDirEnabled)), "__NEXT_ERROR_CODE", {
+            value: "E394",
+            enumerable: false,
+            configurable: true
+        });
     }
     const warnings = allDiagnostics.filter((d)=>d.category === _diagnosticFormatter.DiagnosticCategory.Warning).map((d)=>(0, _diagnosticFormatter.getFormattedDiagnostic)(ts, baseDir, distDir, d, isAppDirEnabled));
     return {

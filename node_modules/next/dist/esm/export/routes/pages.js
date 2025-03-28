@@ -6,16 +6,9 @@ import { isBailoutToCSRError } from '../../shared/lib/lazy-dynamic/bailout-to-cs
 import AmpHtmlValidator from 'next/dist/compiled/amphtml-validator';
 import { FileType, fileExists } from '../../lib/file-exists';
 import { lazyRenderPagesPage } from '../../server/route-modules/pages/module.render';
-export var ExportedPagesFiles = /*#__PURE__*/ function(ExportedPagesFiles) {
-    ExportedPagesFiles["HTML"] = "HTML";
-    ExportedPagesFiles["DATA"] = "DATA";
-    ExportedPagesFiles["AMP_HTML"] = "AMP_HTML";
-    ExportedPagesFiles["AMP_DATA"] = "AMP_PAGE_DATA";
-    return ExportedPagesFiles;
-}({});
 /**
  * Renders & exports a page associated with the /pages directory
- */ export async function exportPagesPage(req, res, path, page, query, params, htmlFilepath, htmlFilename, ampPath, subFolders, outDir, ampValidatorPath, pagesDataDir, buildExport, isDynamic, hasOrigQueryValues, renderOpts, components, fileWriter) {
+ */ export async function exportPagesPage(req, res, path, page, query, params, htmlFilepath, htmlFilename, ampPath, subFolders, outDir, ampValidatorPath, pagesDataDir, buildExport, isDynamic, sharedContext, renderContext, hasOrigQueryValues, renderOpts, components, fileWriter) {
     var _components_pageConfig, _components_pageConfig1;
     const ampState = {
         ampFirst: ((_components_pageConfig = components.pageConfig) == null ? void 0 : _components_pageConfig.amp) === true,
@@ -28,7 +21,11 @@ export var ExportedPagesFiles = /*#__PURE__*/ function(ExportedPagesFiles) {
     const inAmpMode = isInAmpMode(ampState);
     const hybridAmp = ampState.hybrid;
     if (components.getServerSideProps) {
-        throw new Error(`Error for page ${page}: ${SERVER_PROPS_EXPORT_ERROR}`);
+        throw Object.defineProperty(new Error(`Error for page ${page}: ${SERVER_PROPS_EXPORT_ERROR}`), "__NEXT_ERROR_CODE", {
+            value: "E15",
+            enumerable: false,
+            configurable: true
+        });
     }
     // for non-dynamic SSG pages we should have already
     // prerendered the file
@@ -52,7 +49,11 @@ export var ExportedPagesFiles = /*#__PURE__*/ function(ExportedPagesFiles) {
     if (typeof components.Component === 'string') {
         renderResult = RenderResult.fromStatic(components.Component);
         if (hasOrigQueryValues) {
-            throw new Error(`\nError: you provided query values for ${path} which is an auto-exported page. These can not be applied since the page can no longer be re-rendered on the server. To disable auto-export for this page add \`getInitialProps\`\n`);
+            throw Object.defineProperty(new Error(`\nError: you provided query values for ${path} which is an auto-exported page. These can not be applied since the page can no longer be re-rendered on the server. To disable auto-export for this page add \`getInitialProps\`\n`), "__NEXT_ERROR_CODE", {
+                value: "E505",
+                enumerable: false,
+                configurable: true
+            });
         }
     } else {
         /**
@@ -63,7 +64,7 @@ export var ExportedPagesFiles = /*#__PURE__*/ function(ExportedPagesFiles) {
             process.env.__NEXT_OPTIMIZE_CSS = JSON.stringify(true);
         }
         try {
-            renderResult = await lazyRenderPagesPage(req, res, page, searchAndDynamicParams, renderOpts);
+            renderResult = await lazyRenderPagesPage(req, res, page, searchAndDynamicParams, renderOpts, sharedContext, renderContext);
         } catch (err) {
             if (!isBailoutToCSRError(err)) throw err;
         }
@@ -100,7 +101,7 @@ export var ExportedPagesFiles = /*#__PURE__*/ function(ExportedPagesFiles) {
                 ampRenderResult = await lazyRenderPagesPage(req, res, page, {
                     ...searchAndDynamicParams,
                     amp: '1'
-                }, renderOpts);
+                }, renderOpts, sharedContext, renderContext);
             } catch (err) {
                 if (!isBailoutToCSRError(err)) throw err;
             }
@@ -108,24 +109,27 @@ export var ExportedPagesFiles = /*#__PURE__*/ function(ExportedPagesFiles) {
             if (!renderOpts.ampSkipValidation) {
                 await validateAmp(ampHtml, page + '?amp=1', ampValidatorPath);
             }
-            await fileWriter("AMP_HTML", ampHtmlFilepath, ampHtml, 'utf8');
+            fileWriter.append(ampHtmlFilepath, ampHtml);
         }
     }
     const metadata = (renderResult == null ? void 0 : renderResult.metadata) || (ampRenderResult == null ? void 0 : ampRenderResult.metadata) || {};
     if (metadata.pageData) {
         const dataFile = join(pagesDataDir, htmlFilename.replace(/\.html$/, NEXT_DATA_SUFFIX));
-        await fileWriter("DATA", dataFile, JSON.stringify(metadata.pageData), 'utf8');
+        fileWriter.append(dataFile, JSON.stringify(metadata.pageData));
         if (hybridAmp) {
-            await fileWriter("AMP_PAGE_DATA", dataFile.replace(/\.json$/, '.amp.json'), JSON.stringify(metadata.pageData), 'utf8');
+            fileWriter.append(dataFile.replace(/\.json$/, '.amp.json'), JSON.stringify(metadata.pageData));
         }
     }
     if (!ssgNotFound) {
         // don't attempt writing to disk if getStaticProps returned not found
-        await fileWriter("HTML", htmlFilepath, html, 'utf8');
+        fileWriter.append(htmlFilepath, html);
     }
     return {
         ampValidations,
-        revalidate: metadata.revalidate ?? false,
+        cacheControl: metadata.cacheControl ?? {
+            revalidate: false,
+            expire: undefined
+        },
         ssgNotFound
     };
 }

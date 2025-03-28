@@ -37,24 +37,5 @@ export function getRequestMeta(req, key) {
     delete meta[key];
     return setRequestMeta(request, meta);
 }
-export function getNextInternalQuery(query) {
-    const keysToInclude = [
-        '__nextDefaultLocale',
-        '__nextFallback',
-        '__nextLocale',
-        '__nextSsgPath',
-        '_nextBubbleNoFallback',
-        '__nextDataReq',
-        '__nextInferredLocaleFromDefault'
-    ];
-    const nextInternalQuery = {};
-    for (const key of keysToInclude){
-        if (key in query) {
-            // @ts-ignore this can't be typed correctly
-            nextInternalQuery[key] = query[key];
-        }
-    }
-    return nextInternalQuery;
-}
 
 //# sourceMappingURL=request-meta.js.map

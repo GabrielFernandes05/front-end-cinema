@@ -22,6 +22,7 @@ export interface BuildTraceContext {
         outputPath: string;
         depModArray: string[];
         entryNameMap: Record<string, string>;
+        absolutePathByEntryName: Record<string, string>;
     };
     chunksTrace?: {
         action: TurbotraceAction;
@@ -29,34 +30,28 @@ export interface BuildTraceContext {
         entryNameFilesMap: Record<string, Array<string>>;
     };
 }
-export declare function getHash(content: string | Buffer): string;
 export declare class TraceEntryPointsPlugin implements webpack.WebpackPluginInstance {
     buildTraceContext: BuildTraceContext;
     private rootDir;
     private appDir;
     private pagesDir;
-    private optOutBundlingPackages;
     private appDirEnabled?;
     private tracingRoot;
     private entryTraces;
     private traceIgnores;
     private esmExternals?;
-    private traceHashes;
     private compilerType;
-    private swcLoaderConfig;
-    constructor({ rootDir, appDir, pagesDir, compilerType, optOutBundlingPackages, appDirEnabled, traceIgnores, esmExternals, outputFileTracingRoot, swcLoaderConfig, }: {
+    constructor({ rootDir, appDir, pagesDir, compilerType, appDirEnabled, traceIgnores, esmExternals, outputFileTracingRoot, }: {
         rootDir: string;
         compilerType: CompilerNameValues;
         appDir: string | undefined;
         pagesDir: string | undefined;
-        optOutBundlingPackages: string[];
         appDirEnabled?: boolean;
         traceIgnores?: string[];
         outputFileTracingRoot?: string;
         esmExternals?: NextConfigComplete['experimental']['esmExternals'];
-        swcLoaderConfig: TraceEntryPointsPlugin['swcLoaderConfig'];
     });
-    createTraceAssets(compilation: webpack.Compilation, assets: any, span: Span): Promise<void>;
+    createTraceAssets(compilation: webpack.Compilation, span: Span): Promise<void>;
     tapfinishModules(compilation: webpack.Compilation, traceEntrypointsPluginSpan: Span, doResolve: (request: string, parent: string, job: import('@vercel/nft/out/node-file-trace').Job, isEsmRequested: boolean) => Promise<string>, readlink: any, stat: any): void;
     apply(compiler: webpack.Compiler): void;
 }

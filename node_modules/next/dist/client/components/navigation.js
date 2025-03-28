@@ -82,8 +82,8 @@ const _hooksclientcontextsharedruntime = require("../../shared/lib/hooks-client-
 const _getsegmentvalue = require("./router-reducer/reducers/get-segment-value");
 const _segment = require("../../shared/lib/segment");
 const _navigationreactserver = require("./navigation.react-server");
-const _dynamicrendering = require("../../server/app-render/dynamic-rendering");
 const _serverinsertedhtmlsharedruntime = require("../../shared/lib/server-inserted-html.shared-runtime");
+const useDynamicRouteParams = typeof window === 'undefined' ? require('../../server/app-render/dynamic-rendering').useDynamicRouteParams : undefined;
 function useSearchParams() {
     const searchParams = (0, _react.useContext)(_hooksclientcontextsharedruntime.SearchParamsContext);
     // In the case where this is `null`, the compat types added in
@@ -108,7 +108,7 @@ function useSearchParams() {
     return readonlySearchParams;
 }
 function usePathname() {
-    (0, _dynamicrendering.useDynamicRouteParams)('usePathname()');
+    useDynamicRouteParams == null ? void 0 : useDynamicRouteParams('usePathname()');
     // In the case where this is `null`, the compat types added in `next-env.d.ts`
     // will add a new overload that changes the return type to include `null`.
     return (0, _react.useContext)(_hooksclientcontextsharedruntime.PathnameContext);
@@ -116,12 +116,16 @@ function usePathname() {
 function useRouter() {
     const router = (0, _react.useContext)(_approutercontextsharedruntime.AppRouterContext);
     if (router === null) {
-        throw new Error('invariant expected app router to be mounted');
+        throw Object.defineProperty(new Error('invariant expected app router to be mounted'), "__NEXT_ERROR_CODE", {
+            value: "E238",
+            enumerable: false,
+            configurable: true
+        });
     }
     return router;
 }
 function useParams() {
-    (0, _dynamicrendering.useDynamicRouteParams)('useParams()');
+    useDynamicRouteParams == null ? void 0 : useDynamicRouteParams('useParams()');
     return (0, _react.useContext)(_hooksclientcontextsharedruntime.PathParamsContext);
 }
 /** Get the canonical parameters from the current level to the leaf node. */ // Client components API
@@ -149,15 +153,15 @@ function getSelectedLayoutSegmentPath(tree, parallelRouteKey, first, segmentPath
 }
 function useSelectedLayoutSegments(parallelRouteKey) {
     if (parallelRouteKey === void 0) parallelRouteKey = 'children';
-    (0, _dynamicrendering.useDynamicRouteParams)('useSelectedLayoutSegments()');
+    useDynamicRouteParams == null ? void 0 : useDynamicRouteParams('useSelectedLayoutSegments()');
     const context = (0, _react.useContext)(_approutercontextsharedruntime.LayoutRouterContext);
     // @ts-expect-error This only happens in `pages`. Type is overwritten in navigation.d.ts
     if (!context) return null;
-    return getSelectedLayoutSegmentPath(context.tree, parallelRouteKey);
+    return getSelectedLayoutSegmentPath(context.parentTree, parallelRouteKey);
 }
 function useSelectedLayoutSegment(parallelRouteKey) {
     if (parallelRouteKey === void 0) parallelRouteKey = 'children';
-    (0, _dynamicrendering.useDynamicRouteParams)('useSelectedLayoutSegment()');
+    useDynamicRouteParams == null ? void 0 : useDynamicRouteParams('useSelectedLayoutSegment()');
     const selectedLayoutSegments = useSelectedLayoutSegments(parallelRouteKey);
     if (!selectedLayoutSegments || selectedLayoutSegments.length === 0) {
         return null;

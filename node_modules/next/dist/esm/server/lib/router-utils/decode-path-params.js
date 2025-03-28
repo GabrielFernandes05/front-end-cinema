@@ -14,7 +14,11 @@ import { DecodeError } from '../../../shared/lib/utils';
             seg = escapePathDelimiters(decodeURIComponent(seg), true);
         } catch (_) {
             // An improperly encoded URL was provided
-            throw new DecodeError('Failed to decode path param(s).');
+            throw Object.defineProperty(new DecodeError('Failed to decode path param(s).'), "__NEXT_ERROR_CODE", {
+                value: "E539",
+                enumerable: false,
+                configurable: true
+            });
         }
         return seg;
     }).join('/');

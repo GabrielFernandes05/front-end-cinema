@@ -69,7 +69,7 @@ import process from './lib/postcss';
         }
     }
     function encodeError(label, exception) {
-        return new Error([
+        return Object.defineProperty(new Error([
             'resolve-url-loader',
             ': ',
             [
@@ -78,7 +78,11 @@ import process from './lib/postcss';
                 exception.message,
                 exception.stack.split('\n', 2)[1].trim()
             ] || []).filter(Boolean).join('\n  ')
-        ].join(''));
+        ].join('')), "__NEXT_ERROR_CODE", {
+            value: "E394",
+            enumerable: false,
+            configurable: true
+        });
     }
 }
 

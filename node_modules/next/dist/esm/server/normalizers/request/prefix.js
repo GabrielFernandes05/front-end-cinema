@@ -2,7 +2,11 @@ export class PrefixPathnameNormalizer {
     constructor(prefix){
         this.prefix = prefix;
         if (prefix.endsWith('/')) {
-            throw new Error(`PrefixPathnameNormalizer: prefix "${prefix}" should not end with a slash`);
+            throw Object.defineProperty(new Error(`PrefixPathnameNormalizer: prefix "${prefix}" should not end with a slash`), "__NEXT_ERROR_CODE", {
+                value: "E219",
+                enumerable: false,
+                configurable: true
+            });
         }
     }
     match(pathname) {

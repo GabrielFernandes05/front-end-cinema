@@ -36,19 +36,23 @@ _export(exports, {
         return redirect;
     }
 });
-const _actionasyncstorageexternal = require("../../server/app-render/action-async-storage.external");
 const _redirectstatuscode = require("./redirect-status-code");
 const _redirecterror = require("./redirect-error");
+const actionAsyncStorage = typeof window === 'undefined' ? require('../../server/app-render/action-async-storage.external').actionAsyncStorage : undefined;
 function getRedirectError(url, type, statusCode) {
     if (statusCode === void 0) statusCode = _redirectstatuscode.RedirectStatusCode.TemporaryRedirect;
-    const error = new Error(_redirecterror.REDIRECT_ERROR_CODE);
+    const error = Object.defineProperty(new Error(_redirecterror.REDIRECT_ERROR_CODE), "__NEXT_ERROR_CODE", {
+        value: "E394",
+        enumerable: false,
+        configurable: true
+    });
     error.digest = _redirecterror.REDIRECT_ERROR_CODE + ";" + type + ";" + url + ";" + statusCode + ";";
     return error;
 }
 function redirect(/** The URL to redirect to */ url, type) {
-    const actionStore = _actionasyncstorageexternal.actionAsyncStorage.getStore();
-    const redirectType = type || ((actionStore == null ? void 0 : actionStore.isAction) ? _redirecterror.RedirectType.push : _redirecterror.RedirectType.replace);
-    throw getRedirectError(url, redirectType, _redirectstatuscode.RedirectStatusCode.TemporaryRedirect);
+    var _actionAsyncStorage_getStore;
+    type != null ? type : type = (actionAsyncStorage == null ? void 0 : (_actionAsyncStorage_getStore = actionAsyncStorage.getStore()) == null ? void 0 : _actionAsyncStorage_getStore.isAction) ? _redirecterror.RedirectType.push : _redirecterror.RedirectType.replace;
+    throw getRedirectError(url, type, _redirectstatuscode.RedirectStatusCode.TemporaryRedirect);
 }
 function permanentRedirect(/** The URL to redirect to */ url, type) {
     if (type === void 0) type = _redirecterror.RedirectType.replace;
@@ -62,13 +66,21 @@ function getURLFromRedirectError(error) {
 }
 function getRedirectTypeFromError(error) {
     if (!(0, _redirecterror.isRedirectError)(error)) {
-        throw new Error('Not a redirect error');
+        throw Object.defineProperty(new Error('Not a redirect error'), "__NEXT_ERROR_CODE", {
+            value: "E260",
+            enumerable: false,
+            configurable: true
+        });
     }
     return error.digest.split(';', 2)[1];
 }
 function getRedirectStatusCodeFromError(error) {
     if (!(0, _redirecterror.isRedirectError)(error)) {
-        throw new Error('Not a redirect error');
+        throw Object.defineProperty(new Error('Not a redirect error'), "__NEXT_ERROR_CODE", {
+            value: "E260",
+            enumerable: false,
+            configurable: true
+        });
     }
     return Number(error.digest.split(';').at(-2));
 }

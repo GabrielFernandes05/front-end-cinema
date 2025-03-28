@@ -117,26 +117,29 @@ import { NEXT_INTERCEPTION_MARKER_PREFIX, NEXT_QUERY_PARAM_PREFIX } from '../../
     try {
         return String(new URL(String(url)));
     } catch (error) {
-        throw new Error(`URL is malformed "${String(url)}". Please use only absolute URLs - https://nextjs.org/docs/messages/middleware-relative-urls`, {
+        throw Object.defineProperty(new Error(`URL is malformed "${String(url)}". Please use only absolute URLs - https://nextjs.org/docs/messages/middleware-relative-urls`, {
             cause: error
+        }), "__NEXT_ERROR_CODE", {
+            value: "E61",
+            enumerable: false,
+            configurable: true
         });
     }
 }
 /**
  * Normalizes `nxtP` and `nxtI` query param values to remove the prefix.
- * This function does not mutate the input key; it calls the provided function
- * with the normalized key.
- */ export function normalizeNextQueryParam(key, onKeyNormalized) {
+ * This function does not mutate the input key.
+ */ export function normalizeNextQueryParam(key) {
     const prefixes = [
         NEXT_QUERY_PARAM_PREFIX,
         NEXT_INTERCEPTION_MARKER_PREFIX
     ];
     for (const prefix of prefixes){
         if (key !== prefix && key.startsWith(prefix)) {
-            const normalizedKey = key.substring(prefix.length);
-            onKeyNormalized(normalizedKey);
+            return key.substring(prefix.length);
         }
     }
+    return null;
 }
 
 //# sourceMappingURL=utils.js.map

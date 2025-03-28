@@ -40,24 +40,37 @@ function trackBodyConsumed(body, onEnd) {
     }
 }
 function trackStreamConsumed(stream, onEnd) {
-    const closePassThrough = new TransformStream({
-        flush: ()=>{
-            return onEnd();
-        }
-    });
-    return stream.pipeThrough(closePassThrough);
+    // NOTE: This function must handle `stream` being aborted or cancelled,
+    // so it can't just be this:
+    //
+    //   return stream.pipeThrough(new TransformStream({ flush() { onEnd() } }))
+    //
+    // because that doesn't handle cancellations.
+    // (and cancellation handling via `Transformer.cancel` is only available in node >20)
+    const dest = new TransformStream();
+    const runOnEnd = ()=>onEnd();
+    stream.pipeTo(dest.writable).then(runOnEnd, runOnEnd);
+    return dest.readable;
 }
 class CloseController {
     onClose(callback) {
         if (this.isClosed) {
-            throw new Error('Cannot subscribe to a closed CloseController');
+            throw Object.defineProperty(new Error('Cannot subscribe to a closed CloseController'), "__NEXT_ERROR_CODE", {
+                value: "E365",
+                enumerable: false,
+                configurable: true
+            });
         }
         this.target.addEventListener('close', callback);
         this.listeners++;
     }
     dispatchClose() {
         if (this.isClosed) {
-            throw new Error('Cannot close a CloseController multiple times');
+            throw Object.defineProperty(new Error('Cannot close a CloseController multiple times'), "__NEXT_ERROR_CODE", {
+                value: "E229",
+                enumerable: false,
+                configurable: true
+            });
         }
         if (this.listeners > 0) {
             this.target.dispatchEvent(new Event('close'));

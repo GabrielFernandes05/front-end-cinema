@@ -1,7 +1,7 @@
 import { isResSent } from '../shared/lib/utils';
 import { generateETag } from './lib/etag';
 import fresh from 'next/dist/compiled/fresh';
-import { formatRevalidate } from './lib/revalidate';
+import { getCacheControlHeader } from './lib/cache-control';
 import { RSC_CONTENT_TYPE_HEADER } from '../client/components/app-router-headers';
 export function sendEtagResponse(req, res, etag) {
     if (etag) {
@@ -21,7 +21,7 @@ export function sendEtagResponse(req, res, etag) {
     }
     return false;
 }
-export async function sendRenderResult({ req, res, result, type, generateEtags, poweredByHeader, revalidate, expireTime }) {
+export async function sendRenderResult({ req, res, result, type, generateEtags, poweredByHeader, cacheControl }) {
     if (isResSent(res)) {
         return;
     }
@@ -30,11 +30,8 @@ export async function sendRenderResult({ req, res, result, type, generateEtags, 
     }
     // If cache control is already set on the response we don't
     // override it to allow users to customize it via next.config
-    if (typeof revalidate !== 'undefined' && !res.getHeader('Cache-Control')) {
-        res.setHeader('Cache-Control', formatRevalidate({
-            revalidate,
-            expireTime
-        }));
+    if (cacheControl && !res.getHeader('Cache-Control')) {
+        res.setHeader('Cache-Control', getCacheControlHeader(cacheControl));
     }
     const payload = result.isDynamic ? null : result.toUnchunkedString();
     if (generateEtags && payload !== null) {

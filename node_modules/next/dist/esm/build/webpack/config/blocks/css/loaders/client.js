@@ -1,4 +1,6 @@
+import { getRspackCore } from '../../../../../../shared/lib/get-rspack';
 export function getClientStyleLoader({ hasAppDir, isAppDir, isDevelopment, assetPrefix }) {
+    const isRspack = Boolean(process.env.NEXT_RSPACK);
     const shouldEnableApp = typeof isAppDir === 'boolean' ? isAppDir : hasAppDir;
     // Keep next-style-loader for development mode in `pages/`
     if (isDevelopment && !shouldEnableApp) {
@@ -24,7 +26,7 @@ export function getClientStyleLoader({ hasAppDir, isAppDir, isDevelopment, asset
             }
         };
     }
-    const MiniCssExtractPlugin = require('../../../../plugins/mini-css-extract-plugin').default;
+    const MiniCssExtractPlugin = isRspack ? getRspackCore().rspack.CssExtractRspackPlugin : require('../../../../plugins/mini-css-extract-plugin').default;
     return {
         loader: MiniCssExtractPlugin.loader,
         options: {

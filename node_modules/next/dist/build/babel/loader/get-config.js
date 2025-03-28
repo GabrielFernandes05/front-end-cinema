@@ -155,7 +155,11 @@ const isJsFile = /\.js$/;
     } else if (isJsFile.exec(configFilePath)) {
         return require(configFilePath);
     }
-    throw new Error('The Next.js Babel loader does not support .mjs or .cjs config files.');
+    throw Object.defineProperty(new Error('The Next.js Babel loader does not support .mjs or .cjs config files.'), "__NEXT_ERROR_CODE", {
+        value: "E477",
+        enumerable: false,
+        configurable: true
+    });
 }
 let babelConfigWarned = false;
 /**
@@ -223,6 +227,9 @@ let babelConfigWarned = false;
         if (loaderOptions.reactCompilerPlugins && loaderOptions.reactCompilerPlugins.length === 0) {
             return false;
         }
+        if (/[/\\]node_modules[/\\]/.test(filename)) {
+            return false;
+        }
         if (loaderOptions.reactCompilerExclude && loaderOptions.reactCompilerExclude(filename)) {
             return false;
         }
@@ -259,6 +266,9 @@ let babelConfigWarned = false;
         ...loaderOptions.caller
     };
     if (loaderOptions.transformMode === 'standalone') {
+        if (!reactCompilerPluginsIfEnabled.length) {
+            return null;
+        }
         options.plugins = [
             _pluginsyntaxjsx.default,
             ...reactCompilerPluginsIfEnabled
@@ -317,7 +327,11 @@ let babelConfigWarned = false;
         writable: false,
         value: (reason)=>{
             if (!(reason instanceof Error)) {
-                reason = new Error(reason);
+                reason = Object.defineProperty(new Error(reason), "__NEXT_ERROR_CODE", {
+                    value: "E394",
+                    enumerable: false,
+                    configurable: true
+                });
             }
             this.emitWarning(reason);
         }
@@ -346,6 +360,9 @@ function getConfig({ source, target, loaderOptions, filename, inputSourceMap }) 
     const cacheKey = getCacheKey(cacheCharacteristics);
     if (configCache.has(cacheKey)) {
         const cachedConfig = configCache.get(cacheKey);
+        if (!cachedConfig) {
+            return null;
+        }
         return {
             ...cachedConfig,
             options: {

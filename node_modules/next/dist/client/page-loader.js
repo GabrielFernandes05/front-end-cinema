@@ -33,7 +33,11 @@ class PageLoader {
                     return manifest.pages;
                 }).catch((err)=>{
                     console.log("Failed to fetch devPagesManifest:", err);
-                    throw new Error("Failed to fetch _devPagesManifest.json. Is something blocking that network request?\n" + 'Read more: https://nextjs.org/docs/messages/failed-to-fetch-devpagesmanifest');
+                    throw Object.defineProperty(new Error("Failed to fetch _devPagesManifest.json. Is something blocking that network request?\n" + 'Read more: https://nextjs.org/docs/messages/failed-to-fetch-devpagesmanifest'), "__NEXT_ERROR_CODE", {
+                        value: "E423",
+                        enumerable: false,
+                        configurable: true
+                    });
                 }));
                 return this.promisedDevPagesManifest;
             }
@@ -93,7 +97,11 @@ class PageLoader {
         const { pathname: asPathname } = (0, _parserelativeurl.parseRelativeUrl)(asPath);
         const route = (0, _removetrailingslash.removeTrailingSlash)(hrefPathname);
         if (route[0] !== '/') {
-            throw new Error('Route name should start with a "/", got "' + route + '"');
+            throw Object.defineProperty(new Error('Route name should start with a "/", got "' + route + '"'), "__NEXT_ERROR_CODE", {
+                value: "E303",
+                enumerable: false,
+                configurable: true
+            });
         }
         const getHrefForSlug = (path)=>{
             const dataRoute = (0, _getassetpathfromroute.default)((0, _removetrailingslash.removeTrailingSlash)((0, _addlocale.addLocale)(path, locale)), '.json');

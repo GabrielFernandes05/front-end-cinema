@@ -73,7 +73,11 @@ function autoImplementMethods(handlers) {
             implemented.add('OPTIONS');
             continue;
         }
-        throw new Error(`Invariant: should handle all automatic implementable methods, got method: ${method}`);
+        throw Object.defineProperty(new Error(`Invariant: should handle all automatic implementable methods, got method: ${method}`), "__NEXT_ERROR_CODE", {
+            value: "E211",
+            enumerable: false,
+            configurable: true
+        });
     }
     return methods;
 }

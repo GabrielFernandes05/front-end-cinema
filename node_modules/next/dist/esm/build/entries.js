@@ -1,4 +1,5 @@
-import { posix, join, dirname, extname } from 'path';
+import * as Log from './output/log';
+import { posix, join, dirname, extname, normalize } from 'path';
 import { stringify } from 'querystring';
 import fs from 'fs';
 import { PAGES_DIR_ALIAS, ROOT_DIR_ALIAS, APP_DIR_ALIAS, WEBPACK_LAYERS, INSTRUMENTATION_HOOK_FILENAME } from '../lib/constants';
@@ -195,7 +196,8 @@ export function getEdgeServerEntry(opts) {
             appDirLoader: Buffer.from(opts.appDirLoader || '').toString('base64'),
             nextConfig: Buffer.from(JSON.stringify(opts.config)).toString('base64'),
             preferredRegion: opts.preferredRegion,
-            middlewareConfig: Buffer.from(JSON.stringify(opts.middlewareConfig || {})).toString('base64')
+            middlewareConfig: Buffer.from(JSON.stringify(opts.middlewareConfig || {})).toString('base64'),
+            cacheHandlers: JSON.stringify(opts.config.experimental.cacheHandlers || {})
         };
         return {
             import: `next-edge-app-route-loader?${stringify(loaderParams)}!`,
@@ -212,7 +214,10 @@ export function getEdgeServerEntry(opts) {
             preferredRegion: opts.preferredRegion,
             middlewareConfig: Buffer.from(JSON.stringify(opts.middlewareConfig || {})).toString('base64')
         };
-        return `next-middleware-loader?${stringify(loaderParams)}!`;
+        return {
+            import: `next-middleware-loader?${stringify(loaderParams)}!`,
+            layer: WEBPACK_LAYERS.middleware
+        };
     }
     if (isAPIRoute(opts.page)) {
         const loaderParams = {
@@ -222,7 +227,10 @@ export function getEdgeServerEntry(opts) {
             preferredRegion: opts.preferredRegion,
             middlewareConfig: Buffer.from(JSON.stringify(opts.middlewareConfig || {})).toString('base64')
         };
-        return `next-edge-function-loader?${stringify(loaderParams)}!`;
+        return {
+            import: `next-edge-function-loader?${stringify(loaderParams)}!`,
+            layer: WEBPACK_LAYERS.apiEdge
+        };
     }
     const loaderParams = {
         absolute500Path: opts.pages['/500'] || '',
@@ -260,9 +268,16 @@ export function getInstrumentationEntry(opts) {
         layer: WEBPACK_LAYERS.instrument
     };
 }
+export function getAppLoader() {
+    return process.env.BUILTIN_APP_LOADER ? `builtin:next-app-loader` : 'next-app-loader';
+}
 export function getAppEntry(opts) {
+    if (process.env.NEXT_RSPACK && process.env.BUILTIN_APP_LOADER) {
+        ;
+        opts.projectRoot = normalize(join(__dirname, '../../..'));
+    }
     return {
-        import: `next-app-loader?${stringify(opts)}!`,
+        import: `${getAppLoader()}?${stringify(opts)}!`,
         layer: WEBPACK_LAYERS.reactServerComponents
     };
 }
@@ -287,8 +302,13 @@ export function runDependingOnPageType(params) {
         return;
     }
     if (isMiddlewareFile(params.page)) {
-        params.onEdgeServer();
-        return;
+        if (params.pageRuntime === 'nodejs') {
+            params.onServer();
+            return;
+        } else {
+            params.onEdgeServer();
+            return;
+        }
     }
     if (isAPIRoute(params.page)) {
         if (isEdgeRuntime(params.pageRuntime)) {
@@ -375,6 +395,11 @@ export async function createEntrypoints(params) {
                 ];
             }
             const isInstrumentation = isInstrumentationHookFile(page) && pagesType === PAGE_TYPES.ROOT;
+            let pageRuntime = staticInfo == null ? void 0 : staticInfo.runtime;
+            if (isMiddlewareFile(page) && !config.experimental.nodeMiddleware && pageRuntime === 'nodejs') {
+                Log.warn('nodejs runtime support for middleware requires experimental.nodeMiddleware be enabled in your next.config');
+                pageRuntime = 'edge';
+            }
             runDependingOnPageType({
                 page,
                 pageRuntime: staticInfo.runtime,
@@ -412,6 +437,20 @@ export async function createEntrypoints(params) {
                             absolutePagePath,
                             isEdgeServer: false,
                             isDev: false
+                        });
+                    } else if (isMiddlewareFile(page)) {
+                        server[serverBundlePath.replace('src/', '')] = getEdgeServerEntry({
+                            ...params,
+                            rootDir,
+                            absolutePagePath: absolutePagePath,
+                            bundlePath: clientBundlePath,
+                            isDev: false,
+                            isServerComponent,
+                            page,
+                            middleware: staticInfo == null ? void 0 : staticInfo.middleware,
+                            pagesType,
+                            preferredRegion: staticInfo.preferredRegion,
+                            middlewareConfig: staticInfo.middleware
                         });
                     } else if (isAPIRoute(page)) {
                         server[serverBundlePath] = [
@@ -516,7 +555,7 @@ export function finalizeEntrypoint({ name, compilerType, value, isServerComponen
     switch(compilerType){
         case COMPILER_NAMES.server:
             {
-                const layer = isApi ? WEBPACK_LAYERS.api : isInstrumentation ? WEBPACK_LAYERS.instrument : isServerComponent ? WEBPACK_LAYERS.reactServerComponents : undefined;
+                const layer = isApi ? WEBPACK_LAYERS.apiNode : isInstrumentation ? WEBPACK_LAYERS.instrument : isServerComponent ? WEBPACK_LAYERS.reactServerComponents : name.startsWith('pages/') ? WEBPACK_LAYERS.pagesDirNode : undefined;
                 return {
                     publicPath: isApi ? '' : undefined,
                     runtime: isApi ? 'webpack-api-runtime' : 'webpack-runtime',
@@ -527,7 +566,7 @@ export function finalizeEntrypoint({ name, compilerType, value, isServerComponen
         case COMPILER_NAMES.edgeServer:
             {
                 return {
-                    layer: isApi ? WEBPACK_LAYERS.api : isMiddlewareFilename(name) || isInstrumentation ? WEBPACK_LAYERS.middleware : undefined,
+                    layer: isApi ? WEBPACK_LAYERS.apiEdge : isMiddlewareFilename(name) || isInstrumentation ? WEBPACK_LAYERS.middleware : name.startsWith('pages/') ? WEBPACK_LAYERS.pagesDirEdge : undefined,
                     library: {
                         name: [
                             '_ENTRIES',
@@ -554,6 +593,7 @@ export function finalizeEntrypoint({ name, compilerType, value, isServerComponen
                     }
                     return {
                         dependOn: name.startsWith('pages/') && name !== 'pages/_app' ? 'pages/_app' : CLIENT_STATIC_FILES_RUNTIME_MAIN,
+                        layer: WEBPACK_LAYERS.pagesDirBrowser,
                         ...entry
                     };
                 }
@@ -563,12 +603,19 @@ export function finalizeEntrypoint({ name, compilerType, value, isServerComponen
                         ...entry
                     };
                 }
-                return entry;
+                return {
+                    layer: WEBPACK_LAYERS.pagesDirBrowser,
+                    ...entry
+                };
             }
         default:
             {
                 // Should never happen.
-                throw new Error('Invalid compiler type');
+                throw Object.defineProperty(new Error('Invalid compiler type'), "__NEXT_ERROR_CODE", {
+                    value: "E498",
+                    enumerable: false,
+                    configurable: true
+                });
             }
     }
 }

@@ -16,6 +16,7 @@ type ApiContext = __ApiPreviewProps & {
     hostname?: string;
     revalidate?: RevalidateFn;
     multiZoneDraftMode?: boolean;
+    dev: boolean;
 };
 export declare function apiResolver(req: IncomingMessage, res: ServerResponse, query: any, resolverModule: any, apiContext: ApiContext, propagateError: boolean, dev?: boolean, page?: string, onError?: ServerOnInstrumentationRequestError): Promise<void>;
 export {};

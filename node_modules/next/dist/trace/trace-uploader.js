@@ -6,7 +6,6 @@ const _findup = /*#__PURE__*/ _interop_require_default(require("next/dist/compil
 const _promises = /*#__PURE__*/ _interop_require_default(require("fs/promises"));
 const _child_process = /*#__PURE__*/ _interop_require_default(require("child_process"));
 const _assert = /*#__PURE__*/ _interop_require_default(require("assert"));
-const _nodefetch = /*#__PURE__*/ _interop_require_default(require("next/dist/compiled/node-fetch"));
 const _os = /*#__PURE__*/ _interop_require_default(require("os"));
 const _readline = require("readline");
 const _fs = require("fs");
@@ -121,7 +120,7 @@ const isTurboSession = _isTurboSession === 'true';
     if (isDebugEnabled) {
         console.log('Sending request with body', JSON.stringify(body, null, 2));
     }
-    let res = await (0, _nodefetch.default)(traceUploadUrl, {
+    let res = await fetch(traceUploadUrl, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',

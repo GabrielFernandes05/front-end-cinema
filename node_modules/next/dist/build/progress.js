@@ -69,7 +69,11 @@ function divideSegments(number, segments) {
 const createProgress = (total, label)=>{
     const segments = divideSegments(total, 4);
     if (total === 0) {
-        throw new Error('invariant: progress total can not be zero');
+        throw Object.defineProperty(new Error('invariant: progress total can not be zero'), "__NEXT_ERROR_CODE", {
+            value: "E49",
+            enumerable: false,
+            configurable: true
+        });
     }
     let currentSegmentTotal = segments.shift();
     let currentSegmentCount = 0;

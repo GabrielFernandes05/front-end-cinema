@@ -8,7 +8,7 @@ Object.defineProperty(exports, "getSegmentParam", {
         return getSegmentParam;
     }
 });
-const _interceptionroutes = require("../lib/interception-routes");
+const _interceptionroutes = require("../../shared/lib/router/utils/interception-routes");
 function getSegmentParam(segment) {
     const interceptionMarker = _interceptionroutes.INTERCEPTION_ROUTE_MARKERS.find((marker)=>segment.startsWith(marker));
     // if an interception marker is part of the path segment, we need to jump ahead

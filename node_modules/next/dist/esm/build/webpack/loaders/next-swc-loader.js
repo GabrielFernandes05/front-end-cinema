@@ -29,6 +29,7 @@ import { getLoaderSWCOptions } from '../../swc/options';
 import path, { isAbsolute } from 'path';
 import { babelIncludeRegexes } from '../../webpack-config';
 import { isResourceInPackages } from '../../handle-externals';
+import { updateTelemetryLoaderCtxFromTransformOutput } from '../plugins/telemetry-plugin/update-telemetry-loader-context-from-swc';
 const maybeExclude = (excludePath, transpilePackages)=>{
     if (babelIncludeRegexes.some((r)=>r.test(excludePath))) {
         return false;
@@ -41,7 +42,7 @@ const maybeExclude = (excludePath, transpilePackages)=>{
 // for to force transpiling a `node_module`
 const FORCE_TRANSPILE_CONDITIONS = /(next\/font|next\/dynamic|use server|use client)/;
 async function loaderTransform(source, inputSourceMap) {
-    var _nextConfig_experimental, _nextConfig_experimental1, _nextConfig_experimental2, _nextConfig_experimental3, _nextConfig_experimental4, _nextConfig_experimental5;
+    var _nextConfig_experimental, _nextConfig_experimental1, _nextConfig_experimental2, _nextConfig_experimental3, _nextConfig_experimental4, _nextConfig_experimental5, _nextConfig_experimental6;
     // Make the loader async
     const filename = this.resourcePath;
     // Ensure `.d.ts` are not processed.
@@ -55,7 +56,11 @@ async function loaderTransform(source, inputSourceMap) {
     const shouldMaybeExclude = maybeExclude(filename, loaderOptions.transpilePackages || []);
     if (shouldMaybeExclude) {
         if (!source) {
-            throw new Error(`Invariant might be excluded but missing source`);
+            throw Object.defineProperty(new Error(`Invariant might be excluded but missing source`), "__NEXT_ERROR_CODE", {
+                value: "E368",
+                enumerable: false,
+                configurable: true
+            });
         }
         if (!FORCE_TRANSPILE_CONDITIONS.test(source)) {
             return [
@@ -65,7 +70,7 @@ async function loaderTransform(source, inputSourceMap) {
         }
     }
     const { isServer, rootDir, pagesDir, appDir, hasReactRefresh, nextConfig, jsConfig, supportedBrowsers, swcCacheDir, serverComponents, serverReferenceHashSalt, bundleLayer, esm } = loaderOptions;
-    const isPageFile = filename.startsWith(pagesDir);
+    const isPageFile = pagesDir ? filename.startsWith(pagesDir) : false;
     const relativeFilePathFromRoot = path.relative(rootDir, filename);
     const swcOptions = getLoaderSWCOptions({
         pagesDir,
@@ -89,7 +94,8 @@ async function loaderTransform(source, inputSourceMap) {
         serverReferenceHashSalt,
         bundleLayer,
         esm,
-        cacheHandlers: (_nextConfig_experimental5 = nextConfig.experimental) == null ? void 0 : _nextConfig_experimental5.cacheHandlers
+        cacheHandlers: (_nextConfig_experimental5 = nextConfig.experimental) == null ? void 0 : _nextConfig_experimental5.cacheHandlers,
+        useCacheEnabled: (_nextConfig_experimental6 = nextConfig.experimental) == null ? void 0 : _nextConfig_experimental6.useCache
     });
     const programmaticOptions = {
         ...swcOptions,
@@ -111,11 +117,7 @@ async function loaderTransform(source, inputSourceMap) {
         programmaticOptions.jsc.transform.react.development = this.mode === 'development';
     }
     return transform(source, programmaticOptions).then((output)=>{
-        if (output.eliminatedPackages && this.eliminatedPackages) {
-            for (const pkg of JSON.parse(output.eliminatedPackages)){
-                this.eliminatedPackages.add(pkg);
-            }
-        }
+        updateTelemetryLoaderCtxFromTransformOutput(this, output);
         return [
             output.code,
             output.map ? JSON.parse(output.map) : undefined

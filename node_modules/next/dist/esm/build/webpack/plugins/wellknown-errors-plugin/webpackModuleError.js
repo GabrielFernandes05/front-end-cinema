@@ -5,7 +5,6 @@ import { getCssError } from './parseCss';
 import { getScssError } from './parseScss';
 import { getNotFoundError, getImageError } from './parseNotFoundError';
 import isError from '../../../../lib/is-error';
-import { getRscError } from './parseRSC';
 import { getNextFontError } from './parseNextFontError';
 import { getNextAppLoaderError } from './parseNextAppLoaderError';
 import { getNextInvalidImportError } from './parseNextInvalidImportError';
@@ -64,10 +63,6 @@ export async function getModuleBuildError(compiler, compilation, input) {
     const scss = getScssError(sourceFilename, sourceContent, err);
     if (scss !== false) {
         return scss;
-    }
-    const rsc = getRscError(sourceFilename, err, input.module, compilation, compiler);
-    if (rsc !== false) {
-        return rsc;
     }
     const nextFont = getNextFontError(err, input.module);
     if (nextFont !== false) {

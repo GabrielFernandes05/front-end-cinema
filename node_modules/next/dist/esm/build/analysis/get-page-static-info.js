@@ -23,13 +23,11 @@ const SERVER_ACTION_DIRECTIVE = 'use server';
 export function getRSCModuleInformation(source, isReactServerLayer) {
     const actionsJson = source.match(ACTION_MODULE_LABEL);
     const parsedActionsMeta = actionsJson ? JSON.parse(actionsJson[1]) : undefined;
-    const actions = parsedActionsMeta ? Object.values(parsedActionsMeta) : undefined;
     const clientInfoMatch = source.match(CLIENT_MODULE_LABEL);
     const isClientRef = !!clientInfoMatch;
     if (!isReactServerLayer) {
         return {
             type: RSC_MODULE_TYPES.client,
-            actions,
             actionIds: parsedActionsMeta,
             isClientRef
         };
@@ -40,7 +38,6 @@ export function getRSCModuleInformation(source, isReactServerLayer) {
     const type = clientInfoMatch ? RSC_MODULE_TYPES.client : RSC_MODULE_TYPES.server;
     return {
         type,
-        actions,
         actionIds: parsedActionsMeta,
         clientRefs,
         clientEntryType,
@@ -262,7 +259,11 @@ function warnAboutUnsupportedValue(pageFilePath, page, error) {
     if (isProductionBuild) {
         Log.error(message);
     } else {
-        throw new Error(message);
+        throw Object.defineProperty(new Error(message), "__NEXT_ERROR_CODE", {
+            value: "E394",
+            enumerable: false,
+            configurable: true
+        });
     }
 }
 export async function getAppPageStaticInfo({ pageFilePath, nextConfig, isDev, page }) {
@@ -303,11 +304,19 @@ export async function getAppPageStaticInfo({ pageFilePath, nextConfig, isDev, pa
     const config = parseAppSegmentConfig(exportedConfig, route);
     // Prevent edge runtime and generateStaticParams in the same file.
     if (isEdgeRuntime(config.runtime) && generateStaticParams) {
-        throw new Error(`Page "${page}" cannot use both \`export const runtime = 'edge'\` and export \`generateStaticParams\`.`);
+        throw Object.defineProperty(new Error(`Page "${page}" cannot use both \`export const runtime = 'edge'\` and export \`generateStaticParams\`.`), "__NEXT_ERROR_CODE", {
+            value: "E42",
+            enumerable: false,
+            configurable: true
+        });
     }
     // Prevent use client and generateStaticParams in the same file.
     if ((directives == null ? void 0 : directives.has('client')) && generateStaticParams) {
-        throw new Error(`Page "${page}" cannot use both "use client" and export function "generateStaticParams()".`);
+        throw Object.defineProperty(new Error(`Page "${page}" cannot use both "use client" and export function "generateStaticParams()".`), "__NEXT_ERROR_CODE", {
+            value: "E475",
+            enumerable: false,
+            configurable: true
+        });
     }
     return {
         type: PAGE_TYPES.APP,
@@ -323,7 +332,7 @@ export async function getAppPageStaticInfo({ pageFilePath, nextConfig, isDev, pa
     };
 }
 export async function getPagesPageStaticInfo({ pageFilePath, nextConfig, isDev, page }) {
-    var _config_config, _config_config1, _config_config2, _config_config3;
+    var _config_config, _config_config1, _config_config2;
     const content = await tryToReadFile(pageFilePath, !isDev);
     if (!content || !PARSE_PATTERN.test(content)) {
         return {
@@ -361,7 +370,7 @@ export async function getPagesPageStaticInfo({ pageFilePath, nextConfig, isDev, 
     const route = normalizePagePath(page);
     const config = parsePagesSegmentConfig(exportedConfig, route);
     const isAnAPIRoute = isAPIRoute(route);
-    const resolvedRuntime = isEdgeRuntime(config.runtime ?? ((_config_config = config.config) == null ? void 0 : _config_config.runtime)) || getServerSideProps || getStaticProps ? config.runtime ?? ((_config_config1 = config.config) == null ? void 0 : _config_config1.runtime) : undefined;
+    const resolvedRuntime = config.runtime ?? ((_config_config = config.config) == null ? void 0 : _config_config.runtime);
     if (resolvedRuntime === SERVER_RUNTIME.experimentalEdge) {
         warnAboutExperimentalEdge(isAnAPIRoute ? page : null);
     }
@@ -370,7 +379,11 @@ export async function getPagesPageStaticInfo({ pageFilePath, nextConfig, isDev, 
         if (isDev) {
             Log.error(message);
         } else {
-            throw new Error(message);
+            throw Object.defineProperty(new Error(message), "__NEXT_ERROR_CODE", {
+                value: "E394",
+                enumerable: false,
+                configurable: true
+            });
         }
     }
     return {
@@ -381,8 +394,8 @@ export async function getPagesPageStaticInfo({ pageFilePath, nextConfig, isDev, 
         config,
         middleware: parseMiddlewareConfig(page, exportedConfig.config, nextConfig),
         runtime: resolvedRuntime,
-        preferredRegion: (_config_config2 = config.config) == null ? void 0 : _config_config2.regions,
-        maxDuration: config.maxDuration ?? ((_config_config3 = config.config) == null ? void 0 : _config_config3.maxDuration)
+        preferredRegion: (_config_config1 = config.config) == null ? void 0 : _config_config1.regions,
+        maxDuration: config.maxDuration ?? ((_config_config2 = config.config) == null ? void 0 : _config_config2.maxDuration)
     };
 }
 /**

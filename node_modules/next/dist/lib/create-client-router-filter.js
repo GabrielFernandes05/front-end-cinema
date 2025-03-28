@@ -12,7 +12,7 @@ const _bloomfilter = require("../shared/lib/bloom-filter");
 const _utils = require("../shared/lib/router/utils");
 const _removetrailingslash = require("../shared/lib/router/utils/remove-trailing-slash");
 const _trytoparsepath = require("./try-to-parse-path");
-const _interceptionroutes = require("../server/lib/interception-routes");
+const _interceptionroutes = require("../shared/lib/router/utils/interception-routes");
 function createClientRouterFilter(paths, redirects, allowedErrorRate) {
     const staticPaths = new Set();
     const dynamicPaths = new Set();
@@ -25,7 +25,7 @@ function createClientRouterFilter(paths, redirects, allowedErrorRate) {
             const pathParts = path.split('/');
             // start at 1 since we split on '/' and the path starts
             // with this so the first entry is an empty string
-            for(let i = 1; i < pathParts.length + 1; i++){
+            for(let i = 1; i < pathParts.length; i++){
                 const curPart = pathParts[i];
                 if (curPart.startsWith('[')) {
                     break;

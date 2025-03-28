@@ -32,6 +32,7 @@ function getRender({ dev, page, appMod, pageMod, errorMod, error500Mod, pagesTyp
     };
     const server = new _webserver.default({
         dev,
+        buildId,
         conf: config,
         minimalMode: true,
         webServerConfig: {
@@ -40,7 +41,6 @@ function getRender({ dev, page, appMod, pageMod, errorMod, error500Mod, pagesTyp
             pagesType,
             interceptionRouteRewrites,
             extendRenderOpts: {
-                buildId,
                 runtime: _constants.SERVER_RUNTIME.experimentalEdge,
                 supportsDynamicResponse: true,
                 disableOptimizedLoading: true,

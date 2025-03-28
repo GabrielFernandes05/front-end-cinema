@@ -12,7 +12,11 @@ import { ApiError } from '../index';
     try {
         return JSON.parse(str);
     } catch (e) {
-        throw new ApiError(400, 'Invalid JSON');
+        throw Object.defineProperty(new ApiError(400, 'Invalid JSON'), "__NEXT_ERROR_CODE", {
+            value: "E394",
+            enumerable: false,
+            configurable: true
+        });
     }
 }
 /**
@@ -36,9 +40,17 @@ import { ApiError } from '../index';
         });
     } catch (e) {
         if (isError(e) && e.type === 'entity.too.large') {
-            throw new ApiError(413, `Body exceeded ${limit} limit`);
+            throw Object.defineProperty(new ApiError(413, `Body exceeded ${limit} limit`), "__NEXT_ERROR_CODE", {
+                value: "E394",
+                enumerable: false,
+                configurable: true
+            });
         } else {
-            throw new ApiError(400, 'Invalid body');
+            throw Object.defineProperty(new ApiError(400, 'Invalid body'), "__NEXT_ERROR_CODE", {
+                value: "E394",
+                enumerable: false,
+                configurable: true
+            });
         }
     }
     const body = buffer.toString();

@@ -2,29 +2,58 @@
 Object.defineProperty(exports, "__esModule", {
     value: true
 });
-Object.defineProperty(exports, "logRequests", {
-    enumerable: true,
-    get: function() {
+0 && (module.exports = {
+    ignoreLoggingIncomingRequests: null,
+    logRequests: null
+});
+function _export(target, all) {
+    for(var name in all)Object.defineProperty(target, name, {
+        enumerable: true,
+        get: all[name]
+    });
+}
+_export(exports, {
+    ignoreLoggingIncomingRequests: function() {
+        return ignoreLoggingIncomingRequests;
+    },
+    logRequests: function() {
         return logRequests;
     }
 });
 const _picocolors = require("../../lib/picocolors");
 const _url = require("../../lib/url");
 const _requestmeta = require("../request-meta");
+function ignoreLoggingIncomingRequests(request, loggingConfig) {
+    var _loggingConfig_incomingRequests;
+    // If it's boolean use the boolean value
+    if (typeof (loggingConfig == null ? void 0 : loggingConfig.incomingRequests) === 'boolean') {
+        return !loggingConfig.incomingRequests;
+    }
+    // Any of the value on the chain is falsy, will not ignore the request.
+    const ignore = loggingConfig == null ? void 0 : (_loggingConfig_incomingRequests = loggingConfig.incomingRequests) == null ? void 0 : _loggingConfig_incomingRequests.ignore;
+    // If ignore is not set, don't ignore anything
+    if (!ignore) {
+        return false;
+    }
+    // If array of RegExp, ignore if any pattern matches
+    return ignore.some((pattern)=>pattern.test(request.url));
+}
 function logRequests(options) {
     const { request, response, loggingConfig, requestDurationInMs } = options;
-    logIncomingRequest({
-        request,
-        requestDurationInMs,
-        statusCode: response.statusCode
-    });
+    if (!ignoreLoggingIncomingRequests(request, loggingConfig)) {
+        logIncomingRequests({
+            request,
+            requestDurationInMs,
+            statusCode: response.statusCode
+        });
+    }
     if (request.fetchMetrics) {
         for (const fetchMetric of request.fetchMetrics){
             logFetchMetric(fetchMetric, loggingConfig);
         }
     }
 }
-function logIncomingRequest(options) {
+function logIncomingRequests(options) {
     const { request, requestDurationInMs, statusCode } = options;
     const isRSC = (0, _requestmeta.getRequestMeta)(request, 'isRSCRequest');
     const url = isRSC ? (0, _url.stripNextRscUnionQuery)(request.url) : request.url;

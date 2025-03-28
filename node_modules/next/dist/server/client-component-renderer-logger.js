@@ -1,4 +1,3 @@
-// Combined load times for loading client components
 "use strict";
 Object.defineProperty(exports, "__esModule", {
     value: true
@@ -21,6 +20,7 @@ _export(exports, {
         return wrapClientComponentLoader;
     }
 });
+// Combined load times for loading client components
 let clientComponentLoadStart = 0;
 let clientComponentLoadTimes = 0;
 let clientComponentLoadCount = 0;
@@ -43,11 +43,13 @@ function wrapClientComponentLoader(ComponentMod) {
         },
         loadChunk: (...args)=>{
             const startTime = performance.now();
-            try {
-                return ComponentMod.__next_app__.loadChunk(...args);
-            } finally{
+            const result = ComponentMod.__next_app__.loadChunk(...args);
+            // Avoid wrapping `loadChunk`'s result in an extra promise in case something like React depends on its identity.
+            // We only need to know when it's settled.
+            result.finally(()=>{
                 clientComponentLoadTimes += performance.now() - startTime;
-            }
+            });
+            return result;
         }
     };
 }

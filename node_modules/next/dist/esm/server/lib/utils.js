@@ -66,7 +66,11 @@ const parseNodeArgs = (args)=>{
         if (char === '\\' && isInString) {
             // Ensure we don't have an escape character at the end.
             if (input.length === i + 1) {
-                throw new Error('Invalid escape character at the end.');
+                throw Object.defineProperty(new Error('Invalid escape character at the end.'), "__NEXT_ERROR_CODE", {
+                    value: "E168",
+                    enumerable: false,
+                    configurable: true
+                });
             }
             // Skip the next character.
             char = input[++i];
@@ -86,7 +90,11 @@ const parseNodeArgs = (args)=>{
         }
     }
     if (isInString) {
-        throw new Error('Unterminated string');
+        throw Object.defineProperty(new Error('Unterminated string'), "__NEXT_ERROR_CODE", {
+            value: "E208",
+            enumerable: false,
+            configurable: true
+        });
     }
     return args;
 };

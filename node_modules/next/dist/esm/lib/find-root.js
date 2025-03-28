@@ -5,6 +5,7 @@ export function findRootLockFile(cwd) {
         'pnpm-lock.yaml',
         'package-lock.json',
         'yarn.lock',
+        'bun.lock',
         'bun.lockb'
     ], {
         cwd

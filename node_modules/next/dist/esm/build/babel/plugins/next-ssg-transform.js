@@ -48,12 +48,20 @@ const isDataIdentifier = (name, state)=>{
     if (ssgExports.has(name)) {
         if (name === EXPORT_NAME_GET_SERVER_PROPS) {
             if (state.isPrerender) {
-                throw new Error(SERVER_PROPS_SSG_CONFLICT);
+                throw Object.defineProperty(new Error(SERVER_PROPS_SSG_CONFLICT), "__NEXT_ERROR_CODE", {
+                    value: "E394",
+                    enumerable: false,
+                    configurable: true
+                });
             }
             state.isServerProps = true;
         } else {
             if (state.isServerProps) {
-                throw new Error(SERVER_PROPS_SSG_CONFLICT);
+                throw Object.defineProperty(new Error(SERVER_PROPS_SSG_CONFLICT), "__NEXT_ERROR_CODE", {
+                    value: "E394",
+                    enumerable: false,
+                    configurable: true
+                });
             }
             state.isPrerender = true;
         }
@@ -124,7 +132,11 @@ export default function nextTransformSsg({ types: t }) {
                                 const properties = pattern.get('properties');
                                 properties.forEach((p)=>{
                                     const local = p.get(p.node.type === 'ObjectProperty' ? 'value' : p.node.type === 'RestElement' ? 'argument' : function() {
-                                        throw new Error('invariant');
+                                        throw Object.defineProperty(new Error('invariant'), "__NEXT_ERROR_CODE", {
+                                            value: "E400",
+                                            enumerable: false,
+                                            configurable: true
+                                        });
                                     }());
                                     if (isIdentifierReferenced(local)) {
                                         variableState.refs.add(local);
@@ -247,7 +259,11 @@ export default function nextTransformSsg({ types: t }) {
                                     const properties = pattern.get('properties');
                                     properties.forEach((p)=>{
                                         const local = p.get(p.node.type === 'ObjectProperty' ? 'value' : p.node.type === 'RestElement' ? 'argument' : function() {
-                                            throw new Error('invariant');
+                                            throw Object.defineProperty(new Error('invariant'), "__NEXT_ERROR_CODE", {
+                                                value: "E400",
+                                                enumerable: false,
+                                                configurable: true
+                                            });
                                         }());
                                         if (refs.has(local) && !isIdentifierReferenced(local)) {
                                             ++count;

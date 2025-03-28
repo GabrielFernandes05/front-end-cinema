@@ -21,5 +21,6 @@ export declare class DevBundlerService {
         opts: any;
     }): Promise<{}>;
     get appIsrManifest(): Record<string, boolean>;
-    setAppIsrStatus(key: string, value: boolean | null): void;
+    setIsrStatus(key: string, value: boolean | null): void;
+    close(): void;
 }

@@ -96,7 +96,11 @@ class Span {
         const duration = (end - this._start) / NUM_OF_MICROSEC_IN_NANOSEC;
         this.status = "stopped";
         if (duration > Number.MAX_SAFE_INTEGER) {
-            throw new Error(`Duration is too long to express as float64: ${duration}`);
+            throw Object.defineProperty(new Error(`Duration is too long to express as float64: ${duration}`), "__NEXT_ERROR_CODE", {
+                value: "E513",
+                enumerable: false,
+                configurable: true
+            });
         }
         const timestamp = this._start / NUM_OF_MICROSEC_IN_NANOSEC;
         const traceEvent = {

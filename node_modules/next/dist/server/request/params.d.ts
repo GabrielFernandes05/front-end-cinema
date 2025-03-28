@@ -1,5 +1,6 @@
 import type { WorkStore } from '../app-render/work-async-storage.external';
-export type Params = Record<string, string | Array<string> | undefined>;
+export type ParamValue = string | Array<string> | undefined;
+export type Params = Record<string, ParamValue>;
 /**
  * In this version of Next.js the `params` prop passed to Layouts, Pages, and other Segments is a Promise.
  * However to facilitate migration to this new Promise type you can currently still access params directly on the Promise instance passed to these Segments.

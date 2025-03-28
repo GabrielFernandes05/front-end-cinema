@@ -5,7 +5,6 @@ Object.defineProperty(exports, "__esModule", {
 0 && (module.exports = {
     NEXT_REQUEST_META: null,
     addRequestMeta: null,
-    getNextInternalQuery: null,
     getRequestMeta: null,
     removeRequestMeta: null,
     setRequestMeta: null
@@ -22,9 +21,6 @@ _export(exports, {
     },
     addRequestMeta: function() {
         return addRequestMeta;
-    },
-    getNextInternalQuery: function() {
-        return getNextInternalQuery;
     },
     getRequestMeta: function() {
         return getRequestMeta;
@@ -54,25 +50,6 @@ function removeRequestMeta(request, key) {
     const meta = getRequestMeta(request);
     delete meta[key];
     return setRequestMeta(request, meta);
-}
-function getNextInternalQuery(query) {
-    const keysToInclude = [
-        '__nextDefaultLocale',
-        '__nextFallback',
-        '__nextLocale',
-        '__nextSsgPath',
-        '_nextBubbleNoFallback',
-        '__nextDataReq',
-        '__nextInferredLocaleFromDefault'
-    ];
-    const nextInternalQuery = {};
-    for (const key of keysToInclude){
-        if (key in query) {
-            // @ts-ignore this can't be typed correctly
-            nextInternalQuery[key] = query[key];
-        }
-    }
-    return nextInternalQuery;
 }
 
 //# sourceMappingURL=request-meta.js.map

@@ -24,6 +24,9 @@ export declare class WrappedNextRouterError {
  * Route module.
  */
 export type AppRouteModule = typeof import('../../../build/templates/app-route');
+export type AppRouteSharedContext = {
+    buildId: string;
+};
 /**
  * AppRouteRouteHandlerContext is the context that is passed to the route
  * handler for app routes.
@@ -31,6 +34,7 @@ export type AppRouteModule = typeof import('../../../build/templates/app-route')
 export interface AppRouteRouteHandlerContext extends RouteModuleHandleContext {
     renderOpts: WorkStoreContext['renderOpts'] & Pick<RenderOptsPartial, 'onInstrumentationRequestError'> & CollectedCacheInfo;
     prerenderManifest: DeepReadonly<PrerenderManifest>;
+    sharedContext: AppRouteSharedContext;
 }
 type CollectedCacheInfo = {
     collectedTags?: string;

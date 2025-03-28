@@ -278,7 +278,11 @@ function OpenGraphMetadata({ openGraph }) {
                 break;
             default:
                 const _exhaustiveCheck = openGraphType;
-                throw new Error(`Invalid OpenGraph type: ${_exhaustiveCheck}`);
+                throw Object.defineProperty(new Error(`Invalid OpenGraph type: ${_exhaustiveCheck}`), "__NEXT_ERROR_CODE", {
+                    value: "E237",
+                    enumerable: false,
+                    configurable: true
+                });
         }
     }
     return (0, _meta.MetaFilter)([

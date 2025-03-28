@@ -39,10 +39,3 @@ export declare function fallbackModeToFallbackField(fallback: FallbackMode, page
  * @returns The fallback mode.
  */
 export declare function parseStaticPathsResult(result: GetStaticPathsFallback): FallbackMode;
-/**
- * Converts the fallback mode to a static paths result.
- *
- * @param fallback The fallback mode.
- * @returns The static paths fallback result.
- */
-export declare function fallbackModeToStaticPathsResult(fallback: FallbackMode): GetStaticPathsFallback;

@@ -13,7 +13,11 @@ const _bailouttocsr = require("./bailout-to-csr");
 function BailoutToCSR(param) {
     let { reason, children } = param;
     if (typeof window === 'undefined') {
-        throw new _bailouttocsr.BailoutToCSRError(reason);
+        throw Object.defineProperty(new _bailouttocsr.BailoutToCSRError(reason), "__NEXT_ERROR_CODE", {
+            value: "E394",
+            enumerable: false,
+            configurable: true
+        });
     }
     return children;
 }

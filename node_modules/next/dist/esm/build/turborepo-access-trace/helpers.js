@@ -51,8 +51,12 @@ import { TurborepoAccessTraceResult } from './result';
     } catch (err) {
         // if we can't write this file, we should bail out here to avoid
         // the possibility of incorrect turborepo cache hits.
-        throw new Error(`Failed to write turborepo access trace file`, {
+        throw Object.defineProperty(new Error(`Failed to write turborepo access trace file`, {
             cause: err
+        }), "__NEXT_ERROR_CODE", {
+            value: "E342",
+            enumerable: false,
+            configurable: true
         });
     }
 }

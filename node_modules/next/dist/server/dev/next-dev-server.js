@@ -98,7 +98,7 @@ function _interop_require_wildcard(obj, nodeInterop) {
 let ReactDevOverlayImpl;
 const ReactDevOverlay = (props)=>{
     if (ReactDevOverlayImpl === undefined) {
-        ReactDevOverlayImpl = require('../../client/components/react-dev-overlay/pages/client').ReactDevOverlay;
+        ReactDevOverlayImpl = require('../../client/components/react-dev-overlay/pages/pages-dev-overlay').PagesDevOverlay;
     }
     return ReactDevOverlayImpl(props);
 };
@@ -298,7 +298,7 @@ class DevServer extends _nextserver.default {
        * When there is a failure for an internal Next.js request from
        * middleware we bypass the error without finishing the request
        * so we can serve the required chunks to render the error.
-       */ if (request.url.includes('/_next/static') || request.url.includes('/__nextjs_original-stack-frame') || request.url.includes('/__nextjs_source-map')) {
+       */ if (request.url.includes('/_next/static') || request.url.includes('/__nextjs_original-stack-frame') || request.url.includes('/__nextjs_source-map') || request.url.includes('/__nextjs_error_feedback')) {
                 return {
                     finished: false
                 };
@@ -394,7 +394,11 @@ class DevServer extends _nextserver.default {
         const { pathname } = parsedUrl;
         if (pathname.startsWith('/_next')) {
             if (_fs.default.existsSync((0, _path.join)(this.publicDir, '_next'))) {
-                throw new Error(_constants.PUBLIC_DIR_MIDDLEWARE_CONFLICT);
+                throw Object.defineProperty(new Error(_constants.PUBLIC_DIR_MIDDLEWARE_CONFLICT), "__NEXT_ERROR_CODE", {
+                    value: "E394",
+                    enumerable: false,
+                    configurable: true
+                });
             }
         }
         if (originalPathname) {
@@ -433,9 +437,13 @@ class DevServer extends _nextserver.default {
     }
     getinterceptionRoutePatterns() {
         const rewrites = (0, _generateinterceptionroutesrewrites.generateInterceptionRoutesRewrites)(Object.keys(this.appPathRoutes ?? {}), this.nextConfig.basePath).map((route)=>new RegExp((0, _buildcustomroute.buildCustomRoute)('rewrite', route).regex));
+        if (this.nextConfig.output === 'export' && rewrites.length > 0) {
+            _log.error('Intercepting routes are not supported with static export.\nRead more: https://nextjs.org/docs/app/building-your-application/deploying/static-exports#unsupported-features');
+            process.exit(1);
+        }
         return rewrites ?? [];
     }
-    getMiddleware() {
+    async getMiddleware() {
         var _this_middleware;
         // We need to populate the match
         // field as it isn't serializable
@@ -526,6 +534,7 @@ class DevServer extends _nextserver.default {
             const { locales, defaultLocale } = this.nextConfig.i18n || {};
             const staticPathsWorker = this.getStaticPathsWorker();
             try {
+                var _this_nextConfig_experimental_sri;
                 const pathsResult = await staticPathsWorker.loadStaticPaths({
                     dir: this.dir,
                     distDir: this.distDir,
@@ -544,13 +553,15 @@ class DevServer extends _nextserver.default {
                     isAppPath,
                     requestHeaders,
                     cacheHandler: this.nextConfig.cacheHandler,
+                    cacheHandlers: this.nextConfig.experimental.cacheHandlers,
                     cacheLifeProfiles: this.nextConfig.experimental.cacheLife,
                     fetchCacheKeyPrefix: this.nextConfig.experimental.fetchCacheKeyPrefix,
                     isrFlushToDisk: this.nextConfig.experimental.isrFlushToDisk,
                     maxMemoryCacheSize: this.nextConfig.cacheMaxMemorySize,
                     nextConfigOutput: this.nextConfig.output,
-                    buildId: this.renderOpts.buildId,
-                    authInterrupts: !!this.nextConfig.experimental.authInterrupts
+                    buildId: this.buildId,
+                    authInterrupts: Boolean(this.nextConfig.experimental.authInterrupts),
+                    sriEnabled: Boolean((_this_nextConfig_experimental_sri = this.nextConfig.experimental.sri) == null ? void 0 : _this_nextConfig_experimental_sri.algorithm)
                 });
                 return pathsResult;
             } finally{
@@ -563,13 +574,21 @@ class DevServer extends _nextserver.default {
             const { prerenderedRoutes: staticPaths, fallbackMode: fallback } = res.value;
             if (!isAppPath && this.nextConfig.output === 'export') {
                 if (fallback === _fallback.FallbackMode.BLOCKING_STATIC_RENDER) {
-                    throw new Error('getStaticPaths with "fallback: blocking" cannot be used with "output: export". See more info here: https://nextjs.org/docs/advanced-features/static-html-export');
+                    throw Object.defineProperty(new Error('getStaticPaths with "fallback: blocking" cannot be used with "output: export". See more info here: https://nextjs.org/docs/advanced-features/static-html-export'), "__NEXT_ERROR_CODE", {
+                        value: "E11",
+                        enumerable: false,
+                        configurable: true
+                    });
                 } else if (fallback === _fallback.FallbackMode.PRERENDER) {
-                    throw new Error('getStaticPaths with "fallback: true" cannot be used with "output: export". See more info here: https://nextjs.org/docs/advanced-features/static-html-export');
+                    throw Object.defineProperty(new Error('getStaticPaths with "fallback: true" cannot be used with "output: export". See more info here: https://nextjs.org/docs/advanced-features/static-html-export'), "__NEXT_ERROR_CODE", {
+                        value: "E210",
+                        enumerable: false,
+                        configurable: true
+                    });
                 }
             }
             const value = {
-                staticPaths: staticPaths == null ? void 0 : staticPaths.map((route)=>route.path),
+                staticPaths: staticPaths == null ? void 0 : staticPaths.map((route)=>route.pathname),
                 fallbackMode: fallback
             };
             this.staticPathsCache.set(pathname, value);
@@ -588,7 +607,7 @@ class DevServer extends _nextserver.default {
     async ensurePage(opts) {
         await this.bundlerService.ensurePage(opts);
     }
-    async findPageComponents({ page, query, params, isAppPath, appPaths = null, shouldEnsure, url }) {
+    async findPageComponents({ locale, page, query, params, isAppPath, appPaths = null, shouldEnsure, url }) {
         var _this_ready;
         await ((_this_ready = this.ready) == null ? void 0 : _this_ready.promise);
         const compilationErr = await this.getCompilationError(page);
@@ -596,31 +615,25 @@ class DevServer extends _nextserver.default {
             // Wrap build errors so that they don't get logged again
             throw new _nextserver.WrappedBuildError(compilationErr);
         }
-        try {
-            if (shouldEnsure || this.renderOpts.customServer) {
-                await this.ensurePage({
-                    page,
-                    appPaths,
-                    clientOnly: false,
-                    definition: undefined,
-                    url
-                });
-            }
-            this.nextFontManifest = super.getNextFontManifest();
-            return await super.findPageComponents({
+        if (shouldEnsure || this.serverOptions.customServer) {
+            await this.ensurePage({
                 page,
-                query,
-                params,
-                isAppPath,
-                shouldEnsure,
+                appPaths,
+                clientOnly: false,
+                definition: undefined,
                 url
             });
-        } catch (err) {
-            if (err.code !== 'ENOENT') {
-                throw err;
-            }
-            return null;
         }
+        this.nextFontManifest = super.getNextFontManifest();
+        return await super.findPageComponents({
+            page,
+            query,
+            params,
+            locale,
+            isAppPath,
+            shouldEnsure,
+            url
+        });
     }
     async getFallbackErrorComponents(url) {
         await this.bundlerService.getFallbackErrorComponents(url);

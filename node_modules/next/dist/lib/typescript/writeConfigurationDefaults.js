@@ -182,6 +182,7 @@ function getRequiredConfiguration(ts) {
     }
     return res;
 }
+const localDevTestFilesExcludeAction = 'NEXT_PRIVATE_LOCAL_DEV_TEST_FILES_EXCLUDE';
 async function writeConfigurationDefaults(ts, tsConfigPath, isFirstTimeSetup, hasAppDir, distDir, hasPagesDir) {
     var _userTsConfig_compilerOptions;
     if (isFirstTimeSetup) {
@@ -290,6 +291,23 @@ async function writeConfigurationDefaults(ts, tsConfigPath, isFirstTimeSetup, ha
         ];
         suggestedActions.push((0, _picocolors.cyan)('exclude') + ' was set to ' + (0, _picocolors.bold)(`['node_modules']`));
     }
+    // During local development inside Next.js repo, exclude the test files coverage by the local tsconfig
+    if (process.env.NEXT_PRIVATE_LOCAL_DEV && userTsConfig.exclude) {
+        const tsGlob = '**/*.test.ts';
+        const tsxGlob = '**/*.test.tsx';
+        let hasUpdates = false;
+        if (!userTsConfig.exclude.includes(tsGlob)) {
+            userTsConfig.exclude.push(tsGlob);
+            hasUpdates = true;
+        }
+        if (!userTsConfig.exclude.includes(tsxGlob)) {
+            userTsConfig.exclude.push(tsxGlob);
+            hasUpdates = true;
+        }
+        if (hasUpdates) {
+            requiredActions.push(localDevTestFilesExcludeAction);
+        }
+    }
     if (suggestedActions.length < 1 && requiredActions.length < 1) {
         return;
     }
@@ -305,9 +323,10 @@ async function writeConfigurationDefaults(ts, tsConfigPath, isFirstTimeSetup, ha
         suggestedActions.forEach((action)=>_log.info(`\t- ${action}`));
         _log.info('');
     }
-    if (requiredActions.length) {
+    const requiredActionsToBeLogged = process.env.NEXT_PRIVATE_LOCAL_DEV ? requiredActions.filter((action)=>action !== localDevTestFilesExcludeAction) : requiredActions;
+    if (requiredActionsToBeLogged.length) {
         _log.info(`The following ${(0, _picocolors.white)('mandatory changes')} were made to your ${(0, _picocolors.cyan)('tsconfig.json')}:\n`);
-        requiredActions.forEach((action)=>_log.info(`\t- ${action}`));
+        requiredActionsToBeLogged.forEach((action)=>_log.info(`\t- ${action}`));
         _log.info('');
     }
 }

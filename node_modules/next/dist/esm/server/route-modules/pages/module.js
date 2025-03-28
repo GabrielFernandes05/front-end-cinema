@@ -10,7 +10,7 @@ export class PagesRouteModule extends RouteModule {
         return renderToHTMLImpl(req, res, context.page, context.query, context.renderOpts, {
             App: this.components.App,
             Document: this.components.Document
-        });
+        }, context.sharedContext, context.renderContext);
     }
 }
 const vendored = {

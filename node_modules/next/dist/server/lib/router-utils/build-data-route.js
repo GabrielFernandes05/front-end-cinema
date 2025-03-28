@@ -26,12 +26,16 @@ function buildDataRoute(page, buildId) {
     let namedDataRouteRegex;
     let routeKeys;
     if ((0, _isdynamic.isDynamicRoute)(page)) {
-        const routeRegex = (0, _routeregex.getNamedRouteRegex)(dataRoute.replace(/\.json$/, ''), true);
-        dataRouteRegex = (0, _loadcustomroutes.normalizeRouteRegex)(routeRegex.re.source.replace(/\(\?:\\\/\)\?\$$/, `\\.json$`));
-        namedDataRouteRegex = routeRegex.namedRegex.replace(/\(\?:\/\)\?\$$/, `\\.json$`);
+        const routeRegex = (0, _routeregex.getNamedRouteRegex)(dataRoute, {
+            prefixRouteKeys: true,
+            includeSuffix: true,
+            excludeOptionalTrailingSlash: true
+        });
+        dataRouteRegex = (0, _loadcustomroutes.normalizeRouteRegex)(routeRegex.re.source);
+        namedDataRouteRegex = routeRegex.namedRegex;
         routeKeys = routeRegex.routeKeys;
     } else {
-        dataRouteRegex = (0, _loadcustomroutes.normalizeRouteRegex)(new RegExp(`^${_path.default.posix.join('/_next/data', (0, _escaperegexp.escapeStringRegexp)(buildId), `${pagePath}.json`)}$`).source);
+        dataRouteRegex = (0, _loadcustomroutes.normalizeRouteRegex)(new RegExp(`^${_path.default.posix.join('/_next/data', (0, _escaperegexp.escapeStringRegexp)(buildId), `${pagePath}\\.json`)}$`).source);
     }
     return {
         page,

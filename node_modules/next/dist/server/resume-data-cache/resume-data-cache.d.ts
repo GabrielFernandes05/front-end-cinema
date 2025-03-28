@@ -1,4 +1,4 @@
-import { type UseCacheCacheStore, type FetchCacheStore, type EncryptedBoundArgsCacheStore } from './cache-store';
+import { type UseCacheCacheStore, type FetchCacheStore, type EncryptedBoundArgsCacheStore, type DecryptedBoundArgsCacheStore } from './cache-store';
 /**
  * An immutable version of the resume data cache used during rendering.
  * This cache is read-only and cannot be modified once created.
@@ -19,6 +19,13 @@ export interface RenderResumeDataCache {
      * The 'set' operation is omitted to enforce immutability.
      */
     readonly encryptedBoundArgs: Omit<EncryptedBoundArgsCacheStore, 'set'>;
+    /**
+     * A read-only Map store for decrypted bound args of inline server functions.
+     * This is only intended for in-memory usage during pre-rendering, and must
+     * not be persisted in the resume store. The 'set' operation is omitted to
+     * enforce immutability.
+     */
+    readonly decryptedBoundArgs: Omit<DecryptedBoundArgsCacheStore, 'set'>;
 }
 /**
  * A mutable version of the resume data cache used during pre-rendering.
@@ -43,6 +50,13 @@ export interface PrerenderResumeDataCache {
      * pre-rendering.
      */
     readonly encryptedBoundArgs: EncryptedBoundArgsCacheStore;
+    /**
+     * A mutable Map store for decrypted bound args of inline server functions.
+     * This is only intended for in-memory usage during pre-rendering, and must
+     * not be persisted in the resume store. Supports both 'get' and 'set'
+     * operations to build the cache during pre-rendering.
+     */
+    readonly decryptedBoundArgs: DecryptedBoundArgsCacheStore;
 }
 /**
  * Serializes a resume data cache into a JSON string for storage or

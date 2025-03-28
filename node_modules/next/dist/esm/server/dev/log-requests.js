@@ -1,20 +1,39 @@
 import { blue, bold, gray, green, red, white, yellow } from '../../lib/picocolors';
 import { stripNextRscUnionQuery } from '../../lib/url';
 import { getRequestMeta } from '../request-meta';
+/**
+ * Returns true if the incoming request should be ignored for logging.
+ */ export function ignoreLoggingIncomingRequests(request, loggingConfig) {
+    var _loggingConfig_incomingRequests;
+    // If it's boolean use the boolean value
+    if (typeof (loggingConfig == null ? void 0 : loggingConfig.incomingRequests) === 'boolean') {
+        return !loggingConfig.incomingRequests;
+    }
+    // Any of the value on the chain is falsy, will not ignore the request.
+    const ignore = loggingConfig == null ? void 0 : (_loggingConfig_incomingRequests = loggingConfig.incomingRequests) == null ? void 0 : _loggingConfig_incomingRequests.ignore;
+    // If ignore is not set, don't ignore anything
+    if (!ignore) {
+        return false;
+    }
+    // If array of RegExp, ignore if any pattern matches
+    return ignore.some((pattern)=>pattern.test(request.url));
+}
 export function logRequests(options) {
     const { request, response, loggingConfig, requestDurationInMs } = options;
-    logIncomingRequest({
-        request,
-        requestDurationInMs,
-        statusCode: response.statusCode
-    });
+    if (!ignoreLoggingIncomingRequests(request, loggingConfig)) {
+        logIncomingRequests({
+            request,
+            requestDurationInMs,
+            statusCode: response.statusCode
+        });
+    }
     if (request.fetchMetrics) {
         for (const fetchMetric of request.fetchMetrics){
             logFetchMetric(fetchMetric, loggingConfig);
         }
     }
 }
-function logIncomingRequest(options) {
+function logIncomingRequests(options) {
     const { request, requestDurationInMs, statusCode } = options;
     const isRSC = getRequestMeta(request, 'isRSCRequest');
     const url = isRSC ? stripNextRscUnionQuery(request.url) : request.url;

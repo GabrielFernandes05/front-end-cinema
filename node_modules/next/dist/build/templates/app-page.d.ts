@@ -9,8 +9,8 @@ declare const pages: any;
 export { tree, pages };
 export { default as GlobalError } from 'VAR_MODULE_GLOBAL_ERROR';
 export declare const __next_app__: {
-    require: any;
-    loadChunk: any;
+    require: (id: string | number) => unknown;
+    loadChunk: (id: string | number) => Promise<unknown>;
 };
 export * from '../../server/app-render/entry-base';
 export declare const routeModule: AppPageRouteModule;

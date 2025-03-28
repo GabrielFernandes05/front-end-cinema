@@ -2,7 +2,7 @@ import { ReflectAdapter } from '../web/spec-extension/adapters/reflect';
 import { abortAndThrowOnSynchronousRequestDataAccess, throwToInterruptStaticGeneration, postponeWithTracking, trackSynchronousRequestDataAccessInDev } from '../app-render/dynamic-rendering';
 import { workUnitAsyncStorage } from '../app-render/work-unit-async-storage.external';
 import { InvariantError } from '../../shared/lib/invariant-error';
-import { describeStringPropertyAccess, wellKnownProperties } from './utils';
+import { describeStringPropertyAccess, wellKnownProperties } from '../../shared/lib/utils/reflect-utils';
 import { makeHangingPromise } from '../dynamic-rendering-utils';
 import { createDedupedByCallsiteServerErrorLoggerDev } from '../create-deduped-by-callsite-server-error-logger';
 import { scheduleImmediate } from '../../lib/scheduler';
@@ -83,7 +83,7 @@ function createPrerenderParams(underlyingParams, workStore, prerenderStore) {
                 // We are in a dynamicIO (PPR or otherwise) prerender
                 return makeAbortingExoticParams(underlyingParams, workStore.route, prerenderStore);
             }
-            // remaining cases are prender-ppr and prerender-legacy
+            // remaining cases are prerender-ppr and prerender-legacy
             // We aren't in a dynamicIO prerender but we do have fallback params at this
             // level so we need to make an erroring exotic params object which will postpone
             // if you access the fallback params
@@ -289,21 +289,32 @@ function syncIODev(route, expression, missingProperties) {
         warnForSyncAccess(route, expression);
     }
 }
-const noop = ()=>{};
-const warnForSyncAccess = process.env.__NEXT_DISABLE_SYNC_DYNAMIC_API_WARNINGS ? noop : createDedupedByCallsiteServerErrorLoggerDev(createParamsAccessError);
-const warnForIncompleteEnumeration = process.env.__NEXT_DISABLE_SYNC_DYNAMIC_API_WARNINGS ? noop : createDedupedByCallsiteServerErrorLoggerDev(createIncompleteEnumerationError);
+const warnForSyncAccess = createDedupedByCallsiteServerErrorLoggerDev(createParamsAccessError);
+const warnForIncompleteEnumeration = createDedupedByCallsiteServerErrorLoggerDev(createIncompleteEnumerationError);
 function createParamsAccessError(route, expression) {
     const prefix = route ? `Route "${route}" ` : 'This route ';
-    return new Error(`${prefix}used ${expression}. ` + `\`params\` should be awaited before using its properties. ` + `Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis`);
+    return Object.defineProperty(new Error(`${prefix}used ${expression}. ` + `\`params\` should be awaited before using its properties. ` + `Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis`), "__NEXT_ERROR_CODE", {
+        value: "E307",
+        enumerable: false,
+        configurable: true
+    });
 }
 function createIncompleteEnumerationError(route, expression, missingProperties) {
     const prefix = route ? `Route "${route}" ` : 'This route ';
-    return new Error(`${prefix}used ${expression}. ` + `\`params\` should be awaited before using its properties. ` + `The following properties were not available through enumeration ` + `because they conflict with builtin property names: ` + `${describeListOfPropertyNames(missingProperties)}. ` + `Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis`);
+    return Object.defineProperty(new Error(`${prefix}used ${expression}. ` + `\`params\` should be awaited before using its properties. ` + `The following properties were not available through enumeration ` + `because they conflict with builtin property names: ` + `${describeListOfPropertyNames(missingProperties)}. ` + `Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis`), "__NEXT_ERROR_CODE", {
+        value: "E482",
+        enumerable: false,
+        configurable: true
+    });
 }
 function describeListOfPropertyNames(properties) {
     switch(properties.length){
         case 0:
-            throw new InvariantError('Expected describeListOfPropertyNames to be called with a non-empty list of strings.');
+            throw Object.defineProperty(new InvariantError('Expected describeListOfPropertyNames to be called with a non-empty list of strings.'), "__NEXT_ERROR_CODE", {
+                value: "E531",
+                enumerable: false,
+                configurable: true
+            });
         case 1:
             return `\`${properties[0]}\``;
         case 2:

@@ -14,10 +14,18 @@ import { HTTP_ERROR_FALLBACK_ERROR_CODE } from './http-access-fallback/http-acce
  */ const DIGEST = "" + HTTP_ERROR_FALLBACK_ERROR_CODE + ";403";
 export function forbidden() {
     if (!process.env.__NEXT_EXPERIMENTAL_AUTH_INTERRUPTS) {
-        throw new Error("`forbidden()` is experimental and only allowed to be enabled when `experimental.authInterrupts` is enabled.");
+        throw Object.defineProperty(new Error("`forbidden()` is experimental and only allowed to be enabled when `experimental.authInterrupts` is enabled."), "__NEXT_ERROR_CODE", {
+            value: "E488",
+            enumerable: false,
+            configurable: true
+        });
     }
     // eslint-disable-next-line no-throw-literal
-    const error = new Error(DIGEST);
+    const error = Object.defineProperty(new Error(DIGEST), "__NEXT_ERROR_CODE", {
+        value: "E394",
+        enumerable: false,
+        configurable: true
+    });
     error.digest = DIGEST;
     throw error;
 }

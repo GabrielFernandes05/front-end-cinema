@@ -1,4 +1,6 @@
-import { isMetadataRoute } from '../../lib/metadata/is-metadata-route';
+import { getAppLoader } from '../entries';
+import { spans as webpackCompilationSpans } from './plugins/profiling-plugin';
+import { compilationSpans as rspackCompilationSpans } from './plugins/rspack-profiling-plugin';
 export function traverseModules(compilation, callback, filterChunkGroup) {
     compilation.chunkGroups.forEach((chunkGroup)=>{
         if (filterChunkGroup && !filterChunkGroup(chunkGroup)) {
@@ -23,8 +25,7 @@ export function forEachEntryModule(compilation, callback) {
     for (const [name, entry] of compilation.entries.entries()){
         var _entry_dependencies;
         // Skip for entries under pages/
-        if (name.startsWith('pages/') || // Skip for metadata route handlers
-        name.startsWith('app/') && isMetadataRoute(name)) {
+        if (name.startsWith('pages/')) {
             continue;
         }
         // Check if the page entry is a server component or not.
@@ -32,12 +33,12 @@ export function forEachEntryModule(compilation, callback) {
         // Ensure only next-app-loader entries are handled.
         if (!entryDependency || !entryDependency.request) continue;
         const request = entryDependency.request;
-        if (!request.startsWith('next-edge-ssr-loader?') && !request.startsWith('next-edge-app-route-loader?') && !request.startsWith('next-app-loader?')) continue;
+        if (!request.startsWith('next-edge-ssr-loader?') && !request.startsWith('next-edge-app-route-loader?') && !request.startsWith(`${getAppLoader()}?`)) continue;
         let entryModule = compilation.moduleGraph.getResolvedModule(entryDependency);
         if (request.startsWith('next-edge-ssr-loader?') || request.startsWith('next-edge-app-route-loader?')) {
             entryModule.dependencies.forEach((dependency)=>{
                 const modRequest = dependency.request;
-                if (modRequest == null ? void 0 : modRequest.includes('next-app-loader')) {
+                if (modRequest == null ? void 0 : modRequest.includes(getAppLoader())) {
                     entryModule = compilation.moduleGraph.getResolvedModule(dependency);
                 }
             });
@@ -52,6 +53,9 @@ export function formatBarrelOptimizedResource(resource, matchResource) {
     return `${resource}@${matchResource}`;
 }
 export function getModuleReferencesInOrder(module, moduleGraph) {
+    if ('getOutgoingConnectionsInOrder' in moduleGraph && typeof moduleGraph.getOutgoingConnectionsInOrder === 'function') {
+        return moduleGraph.getOutgoingConnectionsInOrder(module);
+    }
     const connections = [];
     for (const connection of moduleGraph.getOutgoingConnections(module)){
         if (connection.dependency && connection.module) {
@@ -63,6 +67,10 @@ export function getModuleReferencesInOrder(module, moduleGraph) {
     }
     connections.sort((a, b)=>a.index - b.index);
     return connections.map((c)=>c.connection);
+}
+export function getCompilationSpan(compilation) {
+    const compilationSpans = process.env.NEXT_RSPACK ? rspackCompilationSpans : webpackCompilationSpans;
+    return compilationSpans.get(compilation);
 }
 
 //# sourceMappingURL=utils.js.map

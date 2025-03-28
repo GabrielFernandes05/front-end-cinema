@@ -19,6 +19,7 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 import { isMiddlewareFilename } from '../../build/utils';
 import { HMR_ACTIONS_SENT_TO_BROWSER } from './hot-reloader-types';
+import { devIndicatorServerState } from './dev-indicator-server-state';
 function isMiddlewareStats(stats) {
     for (const key of stats.compilation.entrypoints.keys()){
         if (isMiddlewareFilename(key)) {
@@ -52,15 +53,11 @@ class EventStream {
     constructor(){
         this.clients = new Set();
     }
-    everyClient(fn) {
-        for (const client of this.clients){
-            fn(client);
-        }
-    }
     close() {
-        this.everyClient((client)=>{
-            client.close();
-        });
+        for (const wsClient of this.clients){
+            // it's okay to not cleanly close these websocket connections, this is dev
+            wsClient.terminate();
+        }
         this.clients.clear();
     }
     handler(client) {
@@ -70,9 +67,9 @@ class EventStream {
         });
     }
     publish(payload) {
-        this.everyClient((client)=>{
-            client.send(JSON.stringify(payload));
-        });
+        for (const wsClient of this.clients){
+            wsClient.send(JSON.stringify(payload));
+        }
     }
 }
 export class WebpackHotMiddleware {
@@ -146,6 +143,9 @@ export class WebpackHotMiddleware {
                 var _this_middlewareLatestStats;
                 const stats = statsToJson(syncStats);
                 const middlewareStats = statsToJson((_this_middlewareLatestStats = this.middlewareLatestStats) == null ? void 0 : _this_middlewareLatestStats.stats);
+                if (devIndicatorServerState.disabledUntil < Date.now()) {
+                    devIndicatorServerState.disabledUntil = 0;
+                }
                 this.publish({
                     action: HMR_ACTIONS_SENT_TO_BROWSER.SYNC,
                     hash: stats.hash,
@@ -160,7 +160,8 @@ export class WebpackHotMiddleware {
                     versionInfo: this.versionInfo,
                     debug: {
                         devtoolsFrontendUrl: this.devtoolsFrontendUrl
-                    }
+                    },
+                    devIndicator: devIndicatorServerState
                 });
             }
         };

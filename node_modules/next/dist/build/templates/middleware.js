@@ -59,7 +59,11 @@ const mod = {
 const handler = mod.middleware || mod.default;
 const page = 'VAR_DEFINITION_PAGE';
 if (typeof handler !== 'function') {
-    throw new Error(`The Middleware "${page}" must export a \`middleware\` or a \`default\` function`);
+    throw Object.defineProperty(new Error(`The Middleware "${page}" must export a \`middleware\` or a \`default\` function`), "__NEXT_ERROR_CODE", {
+        value: "E120",
+        enumerable: false,
+        configurable: true
+    });
 }
 // Middleware will only sent out the FetchEvent to next server,
 // so load instrumentation module here and track the error inside middleware module.

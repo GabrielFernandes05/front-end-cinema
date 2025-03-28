@@ -13,7 +13,11 @@ export function serveStatic(req, res, path, opts) {
     return new Promise((resolve, reject)=>{
         send(req, path, opts).on('directory', ()=>{
             // We don't allow directories to be read.
-            const err = new Error('No directory access');
+            const err = Object.defineProperty(new Error('No directory access'), "__NEXT_ERROR_CODE", {
+                value: "E340",
+                enumerable: false,
+                configurable: true
+            });
             err.code = 'ENOENT';
             reject(err);
         }).on('error', reject).pipe(res).on('finish', resolve);

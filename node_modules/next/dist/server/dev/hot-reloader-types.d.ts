@@ -7,6 +7,7 @@ import type { RouteDefinition } from '../route-definitions/route-definition';
 import type { Project, Update as TurbopackUpdate } from '../../build/swc/types';
 import type { VersionInfo } from './parse-version-info';
 import type { DebugInfo } from '../../client/components/react-dev-overlay/types';
+import type { DevIndicatorServerState } from './dev-indicator-server-state';
 export declare const enum HMR_ACTIONS_SENT_TO_BROWSER {
     ADDED_PAGE = "addedPage",
     REMOVED_PAGE = "removedPage",
@@ -22,7 +23,8 @@ export declare const enum HMR_ACTIONS_SENT_TO_BROWSER {
     TURBOPACK_MESSAGE = "turbopack-message",
     SERVER_ERROR = "serverError",
     TURBOPACK_CONNECTED = "turbopack-connected",
-    APP_ISR_MANIFEST = "appIsrManifest"
+    ISR_MANIFEST = "isrManifest",
+    DEV_INDICATOR = "devIndicator"
 }
 interface ServerErrorAction {
     action: HMR_ACTIONS_SENT_TO_BROWSER.SERVER_ERROR;
@@ -52,6 +54,7 @@ export interface SyncAction {
     versionInfo: VersionInfo;
     updatedModules?: ReadonlyArray<string>;
     debug?: DebugInfo;
+    devIndicator: DevIndicatorServerState;
 }
 interface BuiltAction {
     action: HMR_ACTIONS_SENT_TO_BROWSER.BUILT;
@@ -74,6 +77,7 @@ export interface ReloadPageAction {
 }
 interface ServerComponentChangesAction {
     action: HMR_ACTIONS_SENT_TO_BROWSER.SERVER_COMPONENT_CHANGES;
+    hash: string;
 }
 interface MiddlewareChangesAction {
     event: HMR_ACTIONS_SENT_TO_BROWSER.MIDDLEWARE_CHANGES;
@@ -100,10 +104,14 @@ export interface TurbopackConnectedAction {
     };
 }
 export interface AppIsrManifestAction {
-    action: HMR_ACTIONS_SENT_TO_BROWSER.APP_ISR_MANIFEST;
+    action: HMR_ACTIONS_SENT_TO_BROWSER.ISR_MANIFEST;
     data: Record<string, boolean>;
 }
-export type HMR_ACTION_TYPES = TurbopackMessageAction | TurbopackConnectedAction | BuildingAction | SyncAction | BuiltAction | AddedPageAction | RemovedPageAction | ReloadPageAction | ServerComponentChangesAction | ClientChangesAction | MiddlewareChangesAction | ServerOnlyChangesAction | DevPagesManifestUpdateAction | ServerErrorAction | AppIsrManifestAction;
+export interface DevIndicatorAction {
+    action: HMR_ACTIONS_SENT_TO_BROWSER.DEV_INDICATOR;
+    devIndicator: DevIndicatorServerState;
+}
+export type HMR_ACTION_TYPES = TurbopackMessageAction | TurbopackConnectedAction | BuildingAction | SyncAction | BuiltAction | AddedPageAction | RemovedPageAction | ReloadPageAction | ServerComponentChangesAction | ClientChangesAction | MiddlewareChangesAction | ServerOnlyChangesAction | DevPagesManifestUpdateAction | ServerErrorAction | AppIsrManifestAction | DevIndicatorAction;
 export type TurbopackMsgToBrowser = {
     type: HMR_ACTIONS_SENT_TO_BROWSER.TURBOPACK_MESSAGE;
     data: any;
@@ -124,7 +132,6 @@ export interface NextJsHotReloaderInterface {
     setHmrServerError(error: Error | null): void;
     clearHmrServerError(): void;
     start(): Promise<void>;
-    stop(): Promise<void>;
     send(action: HMR_ACTION_TYPES): void;
     getCompilationErrors(page: string): Promise<any[]>;
     onHMR(req: IncomingMessage, _socket: Duplex, head: Buffer, onUpgrade: (client: {
@@ -142,5 +149,6 @@ export interface NextJsHotReloaderInterface {
         definition: RouteDefinition | undefined;
         url?: string;
     }): Promise<void>;
+    close(): void;
 }
 export {};

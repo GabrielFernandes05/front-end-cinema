@@ -7,7 +7,6 @@ Object.defineProperty(exports, "__esModule", {
 0 && (module.exports = {
     FallbackMode: null,
     fallbackModeToFallbackField: null,
-    fallbackModeToStaticPathsResult: null,
     parseFallbackField: null,
     parseStaticPathsResult: null
 });
@@ -23,9 +22,6 @@ _export(exports, {
     },
     fallbackModeToFallbackField: function() {
         return fallbackModeToFallbackField;
-    },
-    fallbackModeToStaticPathsResult: function() {
-        return fallbackModeToStaticPathsResult;
     },
     parseFallbackField: function() {
         return parseFallbackField;
@@ -61,7 +57,11 @@ function parseFallbackField(fallbackField) {
     } else if (fallbackField === undefined) {
         return undefined;
     } else {
-        throw new Error(`Invalid fallback option: ${fallbackField}. Fallback option must be a string, null, undefined, or false.`);
+        throw Object.defineProperty(new Error(`Invalid fallback option: ${fallbackField}. Fallback option must be a string, null, undefined, or false.`), "__NEXT_ERROR_CODE", {
+            value: "E285",
+            enumerable: false,
+            configurable: true
+        });
     }
 }
 function fallbackModeToFallbackField(fallback, page) {
@@ -72,11 +72,19 @@ function fallbackModeToFallbackField(fallback, page) {
             return false;
         case "PRERENDER":
             if (!page) {
-                throw new Error(`Invariant: expected a page to be provided when fallback mode is "${fallback}"`);
+                throw Object.defineProperty(new Error(`Invariant: expected a page to be provided when fallback mode is "${fallback}"`), "__NEXT_ERROR_CODE", {
+                    value: "E422",
+                    enumerable: false,
+                    configurable: true
+                });
             }
             return page;
         default:
-            throw new Error(`Invalid fallback mode: ${fallback}`);
+            throw Object.defineProperty(new Error(`Invalid fallback mode: ${fallback}`), "__NEXT_ERROR_CODE", {
+                value: "E254",
+                enumerable: false,
+                configurable: true
+            });
     }
 }
 function parseStaticPathsResult(result) {
@@ -86,17 +94,6 @@ function parseStaticPathsResult(result) {
         return "BLOCKING_STATIC_RENDER";
     } else {
         return "NOT_FOUND";
-    }
-}
-function fallbackModeToStaticPathsResult(fallback) {
-    switch(fallback){
-        case "PRERENDER":
-            return true;
-        case "BLOCKING_STATIC_RENDER":
-            return 'blocking';
-        case "NOT_FOUND":
-        default:
-            return false;
     }
 }
 

@@ -22,7 +22,7 @@ _export(exports, {
 });
 const _pathtoregexp = require("next/dist/compiled/path-to-regexp");
 const _approuterheaders = require("../client/components/app-router-headers");
-const _interceptionroutes = require("../server/lib/interception-routes");
+const _interceptionroutes = require("../shared/lib/router/utils/interception-routes");
 // a function that converts normalised paths (e.g. /foo/[bar]/[baz]) to the format expected by pathToRegexp (e.g. /foo/:bar/:baz)
 function toPathToRegexpPath(path) {
     return path.replace(/\[\[?([^\]]+)\]\]?/g, (_, capture)=>{

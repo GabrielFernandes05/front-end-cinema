@@ -54,23 +54,20 @@ async function fromResponseCacheEntry(cacheEntry) {
     };
 }
 async function toResponseCacheEntry(response) {
-    var _response_value, _response_value1, _response_value2;
+    var _response_value, _response_value1;
     if (!response) return null;
-    if (((_response_value = response.value) == null ? void 0 : _response_value.kind) === _types.CachedRouteKind.FETCH) {
-        throw new Error('Invariant: unexpected cachedResponse of kind fetch in response cache');
-    }
     return {
         isMiss: response.isMiss,
         isStale: response.isStale,
-        revalidate: response.revalidate,
+        cacheControl: response.cacheControl,
         isFallback: response.isFallback,
-        value: ((_response_value1 = response.value) == null ? void 0 : _response_value1.kind) === _types.CachedRouteKind.PAGES ? {
+        value: ((_response_value = response.value) == null ? void 0 : _response_value.kind) === _types.CachedRouteKind.PAGES ? {
             kind: _types.CachedRouteKind.PAGES,
             html: _renderresult.default.fromStatic(response.value.html),
             pageData: response.value.pageData,
             headers: response.value.headers,
             status: response.value.status
-        } : ((_response_value2 = response.value) == null ? void 0 : _response_value2.kind) === _types.CachedRouteKind.APP_PAGE ? {
+        } : ((_response_value1 = response.value) == null ? void 0 : _response_value1.kind) === _types.CachedRouteKind.APP_PAGE ? {
             kind: _types.CachedRouteKind.APP_PAGE,
             html: _renderresult.default.fromStatic(response.value.html),
             rscData: response.value.rscData,
@@ -92,7 +89,11 @@ function routeKindToIncrementalCacheKind(routeKind) {
         case _routekind.RouteKind.APP_ROUTE:
             return _types.IncrementalCacheKind.APP_ROUTE;
         default:
-            throw new Error(`Unexpected route kind ${routeKind}`);
+            throw Object.defineProperty(new Error(`Unexpected route kind ${routeKind}`), "__NEXT_ERROR_CODE", {
+                value: "E64",
+                enumerable: false,
+                configurable: true
+            });
     }
 }
 

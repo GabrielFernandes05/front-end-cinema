@@ -48,7 +48,11 @@ const _invarianterror = require("../../shared/lib/invariant-error");
 const _dynamicrendering = require("./dynamic-rendering");
 function prerenderAndAbortInSequentialTasks(prerender, abort) {
     if (process.env.NEXT_RUNTIME === 'edge') {
-        throw new _invarianterror.InvariantError('`prerenderAndAbortInSequentialTasks` should not be called in edge runtime.');
+        throw Object.defineProperty(new _invarianterror.InvariantError('`prerenderAndAbortInSequentialTasks` should not be called in edge runtime.'), "__NEXT_ERROR_CODE", {
+            value: "E538",
+            enumerable: false,
+            configurable: true
+        });
     } else {
         return new Promise((resolve, reject)=>{
             let pendingResult;
@@ -69,7 +73,11 @@ function prerenderAndAbortInSequentialTasks(prerender, abort) {
 }
 function prerenderServerWithPhases(signal, render, ...remainingPhases) {
     if (process.env.NEXT_RUNTIME === 'edge') {
-        throw new _invarianterror.InvariantError('`prerenderAndAbortInSequentialTasks` should not be called in edge runtime.');
+        throw Object.defineProperty(new _invarianterror.InvariantError('`prerenderAndAbortInSequentialTasks` should not be called in edge runtime.'), "__NEXT_ERROR_CODE", {
+            value: "E538",
+            enumerable: false,
+            configurable: true
+        });
     } else {
         return new Promise((resolve, reject)=>{
             let result;
@@ -180,7 +188,11 @@ class ServerPrerenderStreamResult {
             case INTERRUPTED:
                 return new PhasedStream(this.chunksByPhase);
             default:
-                throw new _invarianterror.InvariantError(`ServerPrerenderStreamResult cannot be consumed as a stream because it is not yet complete. status: ${this.status}`);
+                throw Object.defineProperty(new _invarianterror.InvariantError(`ServerPrerenderStreamResult cannot be consumed as a stream because it is not yet complete. status: ${this.status}`), "__NEXT_ERROR_CODE", {
+                    value: "E612",
+                    enumerable: false,
+                    configurable: true
+                });
         }
     }
     /**
@@ -207,14 +219,22 @@ class ServerPrerenderStreamResult {
                     }
                 });
             default:
-                throw new _invarianterror.InvariantError(`ServerPrerenderStreamResult cannot be consumed as a stream because it is not yet complete. status: ${this.status}`);
+                throw Object.defineProperty(new _invarianterror.InvariantError(`ServerPrerenderStreamResult cannot be consumed as a stream because it is not yet complete. status: ${this.status}`), "__NEXT_ERROR_CODE", {
+                    value: "E612",
+                    enumerable: false,
+                    configurable: true
+                });
         }
     }
 }
 class PhasedStream extends ReadableStream {
     constructor(chunksByPhase){
         if (chunksByPhase.length === 0) {
-            throw new _invarianterror.InvariantError('PhasedStream expected at least one phase but none were found.');
+            throw Object.defineProperty(new _invarianterror.InvariantError('PhasedStream expected at least one phase but none were found.'), "__NEXT_ERROR_CODE", {
+                value: "E574",
+                enumerable: false,
+                configurable: true
+            });
         }
         let destination;
         super({
@@ -236,18 +256,30 @@ class PhasedStream extends ReadableStream {
                 this.destination.enqueue(chunks[i]);
             }
         } else {
-            throw new _invarianterror.InvariantError('PhasedStream expected more phases to release but none were found.');
+            throw Object.defineProperty(new _invarianterror.InvariantError('PhasedStream expected more phases to release but none were found.'), "__NEXT_ERROR_CODE", {
+                value: "E541",
+                enumerable: false,
+                configurable: true
+            });
         }
     }
     assertExhausted() {
         if (this.nextPhase < this.chunksByPhase.length) {
-            throw new _invarianterror.InvariantError('PhasedStream expected no more phases to release but some were found.');
+            throw Object.defineProperty(new _invarianterror.InvariantError('PhasedStream expected no more phases to release but some were found.'), "__NEXT_ERROR_CODE", {
+                value: "E584",
+                enumerable: false,
+                configurable: true
+            });
         }
     }
 }
 function prerenderClientWithPhases(render, ...remainingPhases) {
     if (process.env.NEXT_RUNTIME === 'edge') {
-        throw new _invarianterror.InvariantError('`prerenderAndAbortInSequentialTasks` should not be called in edge runtime.');
+        throw Object.defineProperty(new _invarianterror.InvariantError('`prerenderAndAbortInSequentialTasks` should not be called in edge runtime.'), "__NEXT_ERROR_CODE", {
+            value: "E538",
+            enumerable: false,
+            configurable: true
+        });
     } else {
         return new Promise((resolve, reject)=>{
             let pendingResult;
@@ -292,7 +324,11 @@ class ReactServerResult {
     }
     tee() {
         if (this._stream === null) {
-            throw new Error('Cannot tee a ReactServerResult that has already been consumed');
+            throw Object.defineProperty(new Error('Cannot tee a ReactServerResult that has already been consumed'), "__NEXT_ERROR_CODE", {
+                value: "E106",
+                enumerable: false,
+                configurable: true
+            });
         }
         const tee = this._stream.tee();
         this._stream = tee[0];
@@ -300,7 +336,11 @@ class ReactServerResult {
     }
     consume() {
         if (this._stream === null) {
-            throw new Error('Cannot consume a ReactServerResult that has already been consumed');
+            throw Object.defineProperty(new Error('Cannot consume a ReactServerResult that has already been consumed'), "__NEXT_ERROR_CODE", {
+                value: "E470",
+                enumerable: false,
+                configurable: true
+            });
         }
         const stream = this._stream;
         this._stream = null;
@@ -336,7 +376,11 @@ async function createReactServerPrerenderResultFromRender(underlying) {
 class ReactServerPrerenderResult {
     assertChunks(expression) {
         if (this._chunks === null) {
-            throw new _invarianterror.InvariantError(`Cannot \`${expression}\` on a ReactServerPrerenderResult that has already been consumed.`);
+            throw Object.defineProperty(new _invarianterror.InvariantError(`Cannot \`${expression}\` on a ReactServerPrerenderResult that has already been consumed.`), "__NEXT_ERROR_CODE", {
+                value: "E593",
+                enumerable: false,
+                configurable: true
+            });
         }
         return this._chunks;
     }

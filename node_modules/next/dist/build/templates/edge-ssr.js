@@ -24,6 +24,7 @@ require("../../server/web/globals");
 const _adapter = require("../../server/web/adapter");
 const _render = require("../webpack/loaders/next-edge-ssr-loader/render");
 const _incrementalcache = require("../../server/lib/incremental-cache");
+const _handlers = require("../../server/use-cache/handlers");
 const _VAR_MODULE_DOCUMENT = /*#__PURE__*/ _interop_require_default(require("VAR_MODULE_DOCUMENT"));
 const _VAR_MODULE_APP = /*#__PURE__*/ _interop_require_wildcard(require("VAR_MODULE_APP"));
 const _VAR_USERLAND = /*#__PURE__*/ _interop_require_wildcard(require("VAR_USERLAND"));
@@ -83,11 +84,8 @@ function _interop_require_wildcard(obj, nodeInterop) {
 // INJECT:pageRouteModuleOptions
 // INJECT:errorRouteModuleOptions
 // INJECT:user500RouteModuleOptions
-const cacheHandlers = {};
-if (!globalThis.__nextCacheHandlers) {
-    ;
-    globalThis.__nextCacheHandlers = cacheHandlers;
-}
+// Initialize the cache handlers interface.
+(0, _handlers.initializeCacheHandlers)();
 const pageMod = {
     ..._VAR_USERLAND,
     routeModule: new _module.default({

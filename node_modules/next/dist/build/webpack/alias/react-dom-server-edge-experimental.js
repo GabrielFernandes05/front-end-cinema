@@ -1,7 +1,11 @@
 "use strict";
 const ERROR_MESSAGE = 'Internal Error: do not use legacy react-dom/server APIs. If you encountered this error, please open an issue on the Next.js repo.';
 function error() {
-    throw new Error(ERROR_MESSAGE);
+    throw Object.defineProperty(new Error(ERROR_MESSAGE), "__NEXT_ERROR_CODE", {
+        value: "E394",
+        enumerable: false,
+        configurable: true
+    });
 }
 var b;
 if (process.env.NODE_ENV === 'production') {

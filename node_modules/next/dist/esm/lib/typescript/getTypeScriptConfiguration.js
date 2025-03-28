@@ -13,7 +13,11 @@ export async function getTypeScriptConfiguration(ts, tsConfigPath, metaOnly) {
         };
         const { config, error } = ts.readConfigFile(tsConfigPath, ts.sys.readFile);
         if (error) {
-            throw new FatalError(ts.formatDiagnostic(error, formatDiagnosticsHost));
+            throw Object.defineProperty(new FatalError(ts.formatDiagnostic(error, formatDiagnosticsHost)), "__NEXT_ERROR_CODE", {
+                value: "E394",
+                enumerable: false,
+                configurable: true
+            });
         }
         let configToParse = config;
         const result = ts.parseJsonConfigFileContent(configToParse, // When only interested in meta info,
@@ -31,13 +35,21 @@ export async function getTypeScriptConfiguration(ts, tsConfigPath, metaOnly) {
                 code !== 18003);
         }
         if ((_result_errors = result.errors) == null ? void 0 : _result_errors.length) {
-            throw new FatalError(ts.formatDiagnostic(result.errors[0], formatDiagnosticsHost));
+            throw Object.defineProperty(new FatalError(ts.formatDiagnostic(result.errors[0], formatDiagnosticsHost)), "__NEXT_ERROR_CODE", {
+                value: "E394",
+                enumerable: false,
+                configurable: true
+            });
         }
         return result;
     } catch (err) {
         if (isError(err) && err.name === 'SyntaxError') {
             const reason = '\n' + (err.message ?? '');
-            throw new FatalError(bold('Could not parse' + cyan('tsconfig.json') + '.' + ' Please make sure it contains syntactically correct JSON.') + reason);
+            throw Object.defineProperty(new FatalError(bold('Could not parse' + cyan('tsconfig.json') + '.' + ' Please make sure it contains syntactically correct JSON.') + reason), "__NEXT_ERROR_CODE", {
+                value: "E339",
+                enumerable: false,
+                configurable: true
+            });
         }
         throw err;
     }

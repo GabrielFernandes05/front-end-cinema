@@ -20,7 +20,11 @@ class LightningCssMinifyPlugin {
     constructor(opts = {}){
         const { implementation, ...otherOpts } = opts;
         if (implementation && typeof implementation.transformCss !== 'function') {
-            throw new TypeError(`[LightningCssMinifyPlugin]: implementation.transformCss must be an 'lightningcss' transform function. Received ${typeof implementation.transformCss}`);
+            throw Object.defineProperty(new TypeError(`[LightningCssMinifyPlugin]: implementation.transformCss must be an 'lightningcss' transform function. Received ${typeof implementation.transformCss}`), "__NEXT_ERROR_CODE", {
+                value: "E561",
+                enumerable: false,
+                configurable: true
+            });
         }
         this.transform = implementation == null ? void 0 : implementation.transformCss;
         this.options = otherOpts;

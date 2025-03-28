@@ -36,7 +36,7 @@ const _reflect = require("../web/spec-extension/adapters/reflect");
 const _dynamicrendering = require("../app-render/dynamic-rendering");
 const _workunitasyncstorageexternal = require("../app-render/work-unit-async-storage.external");
 const _invarianterror = require("../../shared/lib/invariant-error");
-const _utils = require("./utils");
+const _reflectutils = require("../../shared/lib/utils/reflect-utils");
 const _dynamicrenderingutils = require("../dynamic-rendering-utils");
 const _creatededupedbycallsiteservererrorlogger = require("../create-deduped-by-callsite-server-error-logger");
 const _scheduler = require("../../lib/scheduler");
@@ -116,7 +116,7 @@ function createPrerenderParams(underlyingParams, workStore, prerenderStore) {
                 // We are in a dynamicIO (PPR or otherwise) prerender
                 return makeAbortingExoticParams(underlyingParams, workStore.route, prerenderStore);
             }
-            // remaining cases are prender-ppr and prerender-legacy
+            // remaining cases are prerender-ppr and prerender-legacy
             // We aren't in a dynamicIO prerender but we do have fallback params at this
             // level so we need to make an erroring exotic params object which will postpone
             // if you access the fallback params
@@ -142,13 +142,13 @@ function makeAbortingExoticParams(underlyingParams, route, prerenderStore) {
     const promise = (0, _dynamicrenderingutils.makeHangingPromise)(prerenderStore.renderSignal, '`params`');
     CachedParams.set(underlyingParams, promise);
     Object.keys(underlyingParams).forEach((prop)=>{
-        if (_utils.wellKnownProperties.has(prop)) {
+        if (_reflectutils.wellKnownProperties.has(prop)) {
         // These properties cannot be shadowed because they need to be the
         // true underlying value for Promises to work correctly at runtime
         } else {
             Object.defineProperty(promise, prop, {
                 get () {
-                    const expression = (0, _utils.describeStringPropertyAccess)('params', prop);
+                    const expression = (0, _reflectutils.describeStringPropertyAccess)('params', prop);
                     const error = createParamsAccessError(route, expression);
                     (0, _dynamicrendering.abortAndThrowOnSynchronousRequestDataAccess)(route, expression, error, prerenderStore);
                 },
@@ -180,14 +180,14 @@ function makeErroringExoticParams(underlyingParams, fallbackParams, workStore, p
     const promise = Promise.resolve(augmentedUnderlying);
     CachedParams.set(underlyingParams, promise);
     Object.keys(underlyingParams).forEach((prop)=>{
-        if (_utils.wellKnownProperties.has(prop)) {
+        if (_reflectutils.wellKnownProperties.has(prop)) {
         // These properties cannot be shadowed because they need to be the
         // true underlying value for Promises to work correctly at runtime
         } else {
             if (fallbackParams.has(prop)) {
                 Object.defineProperty(augmentedUnderlying, prop, {
                     get () {
-                        const expression = (0, _utils.describeStringPropertyAccess)('params', prop);
+                        const expression = (0, _reflectutils.describeStringPropertyAccess)('params', prop);
                         // In most dynamic APIs we also throw if `dynamic = "error"` however
                         // for params is only dynamic when we're generating a fallback shell
                         // and even when `dynamic = "error"` we still support generating dynamic
@@ -206,7 +206,7 @@ function makeErroringExoticParams(underlyingParams, fallbackParams, workStore, p
                 });
                 Object.defineProperty(promise, prop, {
                     get () {
-                        const expression = (0, _utils.describeStringPropertyAccess)('params', prop);
+                        const expression = (0, _reflectutils.describeStringPropertyAccess)('params', prop);
                         // In most dynamic APIs we also throw if `dynamic = "error"` however
                         // for params is only dynamic when we're generating a fallback shell
                         // and even when `dynamic = "error"` we still support generating dynamic
@@ -250,7 +250,7 @@ function makeUntrackedExoticParams(underlyingParams) {
     const promise = Promise.resolve(underlyingParams);
     CachedParams.set(underlyingParams, promise);
     Object.keys(underlyingParams).forEach((prop)=>{
-        if (_utils.wellKnownProperties.has(prop)) {
+        if (_reflectutils.wellKnownProperties.has(prop)) {
         // These properties cannot be shadowed because they need to be the
         // true underlying value for Promises to work correctly at runtime
         } else {
@@ -272,7 +272,7 @@ function makeDynamicallyTrackedExoticParamsWithDevWarnings(underlyingParams, sto
     const proxiedProperties = new Set();
     const unproxiedProperties = [];
     Object.keys(underlyingParams).forEach((prop)=>{
-        if (_utils.wellKnownProperties.has(prop)) {
+        if (_reflectutils.wellKnownProperties.has(prop)) {
             // These properties cannot be shadowed because they need to be the
             // true underlying value for Promises to work correctly at runtime
             unproxiedProperties.push(prop);
@@ -286,7 +286,7 @@ function makeDynamicallyTrackedExoticParamsWithDevWarnings(underlyingParams, sto
             if (typeof prop === 'string') {
                 if (// We are accessing a property that was proxied to the promise instance
                 proxiedProperties.has(prop)) {
-                    const expression = (0, _utils.describeStringPropertyAccess)('params', prop);
+                    const expression = (0, _reflectutils.describeStringPropertyAccess)('params', prop);
                     syncIODev(store.route, expression);
                 }
             }
@@ -322,21 +322,32 @@ function syncIODev(route, expression, missingProperties) {
         warnForSyncAccess(route, expression);
     }
 }
-const noop = ()=>{};
-const warnForSyncAccess = process.env.__NEXT_DISABLE_SYNC_DYNAMIC_API_WARNINGS ? noop : (0, _creatededupedbycallsiteservererrorlogger.createDedupedByCallsiteServerErrorLoggerDev)(createParamsAccessError);
-const warnForIncompleteEnumeration = process.env.__NEXT_DISABLE_SYNC_DYNAMIC_API_WARNINGS ? noop : (0, _creatededupedbycallsiteservererrorlogger.createDedupedByCallsiteServerErrorLoggerDev)(createIncompleteEnumerationError);
+const warnForSyncAccess = (0, _creatededupedbycallsiteservererrorlogger.createDedupedByCallsiteServerErrorLoggerDev)(createParamsAccessError);
+const warnForIncompleteEnumeration = (0, _creatededupedbycallsiteservererrorlogger.createDedupedByCallsiteServerErrorLoggerDev)(createIncompleteEnumerationError);
 function createParamsAccessError(route, expression) {
     const prefix = route ? `Route "${route}" ` : 'This route ';
-    return new Error(`${prefix}used ${expression}. ` + `\`params\` should be awaited before using its properties. ` + `Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis`);
+    return Object.defineProperty(new Error(`${prefix}used ${expression}. ` + `\`params\` should be awaited before using its properties. ` + `Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis`), "__NEXT_ERROR_CODE", {
+        value: "E307",
+        enumerable: false,
+        configurable: true
+    });
 }
 function createIncompleteEnumerationError(route, expression, missingProperties) {
     const prefix = route ? `Route "${route}" ` : 'This route ';
-    return new Error(`${prefix}used ${expression}. ` + `\`params\` should be awaited before using its properties. ` + `The following properties were not available through enumeration ` + `because they conflict with builtin property names: ` + `${describeListOfPropertyNames(missingProperties)}. ` + `Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis`);
+    return Object.defineProperty(new Error(`${prefix}used ${expression}. ` + `\`params\` should be awaited before using its properties. ` + `The following properties were not available through enumeration ` + `because they conflict with builtin property names: ` + `${describeListOfPropertyNames(missingProperties)}. ` + `Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis`), "__NEXT_ERROR_CODE", {
+        value: "E482",
+        enumerable: false,
+        configurable: true
+    });
 }
 function describeListOfPropertyNames(properties) {
     switch(properties.length){
         case 0:
-            throw new _invarianterror.InvariantError('Expected describeListOfPropertyNames to be called with a non-empty list of strings.');
+            throw Object.defineProperty(new _invarianterror.InvariantError('Expected describeListOfPropertyNames to be called with a non-empty list of strings.'), "__NEXT_ERROR_CODE", {
+                value: "E531",
+                enumerable: false,
+                configurable: true
+            });
         case 1:
             return `\`${properties[0]}\``;
         case 2:

@@ -35,7 +35,8 @@ const flightRouterStateSchema = _superstruct.default.tuple([
     _superstruct.default.optional(_superstruct.default.nullable(_superstruct.default.string())),
     _superstruct.default.optional(_superstruct.default.nullable(_superstruct.default.union([
         _superstruct.default.literal('refetch'),
-        _superstruct.default.literal('refresh')
+        _superstruct.default.literal('refresh'),
+        _superstruct.default.literal('inside-shared-layout')
     ]))),
     _superstruct.default.optional(_superstruct.default.boolean())
 ]);

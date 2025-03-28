@@ -25,7 +25,7 @@ _export(exports, {
     }
 });
 const _hotreloadertypes = require("../../../../server/dev/hot-reloader-types");
-const _getsocketurl = require("../internal/helpers/get-socket-url");
+const _getsocketurl = require("../utils/get-socket-url");
 let source;
 const eventCallbacks = [];
 function addMessageListener(callback) {

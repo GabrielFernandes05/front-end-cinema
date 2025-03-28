@@ -36,13 +36,23 @@ export default function transformSource(source, sourceMap) {
     var _module_matchResource, _buildInfo_rsc, _buildInfo_rsc1;
     // Avoid buffer to be consumed
     if (typeof source !== 'string') {
-        throw new Error('Expected source to have been transformed to a string.');
+        throw Object.defineProperty(new Error('Expected source to have been transformed to a string.'), "__NEXT_ERROR_CODE", {
+            value: "E429",
+            enumerable: false,
+            configurable: true
+        });
     }
     const module = this._module;
     // Assign the RSC meta information to buildInfo.
     // Exclude next internal files which are not marked as client files
     const buildInfo = getModuleBuildInfo(module);
     buildInfo.rsc = getRSCModuleInformation(source, true);
+    let prefix = '';
+    if (process.env.BUILTIN_FLIGHT_CLIENT_ENTRY_PLUGIN) {
+        const rscModuleInformationJson = JSON.stringify(buildInfo.rsc);
+        prefix = `/* __rspack_internal_rsc_module_information_do_not_use__ ${rscModuleInformationJson} */\n`;
+        source = prefix + source;
+    }
     // Resource key is the unique identifier for the resource. When RSC renders
     // a client module, that key is used to identify that module across all compiler
     // layers.
@@ -61,7 +71,7 @@ export default function transformSource(source, sourceMap) {
     }
     // A client boundary.
     if (((_buildInfo_rsc = buildInfo.rsc) == null ? void 0 : _buildInfo_rsc.type) === RSC_MODULE_TYPES.client) {
-        const assumedSourceType = getAssumedSourceType(module, module.parser.sourceType);
+        const assumedSourceType = getAssumedSourceType(module, sourceTypeFromModule(module));
         const clientRefs = buildInfo.rsc.clientRefs;
         const stringifiedResourceKey = JSON.stringify(resourceKey);
         if (assumedSourceType === 'module') {
@@ -69,10 +79,14 @@ export default function transformSource(source, sourceMap) {
                 return this.callback(null, 'export {}');
             }
             if (clientRefs.includes('*')) {
-                this.callback(new Error(`It's currently unsupported to use "export *" in a client boundary. Please use named exports instead.`));
+                this.callback(Object.defineProperty(new Error(`It's currently unsupported to use "export *" in a client boundary. Please use named exports instead.`), "__NEXT_ERROR_CODE", {
+                    value: "E46",
+                    enumerable: false,
+                    configurable: true
+                }));
                 return;
             }
-            let esmSource = `\
+            let esmSource = prefix + `\
 import { registerClientReference } from "react-server-dom-webpack/server.edge";
 `;
             for (const ref of clientRefs){
@@ -98,7 +112,7 @@ ${JSON.stringify(ref)},
             }
             return this.callback(null, esmSource, sourceMap);
         } else if (assumedSourceType === 'commonjs') {
-            let cjsSource = `\
+            let cjsSource = prefix + `\
 const { createProxy } = require("${MODULE_PROXY_PATH}")
 
 module.exports = createProxy(${stringifiedResourceKey})
@@ -113,6 +127,23 @@ module.exports = createProxy(${stringifiedResourceKey})
     }
     const replacedSource = source.replace(RSC_MOD_REF_PROXY_ALIAS, MODULE_PROXY_PATH);
     this.callback(null, replacedSource, sourceMap);
+}
+function sourceTypeFromModule(module) {
+    const moduleType = module.type;
+    switch(moduleType){
+        case 'javascript/auto':
+            return 'auto';
+        case 'javascript/dynamic':
+            return 'script';
+        case 'javascript/esm':
+            return 'module';
+        default:
+            throw Object.defineProperty(new Error('Unexpected module type ' + moduleType), "__NEXT_ERROR_CODE", {
+                value: "E651",
+                enumerable: false,
+                configurable: true
+            });
+    }
 }
 
 //# sourceMappingURL=index.js.map

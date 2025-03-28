@@ -32,6 +32,6 @@ export declare class ReactLoadablePlugin {
         runtimeAsset?: string;
         dev: boolean;
     });
-    createAssets(compiler: any, compilation: any, assets: any): any;
+    createAssets(compiler: any, compilation: any): void;
     apply(compiler: webpack.Compiler): void;
 }

@@ -8,7 +8,11 @@ import * as Log from '../build/output/log';
 import { getPkgManager } from './helpers/get-pkg-manager';
 async function missingDependencyError(dir) {
     const packageManager = getPkgManager(dir);
-    throw new FatalError(bold(red("It looks like you're trying to use Partytown with next/script but do not have the required package(s) installed.")) + '\n\n' + bold(`Please install Partytown by running:`) + '\n\n' + `\t${bold(cyan((packageManager === 'yarn' ? 'yarn add --dev' : packageManager === 'pnpm' ? 'pnpm install --save-dev' : 'npm install --save-dev') + ' @builder.io/partytown'))}` + '\n\n' + bold(`If you are not trying to use Partytown, please disable the experimental ${cyan('"nextScriptWorkers"')} flag in next.config.js.`) + '\n');
+    throw Object.defineProperty(new FatalError(bold(red("It looks like you're trying to use Partytown with next/script but do not have the required package(s) installed.")) + '\n\n' + bold(`Please install Partytown by running:`) + '\n\n' + `\t${bold(cyan((packageManager === 'yarn' ? 'yarn add --dev' : packageManager === 'pnpm' ? 'pnpm install --save-dev' : 'npm install --save-dev') + ' @builder.io/partytown'))}` + '\n\n' + bold(`If you are not trying to use Partytown, please disable the experimental ${cyan('"nextScriptWorkers"')} flag in next.config.js.`) + '\n'), "__NEXT_ERROR_CODE", {
+        value: "E552",
+        enumerable: false,
+        configurable: true
+    });
 }
 async function copyPartytownStaticFiles(deps, staticDir) {
     const partytownLibDir = path.join(staticDir, '~partytown');

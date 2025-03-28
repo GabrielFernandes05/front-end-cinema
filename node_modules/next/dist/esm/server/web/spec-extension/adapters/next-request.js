@@ -51,7 +51,11 @@ export class NextRequestAdapter {
         process.env.NEXT_RUNTIME !== 'edge' && isNodeNextRequest(request)) {
             return NextRequestAdapter.fromNodeNextRequest(request, signal);
         } else {
-            throw new Error('Invariant: Unsupported NextRequest type');
+            throw Object.defineProperty(new Error('Invariant: Unsupported NextRequest type'), "__NEXT_ERROR_CODE", {
+                value: "E345",
+                enumerable: false,
+                configurable: true
+            });
         }
     }
     static fromNodeNextRequest(request, signal) {
@@ -79,7 +83,6 @@ export class NextRequestAdapter {
         return new NextRequest(url, {
             method: request.method,
             headers: fromNodeOutgoingHttpHeaders(request.headers),
-            // @ts-expect-error - see https://github.com/whatwg/fetch/pull/1457
             duplex: 'half',
             signal,
             // geo
@@ -101,7 +104,6 @@ export class NextRequestAdapter {
         return new NextRequest(request.url, {
             method: request.method,
             headers: fromNodeOutgoingHttpHeaders(request.headers),
-            // @ts-expect-error - see https://github.com/whatwg/fetch/pull/1457
             duplex: 'half',
             signal: request.request.signal,
             // geo

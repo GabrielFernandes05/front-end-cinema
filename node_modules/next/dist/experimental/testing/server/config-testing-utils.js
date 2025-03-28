@@ -16,6 +16,7 @@ const _loadcustomroutes = /*#__PURE__*/ _interop_require_default(require("../../
 const _exports = require("../../../server/web/exports");
 const _redirectstatus = require("../../../lib/redirect-status");
 const _utils = require("./utils");
+const _parsedurlquerytoparams = require("../../../server/route-modules/app-route/helpers/parsed-url-query-to-params");
 function _interop_require_default(obj) {
     return obj && obj.__esModule ? obj : {
         default: obj
@@ -34,7 +35,11 @@ function _interop_require_default(obj) {
     if (regexMatches) {
         const pathMatch = (0, _pathtoregexp.match)(route.source)(pathname);
         if (!pathMatch) {
-            throw new Error('Unexpected error: extracting params from path failed but the regular expression matched');
+            throw Object.defineProperty(new Error('Unexpected error: extracting params from path failed but the regular expression matched'), "__NEXT_ERROR_CODE", {
+                value: "E289",
+                enumerable: false,
+                configurable: true
+            });
         }
         if (route.has || route.missing) {
             if (!(0, _preparedestination.matchHas)(request, parsedUrl.query, route.has, route.missing)) {
@@ -81,7 +86,8 @@ async function unstable_getResponseFromNextConfig({ url, nextConfig, headers = {
             params,
             query: parsedUrl.query
         });
-        return new URL(newUrl, parsedDestination.hostname ? `${parsedDestination.protocol}//${parsedDestination.hostname}` : parsedUrl.host ? `${parsedUrl.protocol}//${parsedUrl.host}` : 'https://example.com');
+        const searchParams = new URLSearchParams((0, _parsedurlquerytoparams.parsedUrlQueryToParams)(parsedDestination.query));
+        return new URL(searchParams.size > 0 ? `${newUrl}?${searchParams.toString()}` : newUrl, parsedDestination.hostname ? `${parsedDestination.protocol}//${parsedDestination.hostname}` : parsedUrl.host ? `${parsedUrl.protocol}//${parsedUrl.host}` : 'https://example.com');
     }
     for (const route of redirectRoutes){
         const redirectUrl = matchRouteAndGetDestination(route);

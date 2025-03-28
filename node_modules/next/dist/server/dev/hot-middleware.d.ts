@@ -5,7 +5,6 @@ import type { HMR_ACTION_TYPES } from './hot-reloader-types';
 declare class EventStream {
     clients: Set<ws>;
     constructor();
-    everyClient(fn: (client: ws) => void): void;
     close(): void;
     handler(client: ws): void;
     publish(payload: any): void;

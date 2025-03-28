@@ -114,6 +114,7 @@ export function getRequiredConfiguration(ts) {
     }
     return res;
 }
+const localDevTestFilesExcludeAction = 'NEXT_PRIVATE_LOCAL_DEV_TEST_FILES_EXCLUDE';
 export async function writeConfigurationDefaults(ts, tsConfigPath, isFirstTimeSetup, hasAppDir, distDir, hasPagesDir) {
     var _userTsConfig_compilerOptions;
     if (isFirstTimeSetup) {
@@ -222,6 +223,23 @@ export async function writeConfigurationDefaults(ts, tsConfigPath, isFirstTimeSe
         ];
         suggestedActions.push(cyan('exclude') + ' was set to ' + bold(`['node_modules']`));
     }
+    // During local development inside Next.js repo, exclude the test files coverage by the local tsconfig
+    if (process.env.NEXT_PRIVATE_LOCAL_DEV && userTsConfig.exclude) {
+        const tsGlob = '**/*.test.ts';
+        const tsxGlob = '**/*.test.tsx';
+        let hasUpdates = false;
+        if (!userTsConfig.exclude.includes(tsGlob)) {
+            userTsConfig.exclude.push(tsGlob);
+            hasUpdates = true;
+        }
+        if (!userTsConfig.exclude.includes(tsxGlob)) {
+            userTsConfig.exclude.push(tsxGlob);
+            hasUpdates = true;
+        }
+        if (hasUpdates) {
+            requiredActions.push(localDevTestFilesExcludeAction);
+        }
+    }
     if (suggestedActions.length < 1 && requiredActions.length < 1) {
         return;
     }
@@ -237,9 +255,10 @@ export async function writeConfigurationDefaults(ts, tsConfigPath, isFirstTimeSe
         suggestedActions.forEach((action)=>Log.info(`\t- ${action}`));
         Log.info('');
     }
-    if (requiredActions.length) {
+    const requiredActionsToBeLogged = process.env.NEXT_PRIVATE_LOCAL_DEV ? requiredActions.filter((action)=>action !== localDevTestFilesExcludeAction) : requiredActions;
+    if (requiredActionsToBeLogged.length) {
         Log.info(`The following ${white('mandatory changes')} were made to your ${cyan('tsconfig.json')}:\n`);
-        requiredActions.forEach((action)=>Log.info(`\t- ${action}`));
+        requiredActionsToBeLogged.forEach((action)=>Log.info(`\t- ${action}`));
         Log.info('');
     }
 }

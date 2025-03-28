@@ -1,4 +1,4 @@
-import { INTERCEPTION_ROUTE_MARKERS } from '../../../server/lib/interception-routes';
+import { INTERCEPTION_ROUTE_MARKERS } from '../../../shared/lib/router/utils/interception-routes';
 import { isGroupSegment, DEFAULT_SEGMENT_KEY, PAGE_SEGMENT_KEY } from '../../../shared/lib/segment';
 import { matchSegment } from '../match-segments';
 const removeLeadingSlash = (segment)=>{

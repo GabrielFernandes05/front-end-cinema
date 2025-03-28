@@ -48,8 +48,12 @@ class DevBundlerService {
         });
         await this.handler(mocked.req, mocked.res);
         await mocked.res.hasStreamed;
-        if (mocked.res.getHeader('x-nextjs-cache') !== 'REVALIDATED' && !(mocked.res.statusCode === 404 && revalidateOpts.unstable_onlyGenerated)) {
-            throw new Error(`Invalid response ${mocked.res.statusCode}`);
+        if (mocked.res.getHeader('x-nextjs-cache') !== 'REVALIDATED' && mocked.res.statusCode !== 200 && !(mocked.res.statusCode === 404 && revalidateOpts.unstable_onlyGenerated)) {
+            throw Object.defineProperty(new Error(`Invalid response ${mocked.res.statusCode}`), "__NEXT_ERROR_CODE", {
+                value: "E175",
+                enumerable: false,
+                configurable: true
+            });
         }
         return {};
     }
@@ -60,7 +64,7 @@ class DevBundlerService {
         }
         return serializableManifest;
     }
-    setAppIsrStatus(key, value) {
+    setIsrStatus(key, value) {
         var _this_bundler_hotReloader, _this_bundler;
         if (value === null) {
             this.appIsrManifestInner.remove(key);
@@ -68,9 +72,12 @@ class DevBundlerService {
             this.appIsrManifestInner.set(key, value);
         }
         (_this_bundler = this.bundler) == null ? void 0 : (_this_bundler_hotReloader = _this_bundler.hotReloader) == null ? void 0 : _this_bundler_hotReloader.send({
-            action: _hotreloadertypes.HMR_ACTIONS_SENT_TO_BROWSER.APP_ISR_MANIFEST,
+            action: _hotreloadertypes.HMR_ACTIONS_SENT_TO_BROWSER.ISR_MANIFEST,
             data: this.appIsrManifest
         });
+    }
+    close() {
+        this.bundler.hotReloader.close();
     }
 }
 

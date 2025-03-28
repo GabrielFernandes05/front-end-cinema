@@ -20,7 +20,11 @@ function _interop_require_default(obj) {
 }
 const page = 'VAR_DEFINITION_PAGE';
 if (typeof _VAR_USERLAND.default !== 'function') {
-    throw new Error(`The Edge Function "pages${page}" must export a \`default\` function`);
+    throw Object.defineProperty(new Error(`The Edge Function "pages${page}" must export a \`default\` function`), "__NEXT_ERROR_CODE", {
+        value: "E162",
+        enumerable: false,
+        configurable: true
+    });
 }
 function _default(opts) {
     return (0, _adapter.adapter)({

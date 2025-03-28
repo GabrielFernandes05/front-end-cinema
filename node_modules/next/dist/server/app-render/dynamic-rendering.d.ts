@@ -98,6 +98,12 @@ export declare function formatDynamicAPIAccesses(dynamicAccesses: Array<DynamicA
  * abort semantics slightly.
  */
 export declare function createPostponedAbortSignal(reason: string): AbortSignal;
+/**
+ * In a prerender, we may end up with hanging Promises as inputs due them
+ * stalling on connection() or because they're loading dynamic data. In that
+ * case we need to abort the encoding of arguments since they'll never complete.
+ */
+export declare function createHangingInputAbortSignal(workUnitStore: PrerenderStoreModern): AbortSignal;
 export declare function annotateDynamicAccess(expression: string, prerenderStore: PrerenderStoreModern): void;
 export declare function useDynamicRouteParams(expression: string): void;
 export declare function trackAllowedDynamicAccess(route: string, componentStack: string, dynamicValidation: DynamicValidationState, serverDynamic: DynamicTrackingState, clientDynamic: DynamicTrackingState): void;

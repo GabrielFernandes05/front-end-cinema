@@ -8,12 +8,18 @@ Object.defineProperty(exports, "isDynamicRoute", {
         return isDynamicRoute;
     }
 });
-const _interceptionroutes = require("../../../../server/lib/interception-routes");
+const _interceptionroutes = require("./interception-routes");
+// Identify /.*[param].*/ in route string
+const TEST_ROUTE = /\/[^/]*\[[^/]+\][^/]*(?=\/|$)/;
 // Identify /[param]/ in route string
-const TEST_ROUTE = /\/\[[^/]+?\](?=\/|$)/;
-function isDynamicRoute(route) {
+const TEST_STRICT_ROUTE = /\/\[[^/]+\](?=\/|$)/;
+function isDynamicRoute(route, strict) {
+    if (strict === void 0) strict = true;
     if ((0, _interceptionroutes.isInterceptionRouteAppPath)(route)) {
         route = (0, _interceptionroutes.extractInterceptionRouteInformation)(route).interceptedRoute;
+    }
+    if (strict) {
+        return TEST_STRICT_ROUTE.test(route);
     }
     return TEST_ROUTE.test(route);
 }

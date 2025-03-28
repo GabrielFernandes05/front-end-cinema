@@ -19,7 +19,11 @@ async function generateBuildId(generate, fallback) {
         }
     }
     if (typeof buildId !== 'string') {
-        throw new Error('generateBuildId did not return a string. https://nextjs.org/docs/messages/generatebuildid-not-a-string');
+        throw Object.defineProperty(new Error('generateBuildId did not return a string. https://nextjs.org/docs/messages/generatebuildid-not-a-string'), "__NEXT_ERROR_CODE", {
+            value: "E455",
+            enumerable: false,
+            configurable: true
+        });
     }
     return buildId.trim();
 }

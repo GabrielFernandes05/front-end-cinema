@@ -5,7 +5,6 @@ Object.defineProperty(exports, "__esModule", {
 0 && (module.exports = {
     decodeFromBase64: null,
     encodeToBase64: null,
-    getActionsFromBuildInfo: null,
     getLoaderModuleNamedExports: null,
     isCSSMod: null,
     isClientComponentEntryModule: null,
@@ -24,9 +23,6 @@ _export(exports, {
     encodeToBase64: function() {
         return encodeToBase64;
     },
-    getActionsFromBuildInfo: function() {
-        return getActionsFromBuildInfo;
-    },
     getLoaderModuleNamedExports: function() {
         return getLoaderModuleNamedExports;
     },
@@ -41,6 +37,7 @@ _export(exports, {
     }
 });
 const _constants = require("../../../shared/lib/constants");
+const _getmodulebuildinfo = require("./get-module-build-info");
 const imageExtensions = [
     'jpg',
     'jpeg',
@@ -53,11 +50,11 @@ const imageExtensions = [
 const imageRegex = new RegExp(`\\.(${imageExtensions.join('|')})$`);
 // Determine if the whole module is client action, 'use server' in nested closure in the client module
 function isActionClientLayerModule(mod) {
-    const rscInfo = mod.buildInfo.rsc;
-    return !!((rscInfo == null ? void 0 : rscInfo.actions) && (rscInfo == null ? void 0 : rscInfo.type) === _constants.RSC_MODULE_TYPES.client);
+    const rscInfo = (0, _getmodulebuildinfo.getModuleBuildInfo)(mod).rsc;
+    return !!((rscInfo == null ? void 0 : rscInfo.actionIds) && (rscInfo == null ? void 0 : rscInfo.type) === _constants.RSC_MODULE_TYPES.client);
 }
 function isClientComponentEntryModule(mod) {
-    const rscInfo = mod.buildInfo.rsc;
+    const rscInfo = (0, _getmodulebuildinfo.getModuleBuildInfo)(mod).rsc;
     const hasClientDirective = rscInfo == null ? void 0 : rscInfo.isClientRef;
     const isActionLayerEntry = isActionClientLayerModule(mod);
     return hasClientDirective || isActionLayerEntry || imageRegex.test(mod.resource);
@@ -65,11 +62,7 @@ function isClientComponentEntryModule(mod) {
 const regexCSS = /\.(css|scss|sass)(\?.*)?$/;
 function isCSSMod(mod) {
     var _mod_loaders;
-    return !!(mod.type === 'css/mini-extract' || mod.resource && regexCSS.test(mod.resource) || ((_mod_loaders = mod.loaders) == null ? void 0 : _mod_loaders.some(({ loader })=>loader.includes('next-style-loader/index.js') || loader.includes('mini-css-extract-plugin/loader.js') || loader.includes('@vanilla-extract/webpack-plugin/loader/'))));
-}
-function getActionsFromBuildInfo(mod) {
-    var _mod_buildInfo_rsc, _mod_buildInfo;
-    return (_mod_buildInfo = mod.buildInfo) == null ? void 0 : (_mod_buildInfo_rsc = _mod_buildInfo.rsc) == null ? void 0 : _mod_buildInfo_rsc.actionIds;
+    return !!(mod.type === 'css/mini-extract' || mod.resource && regexCSS.test(mod.resource) || ((_mod_loaders = mod.loaders) == null ? void 0 : _mod_loaders.some(({ loader })=>loader.includes('next-style-loader/index.js') || process.env.NEXT_RSPACK && loader.includes('rspack.CssExtractRspackPlugin.loader') || loader.includes('mini-css-extract-plugin/loader.js') || loader.includes('@vanilla-extract/webpack-plugin/loader/'))));
 }
 function encodeToBase64(obj) {
     return Buffer.from(JSON.stringify(obj)).toString('base64');

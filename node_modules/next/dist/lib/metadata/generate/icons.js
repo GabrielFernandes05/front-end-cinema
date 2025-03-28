@@ -9,13 +9,7 @@ Object.defineProperty(exports, "IconsMetadata", {
     }
 });
 const _jsxruntime = require("react/jsx-runtime");
-const _react = /*#__PURE__*/ _interop_require_default(require("react"));
 const _meta = require("./meta");
-function _interop_require_default(obj) {
-    return obj && obj.__esModule ? obj : {
-        default: obj
-    };
-}
 function IconDescriptorLink({ icon }) {
     const { url, rel = 'icon', ...props } = icon;
     return /*#__PURE__*/ (0, _jsxruntime.jsx)("link", {

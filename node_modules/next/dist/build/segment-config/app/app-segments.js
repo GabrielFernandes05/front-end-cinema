@@ -11,7 +11,7 @@ Object.defineProperty(exports, "collectSegments", {
 const _appsegmentconfig = require("./app-segment-config");
 const _invarianterror = require("../../../shared/lib/invariant-error");
 const _checks = require("../../../server/route-modules/checks");
-const _clientreference = require("../../../lib/client-reference");
+const _clientandserverreferences = require("../../../lib/client-and-server-references");
 const _getsegmentparam = require("../../../server/app-render/get-segment-param");
 const _appdirmodule = require("../../../server/lib/app-dir-module");
 const _segment = require("../../../shared/lib/segment");
@@ -33,7 +33,11 @@ const _segment = require("../../../shared/lib/segment");
         segment.generateStaticParams = userland.generateStaticParams;
         // Validate that `generateStaticParams` makes sense in this context.
         if (((_segment_config = segment.config) == null ? void 0 : _segment_config.runtime) === 'edge') {
-            throw new Error('Edge runtime is not supported with `generateStaticParams`.');
+            throw Object.defineProperty(new Error('Edge runtime is not supported with `generateStaticParams`.'), "__NEXT_ERROR_CODE", {
+                value: "E502",
+                enumerable: false,
+                configurable: true
+            });
         }
     }
 }
@@ -58,15 +62,14 @@ const _segment = require("../../../shared/lib/segment");
         const [name, parallelRoutes] = loaderTree;
         // Process current node
         const { mod: userland, filePath } = await (0, _appdirmodule.getLayoutOrPageModule)(loaderTree);
-        const isClientComponent = userland && (0, _clientreference.isClientReference)(userland);
-        const isDynamicSegment = /\[.*\]$/.test(name);
-        const param = isDynamicSegment ? (_getSegmentParam = (0, _getsegmentparam.getSegmentParam)(name)) == null ? void 0 : _getSegmentParam.param : undefined;
+        const isClientComponent = userland && (0, _clientandserverreferences.isClientReference)(userland);
+        const param = (_getSegmentParam = (0, _getsegmentparam.getSegmentParam)(name)) == null ? void 0 : _getSegmentParam.param;
         const segment = {
             name,
             param,
             filePath,
             config: undefined,
-            isDynamicSegment,
+            isDynamicSegment: !!param,
             generateStaticParams: undefined
         };
         // Only server components can have app segment configurations
@@ -113,18 +116,21 @@ function getSegmentKey(segment) {
     // Get the pathname parts, slice off the first element (which is empty).
     const parts = routeModule.definition.pathname.split('/').slice(1);
     if (parts.length === 0) {
-        throw new _invarianterror.InvariantError('Expected at least one segment');
+        throw Object.defineProperty(new _invarianterror.InvariantError('Expected at least one segment'), "__NEXT_ERROR_CODE", {
+            value: "E580",
+            enumerable: false,
+            configurable: true
+        });
     }
     // Generate all the segments.
     const segments = parts.map((name)=>{
         var _getSegmentParam;
-        const isDynamicSegment = /^\[.*\]$/.test(name);
-        const param = isDynamicSegment ? (_getSegmentParam = (0, _getsegmentparam.getSegmentParam)(name)) == null ? void 0 : _getSegmentParam.param : undefined;
+        const param = (_getSegmentParam = (0, _getsegmentparam.getSegmentParam)(name)) == null ? void 0 : _getSegmentParam.param;
         return {
             name,
             param,
             filePath: undefined,
-            isDynamicSegment,
+            isDynamicSegment: !!param,
             config: undefined,
             generateStaticParams: undefined
         };
@@ -144,7 +150,11 @@ function collectSegments({ routeModule }) {
     if ((0, _checks.isAppPageRouteModule)(routeModule)) {
         return collectAppPageSegments(routeModule);
     }
-    throw new _invarianterror.InvariantError('Expected a route module to be one of app route or page');
+    throw Object.defineProperty(new _invarianterror.InvariantError('Expected a route module to be one of app route or page'), "__NEXT_ERROR_CODE", {
+        value: "E568",
+        enumerable: false,
+        configurable: true
+    });
 }
 
 //# sourceMappingURL=app-segments.js.map

@@ -5,7 +5,11 @@ function getReactCompiler() {
         // eslint-disable-next-line import/no-extraneous-dependencies
         return require.resolve('babel-plugin-react-compiler');
     } catch  {
-        throw new Error('Failed to load the `babel-plugin-react-compiler`. It is required to use the React Compiler. Please install it.');
+        throw Object.defineProperty(new Error('Failed to load the `babel-plugin-react-compiler`. It is required to use the React Compiler. Please install it.'), "__NEXT_ERROR_CODE", {
+            value: "E78",
+            enumerable: false,
+            configurable: true
+        });
     }
 }
 const getReactCompilerPlugins = (options, isDev, isServer)=>{

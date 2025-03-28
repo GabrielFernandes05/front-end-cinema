@@ -6,16 +6,7 @@ import { isBailoutToCSRError } from '../../shared/lib/lazy-dynamic/bailout-to-cs
 import { NodeNextRequest, NodeNextResponse } from '../../server/base-http/node';
 import { NEXT_IS_PRERENDER_HEADER } from '../../client/components/app-router-headers';
 import { AfterRunner } from '../../server/after/run-with-after';
-export var ExportedAppPageFiles = /*#__PURE__*/ function(ExportedAppPageFiles) {
-    ExportedAppPageFiles["HTML"] = "HTML";
-    ExportedAppPageFiles["FLIGHT"] = "FLIGHT";
-    ExportedAppPageFiles["PREFETCH_FLIGHT"] = "PREFETCH_FLIGHT";
-    ExportedAppPageFiles["PREFETCH_FLIGHT_SEGMENT"] = "PREFETCH_FLIGHT_SEGMENT";
-    ExportedAppPageFiles["META"] = "META";
-    ExportedAppPageFiles["POSTPONED"] = "POSTPONED";
-    return ExportedAppPageFiles;
-}({});
-export async function prospectiveRenderAppPage(req, res, page, pathname, query, fallbackRouteParams, partialRenderOpts) {
+export async function prospectiveRenderAppPage(req, res, page, pathname, query, fallbackRouteParams, partialRenderOpts, sharedContext) {
     const afterRunner = new AfterRunner();
     // If the page is `/_not-found`, then we should update the page to be `/404`.
     // UNDERSCORE_NOT_FOUND_ROUTE value used here, however we don't want to import it here as it causes constants to be inlined which we don't want here.
@@ -28,7 +19,7 @@ export async function prospectiveRenderAppPage(req, res, page, pathname, query, 
             waitUntil: afterRunner.context.waitUntil,
             onClose: afterRunner.context.onClose,
             onAfterTaskError: afterRunner.context.onTaskError
-        }, undefined, false);
+        }, undefined, false, sharedContext);
         // TODO(after): if we abort a prerender because of an error in an after-callback
         // we should probably communicate that better (and not log the error twice)
         await afterRunner.executeAfter();
@@ -45,7 +36,7 @@ export async function prospectiveRenderAppPage(req, res, page, pathname, query, 
 }
 /**
  * Renders & exports a page associated with the /app directory
- */ export async function exportAppPage(req, res, page, path, pathname, query, fallbackRouteParams, partialRenderOpts, htmlFilepath, debugOutput, isDynamicError, fileWriter) {
+ */ export async function exportAppPage(req, res, page, path, pathname, query, fallbackRouteParams, partialRenderOpts, htmlFilepath, debugOutput, isDynamicError, fileWriter, sharedContext) {
     const afterRunner = new AfterRunner();
     const renderOpts = {
         ...partialRenderOpts,
@@ -61,23 +52,34 @@ export async function prospectiveRenderAppPage(req, res, page, pathname, query, 
         pathname = '/404';
     }
     try {
-        const result = await lazyRenderAppPage(new NodeNextRequest(req), new NodeNextResponse(res), pathname, query, fallbackRouteParams, renderOpts, undefined, false);
+        const result = await lazyRenderAppPage(new NodeNextRequest(req), new NodeNextResponse(res), pathname, query, fallbackRouteParams, renderOpts, undefined, false, sharedContext);
         const html = result.toUnchunkedString();
         // TODO(after): if we abort a prerender because of an error in an after-callback
         // we should probably communicate that better (and not log the error twice)
         await afterRunner.executeAfter();
         const { metadata } = result;
-        const { flightData, revalidate = false, postponed, fetchTags, fetchMetrics, segmentData } = metadata;
+        const { flightData, cacheControl = {
+            revalidate: false,
+            expire: undefined
+        }, postponed, fetchTags, fetchMetrics, segmentData } = metadata;
         // Ensure we don't postpone without having PPR enabled.
         if (postponed && !renderOpts.experimental.isRoutePPREnabled) {
-            throw new Error('Invariant: page postponed without PPR being enabled');
+            throw Object.defineProperty(new Error('Invariant: page postponed without PPR being enabled'), "__NEXT_ERROR_CODE", {
+                value: "E156",
+                enumerable: false,
+                configurable: true
+            });
         }
-        if (revalidate === 0) {
+        if (cacheControl.revalidate === 0) {
             if (isDynamicError) {
-                throw new Error(`Page with dynamic = "error" encountered dynamic data method on ${path}.`);
+                throw Object.defineProperty(new Error(`Page with dynamic = "error" encountered dynamic data method on ${path}.`), "__NEXT_ERROR_CODE", {
+                    value: "E388",
+                    enumerable: false,
+                    configurable: true
+                });
             }
             const { staticBailoutInfo = {} } = metadata;
-            if (revalidate === 0 && debugOutput && (staticBailoutInfo == null ? void 0 : staticBailoutInfo.description)) {
+            if (debugOutput && (staticBailoutInfo == null ? void 0 : staticBailoutInfo.description)) {
                 logDynamicUsageWarning({
                     path,
                     description: staticBailoutInfo.description,
@@ -85,7 +87,7 @@ export async function prospectiveRenderAppPage(req, res, page, pathname, query, 
                 });
             }
             return {
-                revalidate: 0,
+                cacheControl,
                 fetchMetrics
             };
         }
@@ -93,9 +95,12 @@ export async function prospectiveRenderAppPage(req, res, page, pathname, query, 
         // properly so long as we don't have unknown route params. When a route doesn't
         // have unknown route params, there will not be any flight data.
         if (!flightData && (!fallbackRouteParams || fallbackRouteParams.size === 0)) {
-            throw new Error(`Invariant: failed to get page data for ${path}`);
+            throw Object.defineProperty(new Error(`Invariant: failed to get page data for ${path}`), "__NEXT_ERROR_CODE", {
+                value: "E194",
+                enumerable: false,
+                configurable: true
+            });
         }
-        let segmentPaths;
         if (flightData) {
             // If PPR is enabled, we want to emit a prefetch rsc file for the page
             // instead of the standard rsc. This is because the standard rsc will
@@ -106,24 +111,23 @@ export async function prospectiveRenderAppPage(req, res, page, pathname, query, 
                 // payload.
                 // TODO: This will eventually be replaced by the per-segment prefetch
                 // output below.
-                await fileWriter("PREFETCH_FLIGHT", htmlFilepath.replace(/\.html$/, RSC_PREFETCH_SUFFIX), flightData);
-                if (segmentData) {
-                    // Emit the per-segment prefetch data. We emit them as separate files
-                    // so that the cache handler has the option to treat each as a
-                    // separate entry.
-                    segmentPaths = [];
-                    const segmentsDir = htmlFilepath.replace(/\.html$/, RSC_SEGMENTS_DIR_SUFFIX);
-                    const tasks = [];
-                    for (const [segmentPath, buffer] of segmentData){
-                        segmentPaths.push(segmentPath);
-                        const segmentDataFilePath = segmentPath === '/' ? segmentsDir + '/_index' + RSC_SEGMENT_SUFFIX : segmentsDir + segmentPath + RSC_SEGMENT_SUFFIX;
-                        tasks.push(fileWriter("PREFETCH_FLIGHT_SEGMENT", segmentDataFilePath, buffer));
-                    }
-                    await Promise.all(tasks);
-                }
+                fileWriter.append(htmlFilepath.replace(/\.html$/, RSC_PREFETCH_SUFFIX), flightData);
             } else {
                 // Writing the RSC payload to a file if we don't have PPR enabled.
-                await fileWriter("FLIGHT", htmlFilepath.replace(/\.html$/, RSC_SUFFIX), flightData);
+                fileWriter.append(htmlFilepath.replace(/\.html$/, RSC_SUFFIX), flightData);
+            }
+        }
+        let segmentPaths;
+        if (segmentData) {
+            // Emit the per-segment prefetch data. We emit them as separate files
+            // so that the cache handler has the option to treat each as a
+            // separate entry.
+            segmentPaths = [];
+            const segmentsDir = htmlFilepath.replace(/\.html$/, RSC_SEGMENTS_DIR_SUFFIX);
+            for (const [segmentPath, buffer] of segmentData){
+                segmentPaths.push(segmentPath);
+                const segmentDataFilePath = segmentsDir + segmentPath + RSC_SEGMENT_SUFFIX;
+                fileWriter.append(segmentDataFilePath, buffer);
             }
         }
         const headers = {
@@ -135,7 +139,7 @@ export async function prospectiveRenderAppPage(req, res, page, pathname, query, 
             headers[NEXT_CACHE_TAGS_HEADER] = fetchTags;
         }
         // Writing static HTML to a file.
-        await fileWriter("HTML", htmlFilepath, html ?? '', 'utf8');
+        fileWriter.append(htmlFilepath, html ?? '');
         const isParallelRoute = /\/@\w+/.test(page);
         const isNonSuccessfulStatusCode = res.statusCode > 300;
         // When PPR is enabled, we don't always send 200 for routes that have been
@@ -156,13 +160,13 @@ export async function prospectiveRenderAppPage(req, res, page, pathname, query, 
             postponed,
             segmentPaths
         };
-        await fileWriter("META", htmlFilepath.replace(/\.html$/, NEXT_META_SUFFIX), JSON.stringify(meta, null, 2));
+        fileWriter.append(htmlFilepath.replace(/\.html$/, NEXT_META_SUFFIX), JSON.stringify(meta, null, 2));
         return {
             // Only include the metadata if the environment has next support.
             metadata: hasNextSupport ? meta : undefined,
             hasEmptyPrelude: Boolean(postponed) && html === '',
             hasPostponed: Boolean(postponed),
-            revalidate,
+            cacheControl,
             fetchMetrics
         };
     } catch (err) {
@@ -186,13 +190,20 @@ export async function prospectiveRenderAppPage(req, res, page, pathname, query, 
             });
         }
         return {
-            revalidate: 0,
+            cacheControl: {
+                revalidate: 0,
+                expire: undefined
+            },
             fetchMetrics
         };
     }
 }
 function logDynamicUsageWarning({ path, description, stack }) {
-    const errMessage = new Error(`Static generation failed due to dynamic usage on ${path}, reason: ${description}`);
+    const errMessage = Object.defineProperty(new Error(`Static generation failed due to dynamic usage on ${path}, reason: ${description}`), "__NEXT_ERROR_CODE", {
+        value: "E381",
+        enumerable: false,
+        configurable: true
+    });
     if (stack) {
         errMessage.stack = errMessage.message + stack.substring(stack.indexOf('\n'));
     }

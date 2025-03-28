@@ -18,7 +18,7 @@ import type { PagesAPIRouteMatch } from './route-matches/pages-api-route-match';
 import type { Server as HTTPServer, IncomingMessage, ServerResponse as HTTPServerResponse } from 'http';
 import type { MiddlewareMatcher } from '../build/analysis/get-page-static-info';
 import type { InstrumentationModule } from './instrumentation/types';
-import { type Revalidate, type ExpireTime } from './lib/revalidate';
+import { type CacheControl } from './lib/cache-control';
 import RenderResult from './render-result';
 import type { RouteMatcherManager } from './route-matcher-managers/route-matcher-manager';
 import { LocaleRouteNormalizer } from './normalizers/locale-route-normalizer';
@@ -29,6 +29,7 @@ import { NextDataPathnameNormalizer } from './normalizers/request/next-data';
 import type { DeepReadonly } from '../shared/lib/deep-readonly';
 import { type WaitUntil } from './after/builtin-request-context';
 import { FallbackMode } from '../lib/fallback';
+import { SegmentPrefixRSCPathnameNormalizer } from './normalizers/request/segment-prefix-rsc';
 export type FindComponentsResult = {
     components: LoadComponentsReturnType;
     query: NextParsedUrlQuery;
@@ -134,7 +135,7 @@ export declare class WrappedBuildError extends Error {
 type ResponsePayload = {
     type: 'html' | 'json' | 'rsc';
     body: RenderResult;
-    revalidate?: Revalidate | undefined;
+    cacheControl?: CacheControl;
 };
 export type NextEnabledDirectories = {
     readonly pages: boolean;
@@ -172,6 +173,7 @@ export default abstract class Server<ServerOptions extends Options = Options, Se
     protected abstract getEnabledDirectories(dev: boolean): NextEnabledDirectories;
     protected readonly experimentalTestProxy?: boolean;
     protected abstract findPageComponents(params: {
+        locale: string | undefined;
         page: string;
         query: NextParsedUrlQuery;
         params: Params;
@@ -190,8 +192,7 @@ export default abstract class Server<ServerOptions extends Options = Options, Se
         type: 'html' | 'json' | 'rsc';
         generateEtags: boolean;
         poweredByHeader: boolean;
-        revalidate: Revalidate | undefined;
-        expireTime: ExpireTime | undefined;
+        cacheControl: CacheControl | undefined;
     }): Promise<void>;
     protected abstract runApi(req: ServerRequest, res: ServerResponse, query: ParsedUrlQuery, match: PagesAPIRouteMatch): Promise<boolean>;
     protected abstract renderHTML(req: ServerRequest, res: ServerResponse, pathname: string, query: NextParsedUrlQuery, renderOpts: LoadedRenderOpts): Promise<RenderResult>;
@@ -213,9 +214,11 @@ export default abstract class Server<ServerOptions extends Options = Options, Se
     protected readonly normalizers: {
         readonly rsc: RSCPathnameNormalizer | undefined;
         readonly prefetchRSC: PrefetchRSCPathnameNormalizer | undefined;
+        readonly segmentPrefetchRSC: SegmentPrefixRSCPathnameNormalizer | undefined;
         readonly data: NextDataPathnameNormalizer | undefined;
     };
     private readonly isAppPPREnabled;
+    private readonly isAppSegmentPrefetchEnabled;
     /**
      * This is used to persist cache scopes across
      * prefetch -> full route requests for dynamic IO
@@ -282,7 +285,7 @@ export default abstract class Server<ServerOptions extends Options = Options, Se
     protected getOriginalAppPaths(route: string): string[] | null;
     protected renderPageComponent(ctx: RequestContext<ServerRequest, ServerResponse>, bubbleNoFallback: boolean): Promise<false | ResponsePayload | null>;
     private renderToResponse;
-    protected abstract getMiddleware(): MiddlewareRoutingItem | undefined;
+    protected abstract getMiddleware(): Promise<MiddlewareRoutingItem | undefined>;
     protected abstract getFallbackErrorComponents(url?: string): Promise<LoadComponentsReturnType | null>;
     protected abstract getRoutesManifest(): NormalizedRouteManifest | undefined;
     private renderToResponseImpl;

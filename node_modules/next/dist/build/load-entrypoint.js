@@ -19,20 +19,9 @@ function _interop_require_default(obj) {
 const PACKAGE_ROOT = _path.default.normalize(_path.default.join(__dirname, '../../..'));
 const TEMPLATE_FOLDER = _path.default.join(__dirname, 'templates');
 const TEMPLATES_ESM_FOLDER = _path.default.normalize(_path.default.join(__dirname, '../../dist/esm/build/templates'));
-async function loadEntrypoint(entrypoint, replacements, injections, imports, importMaps) {
+async function loadEntrypoint(entrypoint, replacements, injections, imports) {
     const filepath = _path.default.resolve(_path.default.join(TEMPLATES_ESM_FOLDER, `${entrypoint}.js`));
     let file = await _promises.default.readFile(filepath, 'utf8');
-    const importMapItems = {};
-    for (const key of Object.keys(importMaps || {})){
-        importMapItems[key] = {};
-        for (const [innerKey, importPath] of Object.entries((importMaps == null ? void 0 : importMaps[key]) || {})){
-            file = `import ${key}_${innerKey} from "${importPath}"\n${file}`;
-            importMapItems[key][innerKey] = `${key}_${innerKey}`;
-        }
-    }
-    file = file.replace(new RegExp(`cacheHandlers = {}`), `cacheHandlers = {\n${Object.entries(importMapItems['cacheHandlers'] || {}).map(([key, value])=>{
-        return `${key}: ${value}`;
-    }).join(',')}\n}`);
     // Update the relative imports to be absolute. This will update any relative
     // imports to be relative to the root of the `next` package.
     let count = 0;
@@ -44,7 +33,11 @@ async function loadEntrypoint(entrypoint, replacements, injections, imports, imp
         // will catch cases where the constants at the top of the file were not
         // updated after the file was moved.
         if (!relative.startsWith('next/')) {
-            throw new Error(`Invariant: Expected relative import to start with "next/", found "${relative}"`);
+            throw Object.defineProperty(new Error(`Invariant: Expected relative import to start with "next/", found "${relative}"`), "__NEXT_ERROR_CODE", {
+                value: "E214",
+                enumerable: false,
+                configurable: true
+            });
         }
         return fromRequest ? `from ${JSON.stringify(relative)}` : `import ${JSON.stringify(relative)}`;
     });
@@ -53,7 +46,11 @@ async function loadEntrypoint(entrypoint, replacements, injections, imports, imp
     // we don't accidentally remove the import replacement code or use the wrong
     // template file.
     if (count === 0) {
-        throw new Error('Invariant: Expected to replace at least one import');
+        throw Object.defineProperty(new Error('Invariant: Expected to replace at least one import'), "__NEXT_ERROR_CODE", {
+            value: "E363",
+            enumerable: false,
+            configurable: true
+        });
     }
     const replaced = new Set();
     // Replace all the template variables with the actual values. If a template
@@ -61,7 +58,11 @@ async function loadEntrypoint(entrypoint, replacements, injections, imports, imp
     file = file.replaceAll(new RegExp(`${Object.keys(replacements).map((k)=>`'${k}'`).join('|')}`, 'g'), (match)=>{
         const key = JSON.parse(match.replace(/'/g, `"`));
         if (!(key in replacements)) {
-            throw new Error(`Invariant: Unexpected template variable ${key}`);
+            throw Object.defineProperty(new Error(`Invariant: Unexpected template variable ${key}`), "__NEXT_ERROR_CODE", {
+                value: "E9",
+                enumerable: false,
+                configurable: true
+            });
         }
         replaced.add(key);
         return JSON.stringify(replacements[key]);
@@ -69,7 +70,11 @@ async function loadEntrypoint(entrypoint, replacements, injections, imports, imp
     // Check to see if there's any remaining template variables.
     let matches = file.match(/VAR_[A-Z_]+/g);
     if (matches) {
-        throw new Error(`Invariant: Expected to replace all template variables, found ${matches.join(', ')}`);
+        throw Object.defineProperty(new Error(`Invariant: Expected to replace all template variables, found ${matches.join(', ')}`), "__NEXT_ERROR_CODE", {
+            value: "E415",
+            enumerable: false,
+            configurable: true
+        });
     }
     // Check to see if any template variable was provided but not used.
     if (replaced.size !== Object.keys(replacements).length) {
@@ -77,7 +82,11 @@ async function loadEntrypoint(entrypoint, replacements, injections, imports, imp
         // template variables. This will let us notify the user of any template
         // variables that were not used but were provided.
         const difference = Object.keys(replacements).filter((key)=>!replaced.has(key));
-        throw new Error(`Invariant: Expected to replace all template variables, missing ${difference.join(', ')} in template`);
+        throw Object.defineProperty(new Error(`Invariant: Expected to replace all template variables, missing ${difference.join(', ')} in template`), "__NEXT_ERROR_CODE", {
+            value: "E196",
+            enumerable: false,
+            configurable: true
+        });
     }
     // Replace the injections.
     const injected = new Set();
@@ -85,7 +94,11 @@ async function loadEntrypoint(entrypoint, replacements, injections, imports, imp
         // Track all the injections to ensure that we're not missing any.
         file = file.replaceAll(new RegExp(`// INJECT:(${Object.keys(injections).join('|')})`, 'g'), (_, key)=>{
             if (!(key in injections)) {
-                throw new Error(`Invariant: Unexpected injection ${key}`);
+                throw Object.defineProperty(new Error(`Invariant: Unexpected injection ${key}`), "__NEXT_ERROR_CODE", {
+                    value: "E26",
+                    enumerable: false,
+                    configurable: true
+                });
             }
             injected.add(key);
             return `const ${key} = ${injections[key]}`;
@@ -94,7 +107,11 @@ async function loadEntrypoint(entrypoint, replacements, injections, imports, imp
     // Check to see if there's any remaining injections.
     matches = file.match(/\/\/ INJECT:[A-Za-z0-9_]+/g);
     if (matches) {
-        throw new Error(`Invariant: Expected to inject all injections, found ${matches.join(', ')}`);
+        throw Object.defineProperty(new Error(`Invariant: Expected to inject all injections, found ${matches.join(', ')}`), "__NEXT_ERROR_CODE", {
+            value: "E84",
+            enumerable: false,
+            configurable: true
+        });
     }
     // Check to see if any injection was provided but not used.
     if (injected.size !== Object.keys(injections ?? {}).length) {
@@ -102,7 +119,11 @@ async function loadEntrypoint(entrypoint, replacements, injections, imports, imp
         // injections. This will let us notify the user of any injections that were
         // not used but were provided.
         const difference = Object.keys(injections ?? {}).filter((key)=>!injected.has(key));
-        throw new Error(`Invariant: Expected to inject all injections, missing ${difference.join(', ')} in template`);
+        throw Object.defineProperty(new Error(`Invariant: Expected to inject all injections, missing ${difference.join(', ')} in template`), "__NEXT_ERROR_CODE", {
+            value: "E382",
+            enumerable: false,
+            configurable: true
+        });
     }
     // Replace the optional imports.
     const importsAdded = new Set();
@@ -110,7 +131,11 @@ async function loadEntrypoint(entrypoint, replacements, injections, imports, imp
         // Track all the imports to ensure that we're not missing any.
         file = file.replaceAll(new RegExp(`// OPTIONAL_IMPORT:(\\* as )?(${Object.keys(imports).join('|')})`, 'g'), (_, asNamespace = '', key)=>{
             if (!(key in imports)) {
-                throw new Error(`Invariant: Unexpected optional import ${key}`);
+                throw Object.defineProperty(new Error(`Invariant: Unexpected optional import ${key}`), "__NEXT_ERROR_CODE", {
+                    value: "E85",
+                    enumerable: false,
+                    configurable: true
+                });
             }
             importsAdded.add(key);
             if (imports[key]) {
@@ -123,7 +148,11 @@ async function loadEntrypoint(entrypoint, replacements, injections, imports, imp
     // Check to see if there's any remaining imports.
     matches = file.match(/\/\/ OPTIONAL_IMPORT:(\* as )?[A-Za-z0-9_]+/g);
     if (matches) {
-        throw new Error(`Invariant: Expected to inject all imports, found ${matches.join(', ')}`);
+        throw Object.defineProperty(new Error(`Invariant: Expected to inject all imports, found ${matches.join(', ')}`), "__NEXT_ERROR_CODE", {
+            value: "E384",
+            enumerable: false,
+            configurable: true
+        });
     }
     // Check to see if any import was provided but not used.
     if (importsAdded.size !== Object.keys(imports ?? {}).length) {
@@ -131,7 +160,11 @@ async function loadEntrypoint(entrypoint, replacements, injections, imports, imp
         // imports. This will let us notify the user of any imports that were
         // not used but were provided.
         const difference = Object.keys(imports ?? {}).filter((key)=>!importsAdded.has(key));
-        throw new Error(`Invariant: Expected to inject all imports, missing ${difference.join(', ')} in template`);
+        throw Object.defineProperty(new Error(`Invariant: Expected to inject all imports, missing ${difference.join(', ')} in template`), "__NEXT_ERROR_CODE", {
+            value: "E150",
+            enumerable: false,
+            configurable: true
+        });
     }
     return file;
 }

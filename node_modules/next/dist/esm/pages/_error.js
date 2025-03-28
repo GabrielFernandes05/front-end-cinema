@@ -8,10 +8,22 @@ const statusCodes = {
     500: 'Internal Server Error'
 };
 function _getInitialProps(param) {
-    let { res, err } = param;
+    let { req, res, err } = param;
     const statusCode = res && res.statusCode ? res.statusCode : err ? err.statusCode : 404;
+    let hostname;
+    if (typeof window !== 'undefined') {
+        hostname = window.location.hostname;
+    } else if (req) {
+        const { getRequestMeta } = require('../server/request-meta');
+        const initUrl = getRequestMeta(req, 'initURL');
+        if (initUrl) {
+            const url = new URL(initUrl);
+            hostname = url.hostname;
+        }
+    }
     return {
-        statusCode
+        statusCode,
+        hostname
     };
 }
 const styles = {
@@ -91,8 +103,19 @@ class Error extends React.Component {
                             children: /*#__PURE__*/ _jsxs("h2", {
                                 style: styles.h2,
                                 children: [
-                                    this.props.title || statusCode ? title : /*#__PURE__*/ _jsx(_Fragment, {
-                                        children: "Application error: a client-side exception has occurred (see the browser console for more information)"
+                                    this.props.title || statusCode ? title : /*#__PURE__*/ _jsxs(_Fragment, {
+                                        children: [
+                                            "Application error: a client-side exception has occurred",
+                                            ' ',
+                                            Boolean(this.props.hostname) && /*#__PURE__*/ _jsxs(_Fragment, {
+                                                children: [
+                                                    "while loading ",
+                                                    this.props.hostname
+                                                ]
+                                            }),
+                                            ' ',
+                                            "(see the browser console for more information)"
+                                        ]
                                     }),
                                     "."
                                 ]

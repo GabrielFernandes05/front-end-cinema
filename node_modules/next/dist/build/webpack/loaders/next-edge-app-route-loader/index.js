@@ -14,11 +14,19 @@ const _constants = require("../../../../lib/constants");
 const _loadentrypoint = require("../../../load-entrypoint");
 const _ismetadataroute = require("../../../../lib/metadata/is-metadata-route");
 const EdgeAppRouteLoader = async function() {
-    const { page, absolutePagePath, preferredRegion, appDirLoader: appDirLoaderBase64 = '', middlewareConfig: middlewareConfigBase64 = '', nextConfig: nextConfigBase64 } = this.getOptions();
+    const { page, absolutePagePath, preferredRegion, appDirLoader: appDirLoaderBase64 = '', middlewareConfig: middlewareConfigBase64 = '', nextConfig: nextConfigBase64, cacheHandlers: cacheHandlersStringified } = this.getOptions();
     const appDirLoader = Buffer.from(appDirLoaderBase64, 'base64').toString();
     const middlewareConfig = JSON.parse(Buffer.from(middlewareConfigBase64, 'base64').toString());
+    const cacheHandlers = JSON.parse(cacheHandlersStringified || '{}');
+    if (!cacheHandlers.default) {
+        cacheHandlers.default = require.resolve('../../../../server/lib/cache-handlers/default');
+    }
     // Ensure we only run this loader for as a module.
-    if (!this._module) throw new Error('This loader is only usable as a module');
+    if (!this._module) throw Object.defineProperty(new Error('This loader is only usable as a module'), "__NEXT_ERROR_CODE", {
+        value: "E433",
+        enumerable: false,
+        configurable: true
+    });
     const buildInfo = (0, _getmodulebuildinfo.getModuleBuildInfo)(this._module);
     buildInfo.nextEdgeSSR = {
         isServerComponent: !(0, _ismetadataroute.isMetadataRoute)(page),

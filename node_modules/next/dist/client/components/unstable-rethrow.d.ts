@@ -5,4 +5,4 @@
  *
  * Read more: [Next.js Docs: `unstable_rethrow`](https://nextjs.org/docs/app/api-reference/functions/unstable_rethrow)
  */
-export declare function unstable_rethrow(error: unknown): void;
+export declare const unstable_rethrow: typeof import("./unstable-rethrow.server").unstable_rethrow;

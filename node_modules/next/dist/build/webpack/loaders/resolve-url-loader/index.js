@@ -84,7 +84,7 @@ async function resolveUrlLoader(/** Css content */ content, /** The source-map *
         }
     }
     function encodeError(label, exception) {
-        return new Error([
+        return Object.defineProperty(new Error([
             'resolve-url-loader',
             ': ',
             [
@@ -93,7 +93,11 @@ async function resolveUrlLoader(/** Css content */ content, /** The source-map *
                 exception.message,
                 exception.stack.split('\n', 2)[1].trim()
             ] || []).filter(Boolean).join('\n  ')
-        ].join(''));
+        ].join('')), "__NEXT_ERROR_CODE", {
+            value: "E394",
+            enumerable: false,
+            configurable: true
+        });
     }
 }
 

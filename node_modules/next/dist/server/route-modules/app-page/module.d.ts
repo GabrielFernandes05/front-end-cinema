@@ -3,7 +3,7 @@ import type RenderResult from '../../render-result';
 import type { RenderOpts } from '../../app-render/types';
 import type { NextParsedUrlQuery } from '../../request-meta';
 import type { LoaderTree } from '../../lib/app-dir-module';
-import { renderToHTMLOrFlight } from '../../app-render/app-render';
+import { renderToHTMLOrFlight, type AppSharedContext } from '../../app-render/app-render';
 import { RouteModule, type RouteModuleOptions, type RouteModuleHandleContext } from '../route-module';
 import * as vendoredContexts from './vendored/contexts/entrypoints';
 import type { BaseNextRequest, BaseNextResponse } from '../../base-http';
@@ -26,6 +26,7 @@ export interface AppPageRouteHandlerContext extends RouteModuleHandleContext {
     fallbackRouteParams: FallbackRouteParams | null;
     renderOpts: RenderOpts;
     serverComponentsHmrCache?: ServerComponentsHmrCache;
+    sharedContext: AppSharedContext;
 }
 export type AppPageRouteModuleOptions = RouteModuleOptions<AppPageRouteDefinition, AppPageUserlandModule>;
 export declare class AppPageRouteModule extends RouteModule<AppPageRouteDefinition, AppPageUserlandModule> {

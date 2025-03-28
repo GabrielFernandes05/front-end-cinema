@@ -24,7 +24,11 @@ export function evalManifest(path, shouldCache = true, cache = sharedCache) {
     }
     const content = readFileSync(path, 'utf8');
     if (content.length === 0) {
-        throw new Error('Manifest file is empty');
+        throw Object.defineProperty(new Error('Manifest file is empty'), "__NEXT_ERROR_CODE", {
+            value: "E328",
+            enumerable: false,
+            configurable: true
+        });
     }
     let contextObject = {};
     runInNewContext(content, contextObject);

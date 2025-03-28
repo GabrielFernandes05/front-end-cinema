@@ -1,8 +1,8 @@
 import type { StackFrame } from 'next/dist/compiled/stacktrace-parser';
-import { getSourceMapFromFile } from '../internal/helpers/get-source-map-from-file';
+import { getSourceMapFromFile } from '../utils/get-source-map-from-file';
 import { type OriginalStackFrameResponse } from './shared';
-export { getServerError } from '../internal/helpers/node-stack-frames';
-export { parseStack } from '../internal/helpers/parse-stack';
+export { getServerError } from '../utils/node-stack-frames';
+export { parseStack } from '../utils/parse-stack';
 export { getSourceMapFromFile };
 import type { IncomingMessage, ServerResponse } from 'http';
 import type webpack from 'webpack';
@@ -18,16 +18,18 @@ type Source = {
     type: 'file';
     sourceMap: RawSourceMap;
     ignoredSources: IgnoredSources;
-    modulePath: string;
+    moduleURL: string;
 } | {
     type: 'bundle';
     sourceMap: RawSourceMap;
     ignoredSources: IgnoredSources;
     compilation: webpack.Compilation;
     moduleId: string;
-    modulePath: string;
+    moduleURL: string;
 };
-export declare function getIgnoredSources(sourceMap: RawSourceMap): IgnoredSources;
+export declare function getIgnoredSources(sourceMap: RawSourceMap & {
+    ignoreList?: number[];
+}): IgnoredSources;
 export declare function createOriginalStackFrame({ source, rootDirectory, frame, errorMessage, }: {
     source: Source;
     rootDirectory: string;

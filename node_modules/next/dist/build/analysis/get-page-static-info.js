@@ -102,13 +102,11 @@ const SERVER_ACTION_DIRECTIVE = 'use server';
 function getRSCModuleInformation(source, isReactServerLayer) {
     const actionsJson = source.match(ACTION_MODULE_LABEL);
     const parsedActionsMeta = actionsJson ? JSON.parse(actionsJson[1]) : undefined;
-    const actions = parsedActionsMeta ? Object.values(parsedActionsMeta) : undefined;
     const clientInfoMatch = source.match(CLIENT_MODULE_LABEL);
     const isClientRef = !!clientInfoMatch;
     if (!isReactServerLayer) {
         return {
             type: _constants1.RSC_MODULE_TYPES.client,
-            actions,
             actionIds: parsedActionsMeta,
             isClientRef
         };
@@ -119,7 +117,6 @@ function getRSCModuleInformation(source, isReactServerLayer) {
     const type = clientInfoMatch ? _constants1.RSC_MODULE_TYPES.client : _constants1.RSC_MODULE_TYPES.server;
     return {
         type,
-        actions,
         actionIds: parsedActionsMeta,
         clientRefs,
         clientEntryType,
@@ -339,7 +336,11 @@ function warnAboutUnsupportedValue(pageFilePath, page, error) {
     if (isProductionBuild) {
         _log.error(message);
     } else {
-        throw new Error(message);
+        throw Object.defineProperty(new Error(message), "__NEXT_ERROR_CODE", {
+            value: "E394",
+            enumerable: false,
+            configurable: true
+        });
     }
 }
 async function getAppPageStaticInfo({ pageFilePath, nextConfig, isDev, page }) {
@@ -380,11 +381,19 @@ async function getAppPageStaticInfo({ pageFilePath, nextConfig, isDev, page }) {
     const config = (0, _appsegmentconfig.parseAppSegmentConfig)(exportedConfig, route);
     // Prevent edge runtime and generateStaticParams in the same file.
     if ((0, _isedgeruntime.isEdgeRuntime)(config.runtime) && generateStaticParams) {
-        throw new Error(`Page "${page}" cannot use both \`export const runtime = 'edge'\` and export \`generateStaticParams\`.`);
+        throw Object.defineProperty(new Error(`Page "${page}" cannot use both \`export const runtime = 'edge'\` and export \`generateStaticParams\`.`), "__NEXT_ERROR_CODE", {
+            value: "E42",
+            enumerable: false,
+            configurable: true
+        });
     }
     // Prevent use client and generateStaticParams in the same file.
     if ((directives == null ? void 0 : directives.has('client')) && generateStaticParams) {
-        throw new Error(`Page "${page}" cannot use both "use client" and export function "generateStaticParams()".`);
+        throw Object.defineProperty(new Error(`Page "${page}" cannot use both "use client" and export function "generateStaticParams()".`), "__NEXT_ERROR_CODE", {
+            value: "E475",
+            enumerable: false,
+            configurable: true
+        });
     }
     return {
         type: _pagetypes.PAGE_TYPES.APP,
@@ -400,7 +409,7 @@ async function getAppPageStaticInfo({ pageFilePath, nextConfig, isDev, page }) {
     };
 }
 async function getPagesPageStaticInfo({ pageFilePath, nextConfig, isDev, page }) {
-    var _config_config, _config_config1, _config_config2, _config_config3;
+    var _config_config, _config_config1, _config_config2;
     const content = await tryToReadFile(pageFilePath, !isDev);
     if (!content || !PARSE_PATTERN.test(content)) {
         return {
@@ -438,7 +447,7 @@ async function getPagesPageStaticInfo({ pageFilePath, nextConfig, isDev, page })
     const route = (0, _normalizepagepath.normalizePagePath)(page);
     const config = (0, _pagessegmentconfig.parsePagesSegmentConfig)(exportedConfig, route);
     const isAnAPIRoute = (0, _isapiroute.isAPIRoute)(route);
-    const resolvedRuntime = (0, _isedgeruntime.isEdgeRuntime)(config.runtime ?? ((_config_config = config.config) == null ? void 0 : _config_config.runtime)) || getServerSideProps || getStaticProps ? config.runtime ?? ((_config_config1 = config.config) == null ? void 0 : _config_config1.runtime) : undefined;
+    const resolvedRuntime = config.runtime ?? ((_config_config = config.config) == null ? void 0 : _config_config.runtime);
     if (resolvedRuntime === _constants.SERVER_RUNTIME.experimentalEdge) {
         warnAboutExperimentalEdge(isAnAPIRoute ? page : null);
     }
@@ -447,7 +456,11 @@ async function getPagesPageStaticInfo({ pageFilePath, nextConfig, isDev, page })
         if (isDev) {
             _log.error(message);
         } else {
-            throw new Error(message);
+            throw Object.defineProperty(new Error(message), "__NEXT_ERROR_CODE", {
+                value: "E394",
+                enumerable: false,
+                configurable: true
+            });
         }
     }
     return {
@@ -458,8 +471,8 @@ async function getPagesPageStaticInfo({ pageFilePath, nextConfig, isDev, page })
         config,
         middleware: parseMiddlewareConfig(page, exportedConfig.config, nextConfig),
         runtime: resolvedRuntime,
-        preferredRegion: (_config_config2 = config.config) == null ? void 0 : _config_config2.regions,
-        maxDuration: config.maxDuration ?? ((_config_config3 = config.config) == null ? void 0 : _config_config3.maxDuration)
+        preferredRegion: (_config_config1 = config.config) == null ? void 0 : _config_config1.regions,
+        maxDuration: config.maxDuration ?? ((_config_config2 = config.config) == null ? void 0 : _config_config2.maxDuration)
     };
 }
 async function getPageStaticInfo(params) {

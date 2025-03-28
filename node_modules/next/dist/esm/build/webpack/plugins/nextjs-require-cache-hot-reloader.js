@@ -27,7 +27,7 @@ export class NextJsRequireCacheHotReloader {
             // since they can have a stale webpack-runtime cache
             // which needs to always be in-sync
             const entries = [
-                ...compilation.entries.keys()
+                ...compilation.entrypoints.keys()
             ].filter((entry)=>{
                 const isAppPath = entry.toString().startsWith('app/');
                 return entry.toString().startsWith('pages/') || isAppPath;

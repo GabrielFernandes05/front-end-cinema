@@ -126,22 +126,26 @@ function validateURL(url) {
     try {
         return String(new URL(String(url)));
     } catch (error) {
-        throw new Error(`URL is malformed "${String(url)}". Please use only absolute URLs - https://nextjs.org/docs/messages/middleware-relative-urls`, {
+        throw Object.defineProperty(new Error(`URL is malformed "${String(url)}". Please use only absolute URLs - https://nextjs.org/docs/messages/middleware-relative-urls`, {
             cause: error
+        }), "__NEXT_ERROR_CODE", {
+            value: "E61",
+            enumerable: false,
+            configurable: true
         });
     }
 }
-function normalizeNextQueryParam(key, onKeyNormalized) {
+function normalizeNextQueryParam(key) {
     const prefixes = [
         _constants.NEXT_QUERY_PARAM_PREFIX,
         _constants.NEXT_INTERCEPTION_MARKER_PREFIX
     ];
     for (const prefix of prefixes){
         if (key !== prefix && key.startsWith(prefix)) {
-            const normalizedKey = key.substring(prefix.length);
-            onKeyNormalized(normalizedKey);
+            return key.substring(prefix.length);
         }
     }
+    return null;
 }
 
 //# sourceMappingURL=utils.js.map

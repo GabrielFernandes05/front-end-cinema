@@ -60,7 +60,7 @@ class EdgeRouteModuleWrapper {
             // only used for rewrites, so setting an arbitrary default value here
             caseSensitive: false
         });
-        const { params } = utils.normalizeDynamicRouteParams((0, _querystring.searchParamsToUrlQuery)(request.nextUrl.searchParams));
+        const { params } = utils.normalizeDynamicRouteParams((0, _querystring.searchParamsToUrlQuery)(request.nextUrl.searchParams), false);
         const waitUntil = evt.waitUntil.bind(evt);
         const closeController = new _webonclose.CloseController();
         const previewProps = (0, _getedgepreviewprops.getEdgePreviewProps)();
@@ -84,8 +84,10 @@ class EdgeRouteModuleWrapper {
                     dynamicIO: !!process.env.__NEXT_DYNAMIC_IO,
                     authInterrupts: !!process.env.__NEXT_EXPERIMENTAL_AUTH_INTERRUPTS
                 },
-                buildId: '',
                 cacheLifeProfiles: this.nextConfig.experimental.cacheLife
+            },
+            sharedContext: {
+                buildId: ''
             }
         };
         // Get the response from the handler.

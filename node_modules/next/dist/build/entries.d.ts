@@ -75,9 +75,15 @@ export declare function getEdgeServerEntry(opts: {
     hasInstrumentationHook?: boolean;
     preferredRegion: string | string[] | undefined;
     middlewareConfig?: MiddlewareConfig;
-}): string | {
+}): {
     import: string;
     layer: "rsc";
+} | {
+    import: string;
+    layer: "middleware";
+} | {
+    import: string;
+    layer: "api-edge";
 } | {
     import: string;
     layer: "ssr" | undefined;
@@ -91,6 +97,7 @@ export declare function getInstrumentationEntry(opts: {
     filename: string;
     layer: "instrument";
 };
+export declare function getAppLoader(): "builtin:next-app-loader" | "next-app-loader";
 export declare function getAppEntry(opts: Readonly<AppLoaderOptions>): {
     import: string;
     layer: "rsc";

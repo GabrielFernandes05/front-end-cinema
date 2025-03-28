@@ -15,7 +15,11 @@ class RouteModuleLoader {
         if ('routeModule' in module) {
             return module.routeModule;
         }
-        throw new Error(`Module "${id}" does not export a routeModule.`);
+        throw Object.defineProperty(new Error(`Module "${id}" does not export a routeModule.`), "__NEXT_ERROR_CODE", {
+            value: "E53",
+            enumerable: false,
+            configurable: true
+        });
     }
 }
 

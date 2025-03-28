@@ -64,7 +64,11 @@ function parsePostponedState(state, params) {
         var _state_match;
         const postponedStringLengthMatch = (_state_match = state.match(/^([0-9]*):/)) == null ? void 0 : _state_match[1];
         if (!postponedStringLengthMatch) {
-            throw new Error(`Invariant: invalid postponed state ${state}`);
+            throw Object.defineProperty(new Error(`Invariant: invalid postponed state ${state}`), "__NEXT_ERROR_CODE", {
+                value: "E314",
+                enumerable: false,
+                configurable: true
+            });
         }
         const postponedStringLength = parseInt(postponedStringLengthMatch);
         // We add a `:` to the end of the length as the first character of the
@@ -82,7 +86,11 @@ function parsePostponedState(state, params) {
                 var _postponedString_match;
                 const match = (_postponedString_match = postponedString.match(/^([0-9]*)/)) == null ? void 0 : _postponedString_match[1];
                 if (!match) {
-                    throw new Error(`Invariant: invalid postponed state ${JSON.stringify(postponedString)}`);
+                    throw Object.defineProperty(new Error(`Invariant: invalid postponed state ${JSON.stringify(postponedString)}`), "__NEXT_ERROR_CODE", {
+                        value: "E314",
+                        enumerable: false,
+                        configurable: true
+                    });
                 }
                 // This is the length of the replacements entries.
                 const length = parseInt(match);

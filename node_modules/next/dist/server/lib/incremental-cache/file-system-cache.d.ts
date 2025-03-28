@@ -1,5 +1,6 @@
 import type { CacheHandler, CacheHandlerContext, CacheHandlerValue } from './';
 import type { CacheFs } from '../../../shared/lib/utils';
+import { type IncrementalCacheValue, type SetIncrementalFetchCacheContext, type SetIncrementalResponseCacheContext } from '../../response-cache';
 type FileSystemCacheContext = Omit<CacheHandlerContext, 'fs' | 'serverDistDir'> & {
     fs: CacheFs;
     serverDistDir: string;
@@ -14,7 +15,7 @@ export default class FileSystemCache implements CacheHandler {
     resetRequestCache(): void;
     revalidateTag(...args: Parameters<CacheHandler['revalidateTag']>): Promise<void>;
     get(...args: Parameters<CacheHandler['get']>): Promise<CacheHandlerValue | null>;
-    set(...args: Parameters<CacheHandler['set']>): Promise<void>;
+    set(key: string, data: IncrementalCacheValue | null, ctx: SetIncrementalFetchCacheContext | SetIncrementalResponseCacheContext): Promise<void>;
     private getFilePath;
 }
 export {};

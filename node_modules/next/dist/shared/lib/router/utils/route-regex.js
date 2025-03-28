@@ -29,7 +29,7 @@ _export(exports, {
     }
 });
 const _constants = require("../../../../lib/constants");
-const _interceptionroutes = require("../../../../server/lib/interception-routes");
+const _interceptionroutes = require("./interception-routes");
 const _escaperegexp = require("../../escape-regexp");
 const _removetrailingslash = require("./remove-trailing-slash");
 /**
@@ -40,13 +40,13 @@ const _removetrailingslash = require("./remove-trailing-slash");
  *   - `[...slug]` matches parameter group with key 'slug', repeat: true, optional: false
  *   - `[[foo]]` matches parameter with key 'foo', repeat: false, optional: true
  *   - `[bar]` matches parameter with key 'bar', repeat: false, optional: false
- */ const PARAMETER_PATTERN = /\[((?:\[.*\])|.+)\]/;
+ */ const PARAMETER_PATTERN = /^([^[]*)\[((?:\[[^\]]*\])|[^\]]+)\](.*)$/;
 function parseParameter(param) {
     const match = param.match(PARAMETER_PATTERN);
     if (!match) {
         return parseMatchedParameter(param);
     }
-    return parseMatchedParameter(match[1]);
+    return parseMatchedParameter(match[2]);
 }
 /**
  * Parses a matched parameter from the PARAMETER_PATTERN regex to a data structure that can be used
@@ -73,42 +73,60 @@ function parseParameter(param) {
         optional
     };
 }
-function getParametrizedRoute(route) {
-    const segments = (0, _removetrailingslash.removeTrailingSlash)(route).slice(1).split('/');
+function getParametrizedRoute(route, includeSuffix, includePrefix) {
     const groups = {};
     let groupIndex = 1;
-    return {
-        parameterizedRoute: segments.map((segment)=>{
-            const markerMatch = _interceptionroutes.INTERCEPTION_ROUTE_MARKERS.find((m)=>segment.startsWith(m));
-            const paramMatches = segment.match(PARAMETER_PATTERN) // Check for parameters
-            ;
-            if (markerMatch && paramMatches) {
-                const { key, optional, repeat } = parseMatchedParameter(paramMatches[1]);
-                groups[key] = {
-                    pos: groupIndex++,
-                    repeat,
-                    optional
-                };
-                return "/" + (0, _escaperegexp.escapeStringRegexp)(markerMatch) + "([^/]+?)";
-            } else if (paramMatches) {
-                const { key, repeat, optional } = parseMatchedParameter(paramMatches[1]);
-                groups[key] = {
-                    pos: groupIndex++,
-                    repeat,
-                    optional
-                };
-                return repeat ? optional ? '(?:/(.+?))?' : '/(.+?)' : '/([^/]+?)';
-            } else {
-                return "/" + (0, _escaperegexp.escapeStringRegexp)(segment);
+    const segments = [];
+    for (const segment of (0, _removetrailingslash.removeTrailingSlash)(route).slice(1).split('/')){
+        const markerMatch = _interceptionroutes.INTERCEPTION_ROUTE_MARKERS.find((m)=>segment.startsWith(m));
+        const paramMatches = segment.match(PARAMETER_PATTERN) // Check for parameters
+        ;
+        if (markerMatch && paramMatches && paramMatches[2]) {
+            const { key, optional, repeat } = parseMatchedParameter(paramMatches[2]);
+            groups[key] = {
+                pos: groupIndex++,
+                repeat,
+                optional
+            };
+            segments.push("/" + (0, _escaperegexp.escapeStringRegexp)(markerMatch) + "([^/]+?)");
+        } else if (paramMatches && paramMatches[2]) {
+            const { key, repeat, optional } = parseMatchedParameter(paramMatches[2]);
+            groups[key] = {
+                pos: groupIndex++,
+                repeat,
+                optional
+            };
+            if (includePrefix && paramMatches[1]) {
+                segments.push("/" + (0, _escaperegexp.escapeStringRegexp)(paramMatches[1]));
             }
-        }).join(''),
+            let s = repeat ? optional ? '(?:/(.+?))?' : '/(.+?)' : '/([^/]+?)';
+            // Remove the leading slash if includePrefix already added it.
+            if (includePrefix && paramMatches[1]) {
+                s = s.substring(1);
+            }
+            segments.push(s);
+        } else {
+            segments.push("/" + (0, _escaperegexp.escapeStringRegexp)(segment));
+        }
+        // If there's a suffix, add it to the segments if it's enabled.
+        if (includeSuffix && paramMatches && paramMatches[3]) {
+            segments.push((0, _escaperegexp.escapeStringRegexp)(paramMatches[3]));
+        }
+    }
+    return {
+        parameterizedRoute: segments.join(''),
         groups
     };
 }
-function getRouteRegex(normalizedRoute) {
-    const { parameterizedRoute, groups } = getParametrizedRoute(normalizedRoute);
+function getRouteRegex(normalizedRoute, param) {
+    let { includeSuffix = false, includePrefix = false, excludeOptionalTrailingSlash = false } = param === void 0 ? {} : param;
+    const { parameterizedRoute, groups } = getParametrizedRoute(normalizedRoute, includeSuffix, includePrefix);
+    let re = parameterizedRoute;
+    if (!excludeOptionalTrailingSlash) {
+        re += '(?:/)?';
+    }
     return {
-        re: new RegExp("^" + parameterizedRoute + "(?:/)?$"),
+        re: new RegExp("^" + re + "$"),
         groups: groups
     };
 }
@@ -128,7 +146,7 @@ function getRouteRegex(normalizedRoute) {
     };
 }
 function getSafeKeyFromSegment(param) {
-    let { interceptionMarker, getSafeRouteKey, segment, routeKeys, keyPrefix } = param;
+    let { interceptionMarker, getSafeRouteKey, segment, routeKeys, keyPrefix, backreferenceDuplicateKeys } = param;
     const { key, optional, repeat } = parseMatchedParameter(segment);
     // replace any non-word characters since they can break
     // the named regex
@@ -148,6 +166,7 @@ function getSafeKeyFromSegment(param) {
     if (invalidKey) {
         cleanedKey = getSafeRouteKey();
     }
+    const duplicateKey = cleanedKey in routeKeys;
     if (keyPrefix) {
         routeKeys[cleanedKey] = "" + keyPrefix + key;
     } else {
@@ -157,50 +176,81 @@ function getSafeKeyFromSegment(param) {
     // this is to ensure that the route with the interception marker doesn't incorrectly match
     // the non-intercepted route (ie /app/(.)[username] should not match /app/[username])
     const interceptionPrefix = interceptionMarker ? (0, _escaperegexp.escapeStringRegexp)(interceptionMarker) : '';
-    return repeat ? optional ? "(?:/" + interceptionPrefix + "(?<" + cleanedKey + ">.+?))?" : "/" + interceptionPrefix + "(?<" + cleanedKey + ">.+?)" : "/" + interceptionPrefix + "(?<" + cleanedKey + ">[^/]+?)";
+    let pattern;
+    if (duplicateKey && backreferenceDuplicateKeys) {
+        // Use a backreference to the key to ensure that the key is the same value
+        // in each of the placeholders.
+        pattern = "\\k<" + cleanedKey + ">";
+    } else if (repeat) {
+        pattern = "(?<" + cleanedKey + ">.+?)";
+    } else {
+        pattern = "(?<" + cleanedKey + ">[^/]+?)";
+    }
+    return optional ? "(?:/" + interceptionPrefix + pattern + ")?" : "/" + interceptionPrefix + pattern;
 }
-function getNamedParametrizedRoute(route, prefixRouteKeys) {
-    const segments = (0, _removetrailingslash.removeTrailingSlash)(route).slice(1).split('/');
+function getNamedParametrizedRoute(route, prefixRouteKeys, includeSuffix, includePrefix, backreferenceDuplicateKeys) {
     const getSafeRouteKey = buildGetSafeRouteKey();
     const routeKeys = {};
-    return {
-        namedParameterizedRoute: segments.map((segment)=>{
-            const hasInterceptionMarker = _interceptionroutes.INTERCEPTION_ROUTE_MARKERS.some((m)=>segment.startsWith(m));
-            const paramMatches = segment.match(/\[((?:\[.*\])|.+)\]/) // Check for parameters
-            ;
-            if (hasInterceptionMarker && paramMatches) {
-                const [usedMarker] = segment.split(paramMatches[0]);
-                return getSafeKeyFromSegment({
-                    getSafeRouteKey,
-                    interceptionMarker: usedMarker,
-                    segment: paramMatches[1],
-                    routeKeys,
-                    keyPrefix: prefixRouteKeys ? _constants.NEXT_INTERCEPTION_MARKER_PREFIX : undefined
-                });
-            } else if (paramMatches) {
-                return getSafeKeyFromSegment({
-                    getSafeRouteKey,
-                    segment: paramMatches[1],
-                    routeKeys,
-                    keyPrefix: prefixRouteKeys ? _constants.NEXT_QUERY_PARAM_PREFIX : undefined
-                });
-            } else {
-                return "/" + (0, _escaperegexp.escapeStringRegexp)(segment);
+    const segments = [];
+    for (const segment of (0, _removetrailingslash.removeTrailingSlash)(route).slice(1).split('/')){
+        const hasInterceptionMarker = _interceptionroutes.INTERCEPTION_ROUTE_MARKERS.some((m)=>segment.startsWith(m));
+        const paramMatches = segment.match(PARAMETER_PATTERN) // Check for parameters
+        ;
+        if (hasInterceptionMarker && paramMatches && paramMatches[2]) {
+            // If there's an interception marker, add it to the segments.
+            segments.push(getSafeKeyFromSegment({
+                getSafeRouteKey,
+                interceptionMarker: paramMatches[1],
+                segment: paramMatches[2],
+                routeKeys,
+                keyPrefix: prefixRouteKeys ? _constants.NEXT_INTERCEPTION_MARKER_PREFIX : undefined,
+                backreferenceDuplicateKeys
+            }));
+        } else if (paramMatches && paramMatches[2]) {
+            // If there's a prefix, add it to the segments if it's enabled.
+            if (includePrefix && paramMatches[1]) {
+                segments.push("/" + (0, _escaperegexp.escapeStringRegexp)(paramMatches[1]));
             }
-        }).join(''),
+            let s = getSafeKeyFromSegment({
+                getSafeRouteKey,
+                segment: paramMatches[2],
+                routeKeys,
+                keyPrefix: prefixRouteKeys ? _constants.NEXT_QUERY_PARAM_PREFIX : undefined,
+                backreferenceDuplicateKeys
+            });
+            // Remove the leading slash if includePrefix already added it.
+            if (includePrefix && paramMatches[1]) {
+                s = s.substring(1);
+            }
+            segments.push(s);
+        } else {
+            segments.push("/" + (0, _escaperegexp.escapeStringRegexp)(segment));
+        }
+        // If there's a suffix, add it to the segments if it's enabled.
+        if (includeSuffix && paramMatches && paramMatches[3]) {
+            segments.push((0, _escaperegexp.escapeStringRegexp)(paramMatches[3]));
+        }
+    }
+    return {
+        namedParameterizedRoute: segments.join(''),
         routeKeys
     };
 }
-function getNamedRouteRegex(normalizedRoute, prefixRouteKey) {
-    const result = getNamedParametrizedRoute(normalizedRoute, prefixRouteKey);
+function getNamedRouteRegex(normalizedRoute, options) {
+    var _options_includeSuffix, _options_includePrefix, _options_backreferenceDuplicateKeys;
+    const result = getNamedParametrizedRoute(normalizedRoute, options.prefixRouteKeys, (_options_includeSuffix = options.includeSuffix) != null ? _options_includeSuffix : false, (_options_includePrefix = options.includePrefix) != null ? _options_includePrefix : false, (_options_backreferenceDuplicateKeys = options.backreferenceDuplicateKeys) != null ? _options_backreferenceDuplicateKeys : false);
+    let namedRegex = result.namedParameterizedRoute;
+    if (!options.excludeOptionalTrailingSlash) {
+        namedRegex += '(?:/)?';
+    }
     return {
-        ...getRouteRegex(normalizedRoute),
-        namedRegex: "^" + result.namedParameterizedRoute + "(?:/)?$",
+        ...getRouteRegex(normalizedRoute, options),
+        namedRegex: "^" + namedRegex + "$",
         routeKeys: result.routeKeys
     };
 }
 function getNamedMiddlewareRegex(normalizedRoute, options) {
-    const { parameterizedRoute } = getParametrizedRoute(normalizedRoute);
+    const { parameterizedRoute } = getParametrizedRoute(normalizedRoute, false, false);
     const { catchAll = true } = options;
     if (parameterizedRoute === '/') {
         let catchAllRegex = catchAll ? '.*' : '';
@@ -208,7 +258,7 @@ function getNamedMiddlewareRegex(normalizedRoute, options) {
             namedRegex: "^/" + catchAllRegex + "$"
         };
     }
-    const { namedParameterizedRoute } = getNamedParametrizedRoute(normalizedRoute, false);
+    const { namedParameterizedRoute } = getNamedParametrizedRoute(normalizedRoute, false, false, false, false);
     let catchAllGroupedRegex = catchAll ? '(?:(/.*)?)' : '';
     return {
         namedRegex: "^" + namedParameterizedRoute + catchAllGroupedRegex + "$"

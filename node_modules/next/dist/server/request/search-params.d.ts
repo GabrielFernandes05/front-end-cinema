@@ -32,3 +32,9 @@ export declare function createSearchParamsFromClient(underlyingSearchParams: Sea
 export declare const createServerSearchParamsForMetadata: typeof createServerSearchParamsForServerPage;
 export declare function createServerSearchParamsForServerPage(underlyingSearchParams: SearchParams, workStore: WorkStore): Promise<SearchParams>;
 export declare function createPrerenderSearchParamsForClientPage(workStore: WorkStore): Promise<SearchParams>;
+/**
+ * This is a variation of `makeErroringExoticSearchParams` that always throws an
+ * error on access, because accessing searchParams inside of `"use cache"` is
+ * not allowed.
+ */
+export declare function makeErroringExoticSearchParamsForUseCache(workStore: WorkStore): Promise<SearchParams>;

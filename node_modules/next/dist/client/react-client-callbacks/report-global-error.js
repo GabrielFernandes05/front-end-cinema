@@ -10,7 +10,8 @@ Object.defineProperty(exports, "reportGlobalError", {
 });
 const reportGlobalError = typeof reportError === 'function' ? // emulating an uncaught JavaScript error.
 reportError : (error)=>{
-    window.console.error(error);
+    // TODO: Dispatch error event
+    globalThis.console.error(error);
 };
 
 if ((typeof exports.default === 'function' || (typeof exports.default === 'object' && exports.default !== null)) && typeof exports.default.__esModule === 'undefined') {

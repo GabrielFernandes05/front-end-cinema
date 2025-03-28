@@ -29,6 +29,7 @@ const _VAR_USERLAND = /*#__PURE__*/ _interop_require_wildcard(require("VAR_USERL
 const _pagetypes = require("../../lib/page-types");
 const _encryptionutils = require("../../server/app-render/encryption-utils");
 const _actionutils = require("../../server/app-render/action-utils");
+const _handlers = require("../../server/use-cache/handlers");
 function _getRequireWildcardCache(nodeInterop) {
     if (typeof WeakMap !== "function") return null;
     var cacheBabelInterop = new WeakMap();
@@ -72,11 +73,8 @@ function _interop_require_wildcard(obj, nodeInterop) {
 }
 var _self___RSC_MANIFEST;
 // OPTIONAL_IMPORT:incrementalCacheHandler
-const cacheHandlers = {};
-if (!globalThis.__nextCacheHandlers) {
-    ;
-    globalThis.__nextCacheHandlers = cacheHandlers;
-}
+// Initialize the cache handlers interface.
+(0, _handlers.initializeCacheHandlers)();
 const Document = null;
 const appMod = null;
 const errorMod = null;

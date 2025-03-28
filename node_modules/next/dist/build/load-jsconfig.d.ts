@@ -10,5 +10,6 @@ export type JsConfig = {
 export default function loadJsConfig(dir: string, config: NextConfigComplete): Promise<{
     useTypeScript: boolean;
     jsConfig: JsConfig;
+    jsConfigPath?: string;
     resolvedBaseUrl: ResolvedBaseUrl;
 }>;

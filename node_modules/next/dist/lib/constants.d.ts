@@ -13,7 +13,6 @@ export declare const NEXT_DATA_SUFFIX = ".json";
 export declare const NEXT_META_SUFFIX = ".meta";
 export declare const NEXT_BODY_SUFFIX = ".body";
 export declare const NEXT_CACHE_TAGS_HEADER = "x-next-cache-tags";
-export declare const NEXT_CACHE_SOFT_TAGS_HEADER = "x-next-cache-soft-tags";
 export declare const NEXT_CACHE_REVALIDATED_TAGS_HEADER = "x-next-revalidated-tags";
 export declare const NEXT_CACHE_REVALIDATE_TAG_TOKEN_HEADER = "x-next-revalidate-tag-token";
 export declare const NEXT_RESUME_HEADER = "next-resume";
@@ -73,9 +72,13 @@ declare const WEBPACK_LAYERS_NAMES: {
      */
     readonly actionBrowser: "action-browser";
     /**
-     * The layer for the API routes.
+     * The Node.js bundle layer for the API routes.
      */
-    readonly api: "api";
+    readonly apiNode: "api-node";
+    /**
+     * The Edge Lite bundle layer for the API routes.
+     */
+    readonly apiEdge: "api-edge";
     /**
      * The layer for the middleware code.
      */
@@ -92,26 +95,42 @@ declare const WEBPACK_LAYERS_NAMES: {
      * The browser client bundle layer for App directory.
      */
     readonly appPagesBrowser: "app-pages-browser";
+    /**
+     * The browser client bundle layer for Pages directory.
+     */
+    readonly pagesDirBrowser: "pages-dir-browser";
+    /**
+     * The Edge Lite bundle layer for Pages directory.
+     */
+    readonly pagesDirEdge: "pages-dir-edge";
+    /**
+     * The Node.js bundle layer for Pages directory.
+     */
+    readonly pagesDirNode: "pages-dir-node";
 };
 export type WebpackLayerName = (typeof WEBPACK_LAYERS_NAMES)[keyof typeof WEBPACK_LAYERS_NAMES];
 declare const WEBPACK_LAYERS: {
     GROUP: {
         builtinReact: ("rsc" | "action-browser")[];
         serverOnly: ("middleware" | "rsc" | "action-browser" | "instrument")[];
-        neutralTarget: "api"[];
+        neutralTarget: ("api-node" | "api-edge")[];
         clientOnly: ("ssr" | "app-pages-browser")[];
-        bundled: ("shared" | "rsc" | "ssr" | "action-browser" | "instrument" | "app-pages-browser")[];
+        bundled: ("shared" | "middleware" | "rsc" | "ssr" | "action-browser" | "instrument" | "app-pages-browser")[];
         appPages: ("rsc" | "ssr" | "action-browser" | "app-pages-browser")[];
     };
     shared: "shared";
     reactServerComponents: "rsc";
     serverSideRendering: "ssr";
     actionBrowser: "action-browser";
-    api: "api";
+    apiNode: "api-node";
+    apiEdge: "api-edge";
     middleware: "middleware";
     instrument: "instrument";
     edgeAsset: "edge-asset";
     appPagesBrowser: "app-pages-browser";
+    pagesDirBrowser: "pages-dir-browser";
+    pagesDirEdge: "pages-dir-edge";
+    pagesDirNode: "pages-dir-node";
 };
 declare const WEBPACK_RESOURCE_QUERIES: {
     edgeSSREntry: string;

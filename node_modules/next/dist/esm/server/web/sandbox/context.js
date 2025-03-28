@@ -81,8 +81,12 @@ function buildEnvironmentVariablesFrom(injectedEnvironments) {
     return env;
 }
 function throwUnsupportedAPIError(name) {
-    const error = new Error(`A Node.js API is used (${name}) which is not supported in the Edge Runtime.
-Learn more: https://nextjs.org/docs/api-reference/edge-runtime`);
+    const error = Object.defineProperty(new Error(`A Node.js API is used (${name}) which is not supported in the Edge Runtime.
+Learn more: https://nextjs.org/docs/api-reference/edge-runtime`), "__NEXT_ERROR_CODE", {
+        value: "E97",
+        enumerable: false,
+        configurable: true
+    });
     decorateServerError(error, COMPILER_NAMES.edgeServer);
     throw error;
 }
@@ -213,7 +217,11 @@ export const edgeSandboxNextRequestContext = createLocalRequestContext();
                 value: (id)=>{
                     const value = NativeModuleMap.get(id);
                     if (!value) {
-                        throw TypeError('Native module not found: ' + id);
+                        throw Object.defineProperty(new TypeError('Native module not found: ' + id), "__NEXT_ERROR_CODE", {
+                            value: "E546",
+                            enumerable: false,
+                            configurable: true
+                        });
                     }
                     return value;
                 }
@@ -226,8 +234,12 @@ export const edgeSandboxNextRequestContext = createLocalRequestContext();
             context.__next_eval__ = function __next_eval__(fn) {
                 const key = fn.toString();
                 if (!warnedEvals.has(key)) {
-                    const warning = getServerError(new Error(`Dynamic Code Evaluation (e. g. 'eval', 'new Function') not allowed in Edge Runtime
-Learn More: https://nextjs.org/docs/messages/edge-dynamic-code-evaluation`), COMPILER_NAMES.edgeServer);
+                    const warning = getServerError(Object.defineProperty(new Error(`Dynamic Code Evaluation (e. g. 'eval', 'new Function') not allowed in Edge Runtime
+Learn More: https://nextjs.org/docs/messages/edge-dynamic-code-evaluation`), "__NEXT_ERROR_CODE", {
+                        value: "E149",
+                        enumerable: false,
+                        configurable: true
+                    }), COMPILER_NAMES.edgeServer);
                     warning.name = 'DynamicCodeEvaluationWarning';
                     Error.captureStackTrace(warning, __next_eval__);
                     warnedEvals.add(key);
@@ -238,8 +250,12 @@ Learn More: https://nextjs.org/docs/messages/edge-dynamic-code-evaluation`), COM
             context.__next_webassembly_compile__ = function __next_webassembly_compile__(fn) {
                 const key = fn.toString();
                 if (!warnedWasmCodegens.has(key)) {
-                    const warning = getServerError(new Error(`Dynamic WASM code generation (e. g. 'WebAssembly.compile') not allowed in Edge Runtime.
-Learn More: https://nextjs.org/docs/messages/edge-dynamic-code-evaluation`), COMPILER_NAMES.edgeServer);
+                    const warning = getServerError(Object.defineProperty(new Error(`Dynamic WASM code generation (e. g. 'WebAssembly.compile') not allowed in Edge Runtime.
+Learn More: https://nextjs.org/docs/messages/edge-dynamic-code-evaluation`), "__NEXT_ERROR_CODE", {
+                        value: "E184",
+                        enumerable: false,
+                        configurable: true
+                    }), COMPILER_NAMES.edgeServer);
                     warning.name = 'DynamicWasmCodeGenerationWarning';
                     Error.captureStackTrace(warning, __next_webassembly_compile__);
                     warnedWasmCodegens.add(key);
@@ -258,8 +274,12 @@ Learn More: https://nextjs.org/docs/messages/edge-dynamic-code-evaluation`), COM
                 const instantiatedFromBuffer = result.hasOwnProperty('module');
                 const key = fn.toString();
                 if (instantiatedFromBuffer && !warnedWasmCodegens.has(key)) {
-                    const warning = getServerError(new Error(`Dynamic WASM code generation ('WebAssembly.instantiate' with a buffer parameter) not allowed in Edge Runtime.
-Learn More: https://nextjs.org/docs/messages/edge-dynamic-code-evaluation`), COMPILER_NAMES.edgeServer);
+                    const warning = getServerError(Object.defineProperty(new Error(`Dynamic WASM code generation ('WebAssembly.instantiate' with a buffer parameter) not allowed in Edge Runtime.
+Learn More: https://nextjs.org/docs/messages/edge-dynamic-code-evaluation`), "__NEXT_ERROR_CODE", {
+                        value: "E40",
+                        enumerable: false,
+                        configurable: true
+                    }), COMPILER_NAMES.edgeServer);
                     warning.name = 'DynamicWasmCodeGenerationWarning';
                     Error.captureStackTrace(warning, __next_webassembly_instantiate__);
                     warnedWasmCodegens.add(key);
@@ -269,8 +289,11 @@ Learn More: https://nextjs.org/docs/messages/edge-dynamic-code-evaluation`), COM
             };
             const __fetch = context.fetch;
             context.fetch = async (input, init = {})=>{
-                var _init_headers_get;
-                const callingError = new Error('[internal]');
+                const callingError = Object.defineProperty(new Error('[internal]'), "__NEXT_ERROR_CODE", {
+                    value: "E5",
+                    enumerable: false,
+                    configurable: true
+                });
                 const assetResponse = await fetchInlineAsset({
                     input,
                     assets: options.edgeFunctionEntry.assets,
@@ -281,14 +304,6 @@ Learn More: https://nextjs.org/docs/messages/edge-dynamic-code-evaluation`), COM
                     return assetResponse;
                 }
                 init.headers = new Headers(init.headers ?? {});
-                // Forward subrequest header from incoming request to outgoing request
-                const store = requestStore.getStore();
-                if ((store == null ? void 0 : store.headers.has('x-middleware-subrequest')) && !init.headers.has('x-middleware-subrequest')) {
-                    init.headers.set('x-middleware-subrequest', store.headers.get('x-middleware-subrequest') ?? '');
-                }
-                const prevs = ((_init_headers_get = init.headers.get(`x-middleware-subrequest`)) == null ? void 0 : _init_headers_get.split(':')) || [];
-                const value = prevs.concat(options.moduleName).join(':');
-                init.headers.set('x-middleware-subrequest', value);
                 if (!init.headers.has('user-agent')) {
                     init.headers.set(`user-agent`, `Next.js Middleware`);
                 }

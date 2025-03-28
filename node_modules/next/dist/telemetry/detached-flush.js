@@ -20,7 +20,11 @@ function _interop_require_default(obj) {
     let dir = args.pop();
     const mode = args.pop();
     if (!dir || mode !== 'dev') {
-        throw new Error(`Invalid flags should be run as node detached-flush dev ./path-to/project`);
+        throw Object.defineProperty(new Error(`Invalid flags should be run as node detached-flush dev ./path-to/project`), "__NEXT_ERROR_CODE", {
+            value: "E24",
+            enumerable: false,
+            configurable: true
+        });
     }
     dir = (0, _getprojectdir.getProjectDir)(dir);
     const config = await (0, _config.default)(_constants.PHASE_DEVELOPMENT_SERVER, dir);

@@ -2,7 +2,7 @@ import type { IncomingMessage, ServerResponse } from 'http';
 import type { GetServerSideProps, GetStaticPaths, GetStaticProps, NextComponentType, PageConfig } from '../../../types';
 import type { PagesRouteDefinition } from '../../route-definitions/pages-route-definition';
 import type { NextParsedUrlQuery } from '../../request-meta';
-import type { RenderOpts } from '../../render';
+import type { PagesRenderContext, PagesSharedContext, RenderOpts } from '../../render';
 import type RenderResult from '../../render-result';
 import type { AppType, DocumentType } from '../../../shared/lib/utils';
 import { RouteModule, type RouteModuleHandleContext, type RouteModuleOptions } from '../route-module';
@@ -73,6 +73,16 @@ export interface PagesRouteHandlerContext extends RouteModuleHandleContext {
      * The parsed URL query for the given request.
      */
     query: NextParsedUrlQuery;
+    /**
+     * The shared context used for all page renders.
+     */
+    sharedContext: PagesSharedContext;
+    /**
+     * The context for the given request.
+     */
+    renderContext: PagesRenderContext;
+    /**
+     * The arguments for the given request.
     /**
      * The RenderOpts for the given request which include the specific modules to
      * use for rendering.

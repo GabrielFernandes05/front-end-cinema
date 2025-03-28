@@ -9,7 +9,8 @@ Object.defineProperty(exports, "__esModule", {
     HooksClientContext: null,
     ImageConfigContext: null,
     RouterContext: null,
-    ServerInsertedHtml: null
+    ServerInsertedHtml: null,
+    ServerInsertedMetadata: null
 });
 function _export(target, all) {
     for(var name in all)Object.defineProperty(target, name, {
@@ -38,10 +39,14 @@ _export(exports, {
     },
     ServerInsertedHtml: function() {
         return _serverinsertedhtmlsharedruntime;
+    },
+    ServerInsertedMetadata: function() {
+        return _serverinsertedmetadatasharedruntime;
     }
 });
 const _headmanagercontextsharedruntime = /*#__PURE__*/ _interop_require_wildcard(require("../../../../../shared/lib/head-manager-context.shared-runtime"));
 const _serverinsertedhtmlsharedruntime = /*#__PURE__*/ _interop_require_wildcard(require("../../../../../shared/lib/server-inserted-html.shared-runtime"));
+const _serverinsertedmetadatasharedruntime = /*#__PURE__*/ _interop_require_wildcard(require("../../../../../shared/lib/server-inserted-metadata.shared-runtime"));
 const _approutercontextsharedruntime = /*#__PURE__*/ _interop_require_wildcard(require("../../../../../shared/lib/app-router-context.shared-runtime"));
 const _hooksclientcontextsharedruntime = /*#__PURE__*/ _interop_require_wildcard(require("../../../../../shared/lib/hooks-client-context.shared-runtime"));
 const _routercontextsharedruntime = /*#__PURE__*/ _interop_require_wildcard(require("../../../../../shared/lib/router-context.shared-runtime"));
