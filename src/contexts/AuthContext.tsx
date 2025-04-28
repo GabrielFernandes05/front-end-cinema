@@ -24,7 +24,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }, [])
 
     const login = (token: string) => {
-        Cookies.set('token', token, { expires: 7 })
+        Cookies.set('token', token, { expires: 1/12 })
         setIsAuthenticated(true)
         router.push('/')
     }
