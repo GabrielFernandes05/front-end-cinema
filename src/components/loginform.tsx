@@ -1,6 +1,7 @@
 'use client'
 import { UsuarioService } from "@/utils/axios";
-import { useState } from "react";
+import { useState, useContext } from "react";
+import { AuthContext } from "@/contexts/AuthContext"
 import { Mail, Lock } from "lucide-react";
 
 const usuarioService = new UsuarioService()
@@ -8,6 +9,8 @@ const usuarioService = new UsuarioService()
 export default function LoginForm() {
     const [useEmail, setEmail] = useState<String>('')
     const [usePassword, setPassword] = useState<String>('')
+
+    const { login } = useContext(AuthContext)
 
     const handleSubmit = () => {
         if (!useEmail || !usePassword) {
@@ -19,7 +22,8 @@ export default function LoginForm() {
             password: String(usePassword)
         })
             .then((response) => {
-                console.log(response)
+                const token = response.data.token
+                login(token)
             })
             .catch((error) => {
                 console.error(error)
