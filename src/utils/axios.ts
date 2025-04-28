@@ -14,9 +14,11 @@ axiosInstance.interceptors.request.use((config) => {
 })
 
 export class UsuarioService {
-
     loginUsuario(data: { email: string, password: string }) {
         return axiosInstance.post("/api/v1/login", data)
     }
 
+    getUsuarioLogado() {
+        return axiosInstance.get("/api/v1/usuarios/logado")
+    }
 }
