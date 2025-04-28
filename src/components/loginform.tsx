@@ -38,7 +38,7 @@ export default function LoginForm() {
                 <span className="p-3 rounded-l-xl bg-zinc-900"><Lock /></span>
                 <input onChange={(e) => { setPassword(e.target.value) }} className="w-44 px-2 py-3 rounded-r-xl bg-zinc-600 outline-none" type="password" name="" id="" placeholder="Insira sua senha..." />
             </div>
-            <button type="button" onClick={() => { handleSubmit() }} className="bg-zinc-900 py-2 px-4 rounded-xl italic text-2xl tracking-widest hover:bg-zinc-800 active:bg-blue-700 duration-300 active:scale-95">GO!</button>
+            <button type="submit" onClick={() => { handleSubmit() }} className="bg-zinc-900 py-2 px-4 rounded-xl italic text-2xl hover:bg-zinc-800 active:bg-blue-700 duration-300 active:scale-95">Logar</button>
         </form >
     )
 }
