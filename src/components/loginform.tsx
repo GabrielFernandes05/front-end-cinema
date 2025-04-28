@@ -23,7 +23,7 @@ export default function LoginForm() {
             password: String(usePassword)
         })
             .then((response) => {
-                const token = response.data.token
+                const token = response.data.data
                 login(token)
             })
             .catch((error) => {
