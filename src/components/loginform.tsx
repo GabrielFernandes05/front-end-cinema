@@ -6,10 +6,14 @@ import { Mail, Lock } from "lucide-react";
 const usuarioService = new UsuarioService()
 
 export default function LoginForm() {
-    const [useEmail, setEmail] = useState<String>()
-    const [usePassword, setPassword] = useState<String>()
+    const [useEmail, setEmail] = useState<String>('')
+    const [usePassword, setPassword] = useState<String>('')
 
     const handleSubmit = () => {
+        if (!useEmail || !usePassword) {
+            alert('Preencha todos os campos!')
+            return
+        }
         usuarioService.loginUsuario({
             email: String(useEmail),
             password: String(usePassword)
@@ -24,7 +28,7 @@ export default function LoginForm() {
     }
 
     return (
-        <form onSubmit={handleSubmit} className="flex items-center justify-center flex-col gap-5 rounded-xl shadow-inner shadow-black p-4">
+        <form onSubmit={(e) => { e.preventDefault(); handleSubmit();}} className="flex items-center justify-center flex-col gap-5 rounded-xl shadow-inner shadow-black p-4">
             <h1 className="font-bold tracking-widest text-4xl">Login</h1>
             <div className="flex justify-center items-center p-2">
                 <span className="p-3 rounded-l-xl bg-zinc-900"><Mail /></span>
