@@ -17,8 +17,8 @@ export default function Navbar() {
 
       <ul className="flex gap-6 items-center">
         <li>
-          <Link href="/sessoes" className="hover:underline font-bold">
-            Sessões
+          <Link href="/em-cartaz" className="hover:underline font-bold">
+            Em Cartaz
           </Link>
         </li>
 
