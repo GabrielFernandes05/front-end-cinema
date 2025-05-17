@@ -22,3 +22,9 @@ export class UsuarioService {
         return axiosInstance.get("/api/v1/usuarios/logado")
     }
 }
+
+export class FilmeService {
+  getFilmesEmCartaz() {
+    return axiosInstance.get("/api/v1/filmes/em-cartaz")
+  }
+}
