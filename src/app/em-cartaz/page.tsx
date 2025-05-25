@@ -1,7 +1,9 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { FilmeService } from '@/utils/axios'
+import { useRouter } from 'next/navigation'
+import { SessaoService } from '@/utils/axios'
+import Background from '@/components/background'
 
 interface Filme {
   id: string
@@ -14,50 +16,68 @@ interface Filme {
   nota: number
 }
 
+interface Sala {
+  id: string
+  nome: string
+  fileiras: string
+  poltronas: number
+}
+
+interface Sessao {
+  id: string
+  filme: Filme
+  sala: Sala
+  dataInicio: string
+  dataFim: string
+  precoIngresso: number
+  disponibilidade: number
+}
+
 export default function EmCartaz() {
-  const [filmes, setFilmes] = useState<Filme[]>([])
-  const [loading, setLoading] = useState(true)
-  const filmeService = new FilmeService()
+  const [sessoes, setSessoes] = useState<Sessao[]>([])
+  const sessaoService = new SessaoService()
+  const router = useRouter()
 
   useEffect(() => {
-    const fetchFilmes = async () => {
+    const fetchData = async () => {
       try {
-        const response = await filmeService.getFilmesEmCartaz()
-        setFilmes(response.data.data)
+        const response = await sessaoService.getSessoesEmCartaz()
+        setSessoes(response.data.data)
       } catch (error) {
-        console.error('Erro ao buscar filmes em cartaz:', error)
-      } finally {
-        setLoading(false)
+        console.error('Erro ao buscar sessões em cartaz:', error)
       }
     }
 
-    fetchFilmes()
+    fetchData()
   }, [])
 
-  if (loading) return <p className="text-center mt-10">Carregando filmes...</p>
-
   return (
-    <div className="p-6">
-      <h1 className="text-2xl font-bold mb-4">Filmes em Cartaz</h1>
+    <Background Propriedades="flex flex-col items-center justify-start p-6 gap-6">
+      <h1 className="text-3xl font-bold text-white mb-4">🎬 Filmes em Cartaz</h1>
 
-      {filmes.length === 0 && <p>Nenhum filme em cartaz.</p>}
+      {sessoes.map(sessao => (
+        <div
+          key={sessao.id}
+          className="bg-gradient-to-br from-zinc-800 to-zinc-700 rounded-2xl p-6 w-full max-w-2xl shadow-lg hover:shadow-xl transition-all duration-300"
+        >
+          <h2 className="text-2xl font-bold text-white mb-2">{sessao.filme.titulo}</h2>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filmes.map((filme) => (
-          <div
-            key={filme.id}
-            className="bg-zinc-800 text-white p-4 rounded-lg shadow-md"
-          >
-            <h2 className="text-xl font-semibold">{filme.titulo}</h2>
-            <p className="text-sm text-zinc-400 mt-1">{filme.diretor} • {new Date(filme.anoLancamento).getFullYear()}</p>
-            <p className="mt-2">{filme.sinopse}</p>
-            <p className="mt-2 text-sm text-zinc-500">
-              Duração: {filme.duracao} min • Classificação: {filme.classificacao}+
-            </p>
-            <p className="mt-1 text-yellow-400">Nota: {filme.nota}</p>
+          <div className="text-gray-300 text-sm space-y-1">
+            <p><span className="font-semibold">🎞️ Duração:</span> {sessao.filme.duracao} min</p>
+            <p><span className="font-semibold">🔞 Classificação:</span> {sessao.filme.classificacao} anos</p>
+            <p><span className="font-semibold">💵 Preço:</span> R$ {sessao.precoIngresso.toFixed(2)}</p>
           </div>
-        ))}
-      </div>
-    </div>
+
+          <div className="mt-4">
+            <button
+              onClick={() => router.push(`/sessao/${sessao.id}`)}
+              className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-full text-sm font-medium transition"
+            >
+              Comprar Ingressos!
+            </button>
+          </div>
+        </div>
+      ))}
+    </Background>
   )
 }
