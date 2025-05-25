@@ -61,6 +61,9 @@ export default function CompraIngresso() {
 
       <div className="mb-6">
         <h3 className="text-lg font-semibold mb-2">Selecione suas poltronas:</h3>
+        <div className="flex justify-center mb-6">
+          <span className="bg-white text-black px-8 py-2 shadow font-bold">TELA</span>
+        </div>
         <div className="flex flex-col gap-2">
           {fileiras.map(fileira => (
             <div key={fileira} className="flex gap-2 items-center">
