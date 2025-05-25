@@ -2,10 +2,11 @@
 
 import { useEffect, useState } from "react"
 import { useParams } from "next/navigation"
-import { SessaoService } from "@/utils/axios"
+import { SessaoService, IngressoService } from "@/utils/axios"
 import Background from "@/components/background"
 
 const sessaoService = new SessaoService()
+const ingressoService = new IngressoService()
 
 export default function CompraIngresso() {
   const { id } = useParams()
@@ -38,6 +39,21 @@ export default function CompraIngresso() {
   const fileiras = Array.from({ length: sessao.sala.fileiras.charCodeAt(0) - 64 }, (_, i) =>
     String.fromCharCode(65 + i)
   )
+
+  const confirmarCompra = async () => {
+    try {
+      const response = await ingressoService.ComprarIngressos(sessao.id, selecionadas)
+  
+      if (response.status === 201) {
+        window.location.href = "/"
+      } else {
+        alert(response.data.error || "Erro ao finalizar a compra.")
+      }
+    } catch (error) {
+      console.error("Erro ao comprar ingresso:", error)
+      alert("Erro de conexão com o servidor.")
+    }
+  }
 
   return (
     <Background Propriedades="p-6">
@@ -95,7 +111,7 @@ export default function CompraIngresso() {
         {selecionadas.length > 0 && (
           <div className="mt-6 text-center">
             <p className="mb-2"><strong>Poltronas selecionadas:</strong> {selecionadas.join(', ')}</p>
-            <button className="bg-green-600 text-white py-2 px-6 rounded shadow hover:bg-green-700 transition">
+            <button className="bg-green-600 text-white py-2 px-6 rounded shadow hover:bg-green-700 transition" onClick={confirmarCompra}>
               Confirmar Compra
             </button>
           </div>

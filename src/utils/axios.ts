@@ -38,9 +38,11 @@ export class SessaoService {
     }
   }
 
-  export class IngressoService {
-    ComprarIngressos() {
-      return axiosInstance.get("/ingressos/em-cartaz")
-    }
+export class IngressoService {
+  ComprarIngressos(idSessao: string, poltronas: string[]) {
+    return axiosInstance.post("/ingressos", {
+        idSessao,
+        poltronas
+      })
   }
-    
+}
