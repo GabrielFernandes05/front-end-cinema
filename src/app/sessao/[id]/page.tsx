@@ -67,7 +67,6 @@ export default function CompraIngresso() {
         <div className="flex flex-col gap-2">
           {fileiras.map(fileira => (
             <div key={fileira} className="flex gap-2 items-center">
-              <span className="w-4">{fileira}</span>
               {Array.from({ length: sessao.sala.poltronas }, (_, i) => {
                 const poltrona = `${fileira}${i + 1}`
                 const disponivel = sessao.poltronasDisponiveis.includes(poltrona)
@@ -83,6 +82,7 @@ export default function CompraIngresso() {
                       text-white text-sm
                     `}
                   >
+                    {fileira}
                     {i + 1}
                   </button>
                 )
