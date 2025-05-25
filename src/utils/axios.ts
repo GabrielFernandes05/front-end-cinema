@@ -28,3 +28,9 @@ export class FilmeService {
     return axiosInstance.get("/api/v1/filmes/em-cartaz")
   }
 }
+
+export class SessaoService {
+  getSessoesEmCartaz() {
+    return axiosInstance.get("/api/v1/sessoes/em-cartaz")
+  }
+}
