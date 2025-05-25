@@ -33,4 +33,7 @@ export class SessaoService {
   getSessoesEmCartaz() {
     return axiosInstance.get("/api/v1/sessoes/em-cartaz")
   }
+  getSessaoById(id: string) {
+    return axiosInstance.get(`/api/v1/sessoes/${id}`)
+  }
 }
