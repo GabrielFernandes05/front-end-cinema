@@ -1,13 +1,35 @@
 'use client'
 
 import Link from 'next/link'
-import { useContext, useState } from 'react'
+import { useContext, useEffect, useRef, useState } from 'react'
 import { AuthContext } from '@/contexts/AuthContext'
 import { LogIn, User } from 'lucide-react'
 
 export default function Navbar() {
   const { isAuthenticated, logout } = useContext(AuthContext)
   const [dropdownOpen, setDropdownOpen] = useState(false)
+  const dropdownRef = useRef<HTMLLIElement>(null)
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
+        setDropdownOpen(false)
+      }
+    }
+
+    if (dropdownOpen) {
+      document.addEventListener('mousedown', handleClickOutside)
+    } else {
+      document.removeEventListener('mousedown', handleClickOutside)
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [dropdownOpen])
 
   return (
     <nav className="bg-red-900 text-white flex justify-between items-center px-6 py-3 shadow-md">
@@ -23,21 +45,19 @@ export default function Navbar() {
         </li>
 
         {!isAuthenticated ? (
-          <>
-            <li>
-              <Link href="/login" className="flex items-center gap-1 hover:underline font-bold">
-                <LogIn size={18} /> Entrar
-              </Link>
-            </li>
-          </>
+          <li>
+            <Link href="/login" className="flex items-center gap-1 hover:underline font-bold">
+              <LogIn size={18} /> Entrar
+            </Link>
+          </li>
         ) : (
-          <li className="relative">
+          <li className="relative" ref={dropdownRef}>
             <button onClick={() => setDropdownOpen(!dropdownOpen)} className="flex items-center gap-1 hover:underline font-bold">
               <User size={18} /> Perfil
             </button>
 
             {dropdownOpen && (
-              <div className="absolute right-0 mt-2 w-32 bg-zinc-800 rounded shadow-lg py-2">
+              <div className="absolute right-0 mt-2 w-32 bg-zinc-800 rounded shadow-lg py-2 z-50">
                 <Link href="/perfil" className="block px-4 py-2 hover:bg-zinc-700">
                   Meu Perfil
                 </Link>
