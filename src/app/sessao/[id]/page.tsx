@@ -1,8 +1,9 @@
 'use client'
 
 import { useEffect, useState } from "react"
-import { useParams } from "next/navigation"
+import { useParams, useRouter } from "next/navigation"
 import { SessaoService, IngressoService } from "@/utils/axios"
+import Cookies from 'js-cookie'
 import Background from "@/components/background"
 
 const sessaoService = new SessaoService()
@@ -12,29 +13,38 @@ export default function CompraIngresso() {
   const { id } = useParams()
   const [sessao, setSessao] = useState<any>(null)
   const [selecionadas, setSelecionadas] = useState<string[]>([])
+  const router = useRouter()
+
+  useEffect(() => {
+    const token = Cookies.get('token')
+    if (!token) {
+      const urlSessao = `/sessao/${id}`;
+      router.push(`/login?redirect=${encodeURIComponent(urlSessao)}`);
+    }
+  }, [])
 
   useEffect(() => {
     const fetchSessao = async () => {
       try {
-        const response = await sessaoService.getSessaoById(id as string)
-        setSessao(response.data.data)
+        const response = await sessaoService.getSessaoById(id as string);
+        setSessao(response.data.data);
       } catch (error) {
-        console.error('Erro ao buscar sessão:', error)
-      }
-    }
+        console.error('Erro ao buscar sessão:', error);
+      };
+    };
 
-    if (id) fetchSessao()
-  }, [id])
+    if (id) fetchSessao();
+  }, [id]);
 
   const togglePoltrona = (poltrona: string) => {
     if (selecionadas.includes(poltrona)) {
-      setSelecionadas(selecionadas.filter(p => p !== poltrona))
+      setSelecionadas(selecionadas.filter(p => p !== poltrona));
     } else {
-      setSelecionadas([...selecionadas, poltrona])
-    }
-  }
+      setSelecionadas([...selecionadas, poltrona]);
+    };
+  };
 
-  if (!sessao) return <p>Carregando sessão...</p>
+  if (!sessao) return <p>Problemas ao carregar esta sessão</p>
 
   const fileiras = Array.from({ length: sessao.sala.fileiras.charCodeAt(0) - 64 }, (_, i) =>
     String.fromCharCode(65 + i)
