@@ -1,5 +1,4 @@
 import Background from "@/components/background"
-import Navmenu from "@/components/navmenu"
 import LoginForm from "@/components/loginform"
 
 export default function Home() {
