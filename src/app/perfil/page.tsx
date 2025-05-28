@@ -58,7 +58,7 @@ export default function Perfil() {
       </div>
 
       <h2 className="text-2xl font-semibold text-white mb-2">🎟️ Ingressos Comprados</h2>
-      {usuario.ingressos.length === 0 ? (
+      {usuario.ingressos == null ? (
         <p className="text-gray-300">Nenhum ingresso comprado.</p>
       ) : (
         <ul className="space-y-4">

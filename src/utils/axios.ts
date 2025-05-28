@@ -46,3 +46,15 @@ export class IngressoService {
       })
   }
 }
+
+export const cadastrarUsuario = async (dados: {
+  primeiroNome: string;
+  ultimoNome: string;
+  cpf: string;
+  email: string;
+  password: string;
+  dataNascimento: string;
+}) => {
+  const response = await axiosInstance.post('/usuarios', dados);
+  return response.data.data;
+};

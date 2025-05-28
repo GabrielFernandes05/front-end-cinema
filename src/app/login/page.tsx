@@ -3,7 +3,7 @@ import LoginForm from "@/components/loginform"
 
 export default function Home() {
     return (
-        <Background Propriedades="flex items-center justify-center">
+        <Background Propriedades="flex flex-col items-center justify-center">
             <LoginForm></LoginForm>
         </Background>
     )
