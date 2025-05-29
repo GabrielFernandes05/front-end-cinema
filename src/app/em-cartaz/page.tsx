@@ -31,6 +31,7 @@ interface Sessao {
   sala: Sala
   dataInicio: string
   dataFim: string
+  data: string
   precoIngresso: number
   disponibilidade: number
 }
@@ -69,7 +70,7 @@ export default function EmCartaz() {
             <p><span className="font-semibold">🎞️ Duração:</span> {sessao.filme.duracao} min</p>
             <p><span className="font-semibold">🔞 Classificação:</span> {sessao.filme.classificacao} anos</p>
             <p><span className="font-semibold">💵 Preço:</span> R$ {sessao.precoIngresso.toFixed(2)}</p>
-            <p><span className="font-semibold">📅 Data:</span> {sessao.dataInicio}</p>
+            <p><span className="font-semibold">📅 Data:</span> {sessao.data}</p>
           </div>
 
           <div className="mt-4">
