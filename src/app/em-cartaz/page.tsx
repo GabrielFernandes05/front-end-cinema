@@ -59,27 +59,21 @@ export default function EmCartaz() {
       <h1 className="text-3xl font-bold text-white mb-4">🎬 Filmes em Cartaz</h1>
 
       {sessoes.map(sessao => (
-        <div
-          key={sessao.id}
-          className="bg-gradient-to-br from-zinc-800 to-zinc-700 rounded-2xl p-6 w-full max-w-2xl shadow-lg hover:shadow-xl transition-all duration-300"
-        >
-          <Img src={sessao.filme.caminhoPoster}></Img>
-          <h2 className="text-2xl font-bold text-white mb-2">{sessao.filme.titulo}</h2>
+        <div key={sessao.id} className="flex flex-row justify-start bg-gradient-to-br from-zinc-800 to-zinc-700 rounded-2xl p-6 w-full max-w-xl shadow-lg hover:shadow-xl transition-all duration-300">
+          <Img src={sessao.filme.caminhoPoster} className=""></Img>
+          <div>
+            <h2 className="text-2xl font-bold text-white mb-2">{sessao.filme.titulo}</h2>
 
-          <div className="text-gray-300 text-sm space-y-1">
-            <p><span className="font-semibold">🎞️ Duração:</span> {sessao.filme.duracao} min</p>
-            <p><span className="font-semibold">🔞 Classificação:</span> {sessao.filme.classificacao} anos</p>
-            <p><span className="font-semibold">💵 Preço:</span> R$ {sessao.precoIngresso.toFixed(2)}</p>
-            <p><span className="font-semibold">📅 Data:</span> {sessao.data}</p>
-          </div>
+            <div className="text-gray-300 text-sm space-y-1">
+              <p><span className="font-semibold">🎞️ Duração:</span> {sessao.filme.duracao} min</p>
+              <p><span className="font-semibold">🔞 Classificação:</span> {sessao.filme.classificacao} anos</p>
+              <p><span className="font-semibold">💵 Preço:</span> R$ {sessao.precoIngresso.toFixed(2)}</p>
+              <p><span className="font-semibold">📅 Data:</span> {sessao.data}</p>
+            </div>
 
-          <div className="mt-4">
-            <button
-              onClick={() => router.push(`/sessao/${sessao.id}`)}
-              className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-full text-sm font-medium transition"
-            >
-              Comprar Ingressos!
-            </button>
+            <div className="mt-4">
+              <button onClick={() => router.push(`/sessao/${sessao.id}`)} className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-full text-sm font-medium transition">Comprar Ingressos!</button>
+            </div>
           </div>
         </div>
       ))}
