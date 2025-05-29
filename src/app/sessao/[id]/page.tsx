@@ -5,6 +5,7 @@ import { useParams, useRouter } from "next/navigation"
 import { SessaoService, IngressoService } from "@/utils/axios"
 import Cookies from 'js-cookie'
 import Background from "@/components/background"
+import Img from "@/components/image"
 
 const sessaoService = new SessaoService()
 const ingressoService = new IngressoService()
@@ -70,19 +71,24 @@ export default function CompraIngresso() {
       <div className="max-w-4xl mx-auto">
         <h1 className="text-2xl font-bold mb-4 text-center">Comprar Ingressos</h1>
 
-        <div className="bg-gradient-to-br from-zinc-800 to-zinc-700 p-6 rounded-2xl shadow-lg mb-8 text-white space-y-3">
-          <h2 className="text-3xl font-bold">{sessao.filme.titulo}</h2>
-          <p className="text-sm italic text-gray-400">{new Date(sessao.filme.anoLancamento).getFullYear()}</p>
-          
-          <p className="text-base">{sessao.filme.sinopse}</p>
+        <div className="bg-gradient-to-br from-zinc-800 to-zinc-700 p-6 rounded-2xl shadow-lg mb-8 text-white flex flex-row gap-6">
+          <Img src={sessao.filme.caminhoPoster} className="w-40 h-60 object-cover rounded-xl shadow-lg" />
 
-          <div className="grid grid-cols-2 gap-4 mt-4 text-sm">
-            <p><span className="font-semibold text-gray-300">🎬 Diretor:</span> {sessao.filme.diretor}</p>
-            <p><span className="font-semibold text-gray-300">🕒 Duração:</span> {sessao.filme.duracao} min</p>
-            <p><span className="font-semibold text-gray-300">🔞 Classificação:</span> {sessao.filme.classificacao} anos</p>
-            <p><span className="font-semibold text-gray-300">⭐ Nota:</span> {sessao.filme.nota}</p>
-            <p><span className="font-semibold text-gray-300">🏠 Sala:</span> {sessao.sala.nome}</p>
-            <p><span className="font-semibold text-gray-300">💵 Preço:</span> R$ {sessao.precoIngresso.toFixed(2)}</p>
+          <div className="flex flex-col justify-between flex-1 space-y-2">
+            <div>
+              <h2 className="text-3xl font-bold">{sessao.filme.titulo}</h2>
+              <p className="text-sm italic text-gray-400">{new Date(sessao.filme.anoLancamento).getFullYear()}</p>
+              <p className="text-base mt-2">{sessao.filme.sinopse}</p>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4 mt-4 text-sm">
+              <p><span className="font-semibold text-gray-300">🎬 Diretor:</span> {sessao.filme.diretor}</p>
+              <p><span className="font-semibold text-gray-300">🕒 Duração:</span> {sessao.filme.duracao} min</p>
+              <p><span className="font-semibold text-gray-300">🔞 Classificação:</span> {sessao.filme.classificacao} anos</p>
+              <p><span className="font-semibold text-gray-300">⭐ Nota:</span> {sessao.filme.nota}</p>
+              <p><span className="font-semibold text-gray-300">🏠 Sala:</span> {sessao.sala.nome}</p>
+              <p><span className="font-semibold text-gray-300">💵 Preço:</span> R$ {sessao.precoIngresso.toFixed(2)}</p>
+            </div>
           </div>
         </div>
 
@@ -128,6 +134,5 @@ export default function CompraIngresso() {
         )}
       </div>
     </Background>
-
   )
 }
