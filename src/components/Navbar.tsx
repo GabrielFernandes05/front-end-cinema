@@ -1,77 +1,151 @@
 'use client'
 
+import { useState, useEffect } from 'react'
+import { useRouter, usePathname } from 'next/navigation'
+import { Button } from '@/components/ui/button'
+import { Card } from '@/components/ui/card'
+import { Film, User, LogOut, Menu, X, Library } from 'lucide-react'
 import Link from 'next/link'
-import { useContext, useEffect, useRef, useState } from 'react'
-import { AuthContext } from '@/contexts/AuthContext'
-import { LogIn, User } from 'lucide-react'
 
 export default function Navbar() {
-  const { isAuthenticated, logout } = useContext(AuthContext)
-  const [dropdownOpen, setDropdownOpen] = useState(false)
-  const dropdownRef = useRef<HTMLLIElement>(null)
+  const [isLoggedIn, setIsLoggedIn] = useState(false)
+  const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const router = useRouter()
+  const pathname = usePathname()
+
+  const checkAuthStatus = () => {
+    const token = localStorage.getItem('token')
+    setIsLoggedIn(!!token)
+  }
 
   useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        dropdownRef.current &&
-        !dropdownRef.current.contains(event.target as Node)
-      ) {
-        setDropdownOpen(false)
-      }
+    checkAuthStatus()
+
+    const handleStorageChange = () => {
+      checkAuthStatus()
     }
 
-    if (dropdownOpen) {
-      document.addEventListener('mousedown', handleClickOutside)
-    } else {
-      document.removeEventListener('mousedown', handleClickOutside)
-    }
+    window.addEventListener('storage', handleStorageChange)
+    checkAuthStatus()
 
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside)
+      window.removeEventListener('storage', handleStorageChange)
     }
-  }, [dropdownOpen])
+  }, [pathname])
+
+  const handleLogout = () => {
+    localStorage.removeItem('token')
+    setIsLoggedIn(false)
+    setIsMenuOpen(false)
+    router.push('/')
+    window.location.reload()
+  }
+
+  const NavLink = ({ href, children, className = "" }: {
+    href: string,
+    children: React.ReactNode,
+    className?: string
+  }) => (
+    <Link
+      href={href}
+      onClick={() => setIsMenuOpen(false)}
+      className={`inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 hover:bg-zinc-700 hover:text-white text-zinc-300 h-9 px-4 py-2 ${className}`}
+    >
+      {children}
+    </Link>
+  )
 
   return (
-    <nav className="bg-red-900 text-white flex justify-between items-center px-6 py-3 shadow-md">
-      <Link href="/" className="text-2xl font-bold">
-        Cinema Digital
-      </Link>
+    <Card className="bg-zinc-900 border-zinc-700 rounded-none border-b border-l-0 border-r-0 border-t-0">
+      <nav className="flex items-center justify-between p-4 max-w-7xl mx-auto">
+        <Link href="/" className="flex items-center gap-2">
+          <div className="p-2 bg-red-600 rounded-lg">
+            <Film className="w-6 h-6 text-white" />
+          </div>
+          <span className="text-xl font-bold text-white">Cinema Digital</span>
+        </Link>
 
-      <ul className="flex gap-6 items-center">
-        <li>
-          <Link href="/em-cartaz" className="hover:underline font-bold">
-            Em Cartaz
-          </Link>
-        </li>
+        <div className="hidden md:flex items-center gap-2">
+          <NavLink href="/">Início</NavLink>
+          <NavLink href="/em-cartaz">Em Cartaz</NavLink>
+          <NavLink href="/filmes" className="flex items-center gap-2">
+            <Library className="w-4 h-4" />
+            Catálogo
+          </NavLink>
 
-        {!isAuthenticated ? (
-          <li>
-            <Link href="/login" className="flex items-center gap-1 hover:underline font-bold">
-              <LogIn size={18} /> Entrar
-            </Link>
-          </li>
-        ) : (
-          <li className="relative" ref={dropdownRef}>
-            <button onClick={() => setDropdownOpen(!dropdownOpen)} className="flex items-center gap-1 hover:underline font-bold">
-              <User size={18} /> Perfil
-            </button>
+          {isLoggedIn ? (
+            <>
+              <NavLink href="/perfil" className="flex items-center gap-2">
+                <User className="w-4 h-4" />
+                Perfil
+              </NavLink>
+              <Button
+                onClick={handleLogout}
+                variant="ghost"
+                className="text-red-400 hover:text-red-300 hover:bg-red-950"
+              >
+                <LogOut className="w-4 h-4 mr-2" />
+                Sair
+              </Button>
+            </>
+          ) : (
+            <>
+              <NavLink href="/login">Login</NavLink>
+              <Link href="/cadastro">
+                <Button className="bg-red-600 hover:bg-red-700 text-white">
+                  Cadastrar
+                </Button>
+              </Link>
+            </>
+          )}
+        </div>
 
-            {dropdownOpen && (
-              <div className="absolute right-0 mt-2 w-32 bg-zinc-800 rounded shadow-lg py-2 z-50">
-                <Link href="/perfil" className="block px-4 py-2 hover:bg-zinc-700">
-                  Meu Perfil
-                </Link>
-                <button
-                  onClick={logout}
-                  className="block w-full text-left px-4 py-2 hover:bg-zinc-700"
-                >
-                  Sair
-                </button>
-              </div>
-            )}
-          </li>
-        )}
-      </ul>
-    </nav>
+        <Button
+          variant="ghost"
+          size="icon"
+          className="md:hidden text-white"
+          onClick={() => setIsMenuOpen(!isMenuOpen)}
+        >
+          {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+        </Button>
+      </nav>
+
+      {isMenuOpen && (
+        <div className="md:hidden border-t border-zinc-700 bg-zinc-900 p-4 space-y-2">
+          <NavLink href="/" className="w-full flex">Início</NavLink>
+          <NavLink href="/em-cartaz" className="w-full flex">Em Cartaz</NavLink>
+          <NavLink href="/filmes" className="w-full flex items-center gap-2">
+            <Library className="w-4 h-4" />
+            Catálogo
+          </NavLink>
+
+          {isLoggedIn ? (
+            <>
+              <NavLink href="/perfil" className="w-full flex items-center gap-2">
+                <User className="w-4 h-4" />
+                Perfil
+              </NavLink>
+              <Button
+                onClick={handleLogout}
+                variant="ghost"
+                className="w-full justify-start text-red-400 hover:text-red-300 hover:bg-red-950"
+              >
+                <LogOut className="w-4 h-4 mr-2" />
+                Sair
+              </Button>
+            </>
+          ) : (
+            <>
+              <NavLink href="/login" className="w-full flex">Login</NavLink>
+              <Link href="/cadastro" className="w-full">
+                <Button className="w-full bg-red-600 hover:bg-red-700 text-white">
+                  Cadastrar
+                </Button>
+              </Link>
+            </>
+          )}
+        </div>
+      )}
+    </Card>
   )
 }

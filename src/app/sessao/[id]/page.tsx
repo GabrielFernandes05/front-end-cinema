@@ -1,136 +1,357 @@
 'use client'
 
-import { useEffect, useState } from "react"
-import { useParams, useRouter } from "next/navigation"
-import { SessaoService, IngressoService } from "@/utils/axios"
-import Cookies from 'js-cookie'
-import Background from "@/components/background"
-import Img from "@/components/image"
+import { useEffect, useState } from 'react'
+import { useParams } from 'next/navigation'
+import { SessaoService, IngressoService } from '@/utils/axios'
+import Background from '@/components/background'
+import Img from '@/components/image'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
+import { Separator } from '@/components/ui/separator'
+import { cn } from '@/lib/utils'
+import { Film, Calendar, Clock, Star, MapPin, DollarSign, User, CheckCircle } from 'lucide-react'
 
-const sessaoService = new SessaoService()
-const ingressoService = new IngressoService()
+interface Filme {
+  id: string
+  titulo: string
+  sinopse: string
+  diretor: string
+  duracao: number
+  anoLancamento: string
+  classificacao: number
+  nota: number
+  caminhoPoster: string
+}
 
-export default function CompraIngresso() {
-  const { id } = useParams()
-  const [sessao, setSessao] = useState<any>(null)
-  const [selecionadas, setSelecionadas] = useState<string[]>([])
-  const router = useRouter()
+interface Sala {
+  id: string
+  nome: string
+  fileiras: string
+  poltronas: number
+}
 
-  useEffect(() => {
-    const token = Cookies.get('token')
-    if (!token) {
-      const urlSessao = `/sessao/${id}`;
-      router.push(`/login?redirect=${encodeURIComponent(urlSessao)}`);
-    }
-  }, [])
+interface Sessao {
+  id: string
+  filme: Filme
+  sala: Sala
+  dataInicio: string
+  dataFim: string
+  data: string
+  precoIngresso: number
+  disponibilidade: number
+}
 
-  useEffect(() => {
-    const fetchSessao = async () => {
-      try {
-        const response = await sessaoService.getSessaoById(id as string);
-        setSessao(response.data.data);
-      } catch (error) {
-        console.error('Erro ao buscar sessão:', error);
-      };
-    };
+const SeatButton = ({
+  seat,
+  isAvailable,
+  isSelected,
+  onToggle
+}: {
+  seat: string
+  isAvailable: boolean
+  isSelected: boolean
+  onToggle: () => void
+}) => (
+  <Button
+    onClick={onToggle}
+    disabled={!isAvailable}
+    size="sm"
+    className={cn(
+      "w-10 h-10 text-xs font-medium transition-all duration-200",
+      {
+        "bg-zinc-600 text-zinc-400 cursor-not-allowed hover:bg-zinc-600": !isAvailable,
+        "bg-red-600 hover:bg-red-700 text-white": isSelected,
+        "bg-zinc-700 hover:bg-zinc-600 text-white border border-zinc-500": isAvailable && !isSelected
+      }
+    )}
+  >
+    {seat}
+  </Button>
+)
 
-    if (id) fetchSessao();
-  }, [id]);
+const MovieInfo = ({ sessao }: { sessao: Sessao }) => (
+  <Card className="bg-zinc-800 border-zinc-700 text-white mb-8">
+    <div className="flex flex-col md:flex-row gap-6 p-6">
+      <div className="flex-shrink-0">
+        <Img
+          src={sessao.filme.caminhoPoster}
+          className="w-full md:w-48 h-72 object-cover rounded-lg shadow-lg"
+        />
+      </div>
+      <div className="flex-1 space-y-4">
+        <CardHeader className="p-0">
+          <div className="flex items-center gap-2 mb-2">
+            <Badge variant="secondary">{new Date(sessao.filme.anoLancamento).getFullYear()}</Badge>
+            <Badge variant="destructive" className="flex items-center gap-1">
+              <Star className="w-3 h-3" />
+              {sessao.filme.nota}
+            </Badge>
+          </div>
+          <CardTitle className="text-3xl text-white mb-2">{sessao.filme.titulo}</CardTitle>
+          <CardDescription className="text-zinc-300 text-base leading-relaxed">
+            {sessao.filme.sinopse}
+          </CardDescription>
+        </CardHeader>
 
-  const togglePoltrona = (poltrona: string) => {
-    if (selecionadas.includes(poltrona)) {
-      setSelecionadas(selecionadas.filter(p => p !== poltrona));
-    } else {
-      setSelecionadas([...selecionadas, poltrona]);
-    };
-  };
+        <Separator className="bg-zinc-600" />
 
-  if (!sessao) return <p>Problemas ao carregar esta sessão</p>
+        <CardContent className="p-0">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+            <div className="space-y-2">
+              <p className="flex items-center gap-2">
+                <Film className="w-4 h-4 text-zinc-400" />
+                <span className="text-zinc-400">Diretor:</span>
+                <span className="text-white">{sessao.filme.diretor}</span>
+              </p>
+              <p className="flex items-center gap-2">
+                <Clock className="w-4 h-4 text-zinc-400" />
+                <span className="text-zinc-400">Duração:</span>
+                <span className="text-white">{sessao.filme.duracao} min</span>
+              </p>
+              <p className="flex items-center gap-2">
+                <User className="w-4 h-4 text-zinc-400" />
+                <span className="text-zinc-400">Classificação:</span>
+                <span className="text-white">{sessao.filme.classificacao} anos</span>
+              </p>
+            </div>
+            <div className="space-y-2">
+              <p className="flex items-center gap-2">
+                <MapPin className="w-4 h-4 text-zinc-400" />
+                <span className="text-zinc-400">Sala:</span>
+                <span className="text-white">{sessao.sala.nome}</span>
+              </p>
+              <p className="flex items-center gap-2">
+                <Calendar className="w-4 h-4 text-zinc-400" />
+                <span className="text-zinc-400">Data:</span>
+                <span className="text-white">{new Date(sessao.data).toLocaleString('pt-BR')}</span>
+              </p>
+              <p className="flex items-center gap-2">
+                <DollarSign className="w-4 h-4 text-zinc-400" />
+                <span className="text-zinc-400">Preço:</span>
+                <span className="text-red-400 font-semibold">R$ {sessao.precoIngresso.toFixed(2)}</span>
+              </p>
+            </div>
+          </div>
+        </CardContent>
+      </div>
+    </div>
+  </Card>
+)
 
-  const fileiras = Array.from({ length: sessao.sala.fileiras.charCodeAt(0) - 64 }, (_, i) =>
+const SeatSelection = ({
+  sessao,
+  selectedSeats,
+  onSeatToggle,
+  poltronasDisponiveis
+}: {
+  sessao: Sessao
+  selectedSeats: string[]
+  onSeatToggle: (seat: string) => void
+  poltronasDisponiveis: string[]
+}) => {
+  const rows = Array.from({ length: sessao.sala.fileiras.charCodeAt(0) - 64 }, (_, i) =>
     String.fromCharCode(65 + i)
   )
 
-  const confirmarCompra = async () => {
+  return (
+    <Card className="bg-zinc-800 border-zinc-700 text-white">
+      <CardHeader className="text-center">
+        <CardTitle className="text-xl mb-4">Selecione suas poltronas</CardTitle>
+        <div className="flex justify-center mb-6">
+          <div className="bg-white text-black px-8 py-2 rounded font-bold shadow-lg">
+            TELA
+          </div>
+        </div>
+        <div className="flex justify-center gap-6 text-sm">
+          <div className="flex items-center gap-2">
+            <div className="w-4 h-4 bg-zinc-700 border border-zinc-500 rounded"></div>
+            <span>Disponível</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="w-4 h-4 bg-red-600 rounded"></div>
+            <span>Selecionada</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="w-4 h-4 bg-zinc-600 rounded"></div>
+            <span>Ocupada</span>
+          </div>
+        </div>
+      </CardHeader>
+
+      <CardContent>
+        <div className="flex flex-col gap-3 items-center">
+          {rows.map(row => (
+            <div key={row} className="flex gap-2 items-center">
+              <span className="w-6 text-center text-zinc-400 text-sm font-medium">{row}</span>
+              {Array.from({ length: sessao.sala.poltronas }, (_, i) => {
+                const seat = `${row}${i + 1}`
+                const isAvailable = poltronasDisponiveis.includes(seat)
+                const isSelected = selectedSeats.includes(seat)
+
+                return (
+                  <SeatButton
+                    key={seat}
+                    seat={`${i + 1}`}
+                    isAvailable={isAvailable}
+                    isSelected={isSelected}
+                    onToggle={() => isAvailable && onSeatToggle(seat)}
+                  />
+                )
+              })}
+            </div>
+          ))}
+        </div>
+      </CardContent>
+    </Card>
+  )
+}
+
+const LoadingState = () => (
+  <Background Propriedades="flex items-center justify-center min-h-screen">
+    <Card className="bg-zinc-800 border-zinc-700">
+      <CardContent className="p-8 text-center">
+        <div className="animate-spin text-4xl mb-4">🎬</div>
+        <p className="text-white">Carregando sessão...</p>
+      </CardContent>
+    </Card>
+  </Background>
+)
+
+const ErrorState = () => (
+  <Background Propriedades="flex items-center justify-center min-h-screen">
+    <Card className="bg-zinc-800 border-zinc-700">
+      <CardContent className="p-8 text-center">
+        <div className="text-4xl mb-4">❌</div>
+        <p className="text-white">Problemas ao carregar esta sessão</p>
+      </CardContent>
+    </Card>
+  </Background>
+)
+
+export default function CompraIngresso() {
+  const [sessao, setSessao] = useState<Sessao | null>(null)
+  const [selectedSeats, setSelectedSeats] = useState<string[]>([])
+  const [poltronasDisponiveis, setPoltronasDisponiveis] = useState<string[]>([])
+  const [loading, setLoading] = useState(true)
+  const [purchasing, setPurchasing] = useState(false)
+
+  const params = useParams()
+  const sessaoService = new SessaoService()
+  const ingressoService = new IngressoService()
+
+  const fetchSessao = async () => {
     try {
-      const response = await ingressoService.ComprarIngressos(sessao.id, selecionadas)
-  
-      if (response.status === 201) {
+      const [sessaoResponse, poltronasResponse] = await Promise.all([
+        sessaoService.getSessaoById(params.id as string),
+        ingressoService.getPoltronasDisponiveis(params.id as string)
+      ])
+
+      if (sessaoResponse.data.data) {
+        setSessao(sessaoResponse.data.data)
+      } else if (sessaoResponse.data) {
+        setSessao(sessaoResponse.data)
+      }
+
+      if (poltronasResponse.data.data) {
+        setPoltronasDisponiveis(poltronasResponse.data.data)
+      } else if (Array.isArray(poltronasResponse.data)) {
+        setPoltronasDisponiveis(poltronasResponse.data)
+      }
+
+    } catch (error) {
+      setSessao(null)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const toggleSeat = (seat: string) => {
+    setSelectedSeats(prev =>
+      prev.includes(seat)
+        ? prev.filter(s => s !== seat)
+        : [...prev, seat]
+    )
+  }
+
+  const handlePurchase = async () => {
+    if (!sessao || selectedSeats.length === 0) return
+
+    setPurchasing(true)
+    try {
+      const response = await ingressoService.comprarIngressos(sessao.id, selectedSeats)
+
+      if (response.status === 201 || response.status === 200) {
         window.location.href = "/"
       } else {
         alert(response.data.error || "Erro ao finalizar a compra.")
       }
-    } catch (error) {
-      console.error("Erro ao comprar ingresso:", error)
-      alert("Erro de conexão com o servidor.")
+    } catch (error: any) {
+      alert(error.response?.data?.error || "Erro de conexão com o servidor.")
+    } finally {
+      setPurchasing(false)
     }
   }
 
+  useEffect(() => {
+    fetchSessao()
+  }, [params.id])
+
+  if (loading) return <LoadingState />
+  if (!sessao) return <ErrorState />
+
+  const totalPrice = selectedSeats.length * sessao.precoIngresso
+
   return (
-    <Background Propriedades="p-6">
-      <div className="max-w-4xl mx-auto">
-        <h1 className="text-2xl font-bold mb-4 text-center">Comprar Ingressos</h1>
-
-        <div className="bg-gradient-to-br from-zinc-800 to-zinc-700 p-6 rounded-2xl shadow-lg mb-8 text-white flex flex-row gap-6">
-          <Img src={sessao.filme.caminhoPoster} className="w-40 h-60 object-cover rounded-xl shadow-lg" />
-
-          <div className="flex flex-col justify-between flex-1 space-y-2">
-            <div>
-              <h2 className="text-3xl font-bold">{sessao.filme.titulo}</h2>
-              <p className="text-sm italic text-gray-400">{new Date(sessao.filme.anoLancamento).getFullYear()}</p>
-              <p className="text-base mt-2">{sessao.filme.sinopse}</p>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4 mt-4 text-sm">
-              <p><span className="font-semibold text-gray-300">🎬 Diretor:</span> {sessao.filme.diretor}</p>
-              <p><span className="font-semibold text-gray-300">🕒 Duração:</span> {sessao.filme.duracao} min</p>
-              <p><span className="font-semibold text-gray-300">🔞 Classificação:</span> {sessao.filme.classificacao} anos</p>
-              <p><span className="font-semibold text-gray-300">⭐ Nota:</span> {sessao.filme.nota}</p>
-              <p><span className="font-semibold text-gray-300">🏠 Sala:</span> {sessao.sala.nome}</p>
-              <p><span className="font-semibold text-gray-300">💵 Preço:</span> R$ {sessao.precoIngresso.toFixed(2)}</p>
-            </div>
-          </div>
+    <Background Propriedades="p-6 min-h-screen">
+      <div className="max-w-6xl mx-auto">
+        <div className="text-center mb-8">
+          <h1 className="text-4xl font-bold text-white mb-2">Comprar Ingressos</h1>
+          <p className="text-zinc-400">Selecione suas poltronas preferidas</p>
         </div>
 
-        <div className="mb-6 text-center">
-          <h3 className="text-lg font-semibold mb-4">Selecione suas poltronas:</h3>
-          <div className="flex justify-center mb-6">
-            <span className="bg-white text-black px-8 py-2 shadow font-bold">TELA</span>
-          </div>
-          <div className="flex flex-col gap-2 items-center">
-            {fileiras.map(fileira => (
-              <div key={fileira} className="flex gap-2 items-center">
-                {Array.from({ length: sessao.sala.poltronas }, (_, i) => {
-                  const poltrona = `${fileira}${i + 1}`
-                  const disponivel = sessao.poltronasDisponiveis.includes(poltrona)
-                  const selecionada = selecionadas.includes(poltrona)
-                  return (
-                    <button
-                      key={poltrona}
-                      onClick={() => disponivel && togglePoltrona(poltrona)}
-                      className={`
-                        w-10 h-10 rounded 
-                        ${!disponivel ? 'bg-gray-600 cursor-not-allowed' : 
-                        selecionada ? 'bg-green-500' : 'bg-blue-500'} 
-                        text-white text-sm
-                      `}
-                    >
-                      {fileira}{i + 1}
-                    </button>
-                  )
-                })}
+        <MovieInfo sessao={sessao} />
+
+        <SeatSelection
+          sessao={sessao}
+          selectedSeats={selectedSeats}
+          onSeatToggle={toggleSeat}
+          poltronasDisponiveis={poltronasDisponiveis}
+        />
+
+        {selectedSeats.length > 0 && (
+          <Card className="mt-8 bg-zinc-800 border-zinc-700 text-white">
+            <CardContent className="p-6">
+              <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                <div className="space-y-2">
+                  <p className="text-sm text-zinc-300">
+                    <strong>Poltronas selecionadas:</strong> {selectedSeats.join(', ')}
+                  </p>
+                  <p className="text-xl font-bold text-red-400">
+                    Total: R$ {totalPrice.toFixed(2)}
+                  </p>
+                </div>
+                <Button
+                  onClick={handlePurchase}
+                  disabled={purchasing}
+                  className="bg-red-600 hover:bg-red-700 text-white px-8 py-3 text-lg font-semibold"
+                  size="lg"
+                >
+                  {purchasing ? (
+                    <>
+                      <div className="animate-spin w-4 h-4 mr-2">⏳</div>
+                      Processando...
+                    </>
+                  ) : (
+                    <>
+                      <CheckCircle className="w-5 h-5 mr-2" />
+                      Confirmar Compra
+                    </>
+                  )}
+                </Button>
               </div>
-            ))}
-          </div>
-        </div>
-
-        {selecionadas.length > 0 && (
-          <div className="mt-6 text-center">
-            <p className="mb-2"><strong>Poltronas selecionadas:</strong> {selecionadas.join(', ')}</p>
-            <button className="bg-green-600 text-white py-2 px-6 rounded shadow hover:bg-green-700 transition" onClick={confirmarCompra}>
-              Confirmar Compra
-            </button>
-          </div>
+            </CardContent>
+          </Card>
         )}
       </div>
     </Background>
