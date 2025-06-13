@@ -336,7 +336,7 @@ export default function CompraIngresso() {
 
     setPurchasing(true)
     try {
-      const response = await ingressoService.comprarIngressos(sessao.id, selectedSeats)
+      const response = await ingressoService.ComprarIngressos(sessao.id, selectedSeats)
 
       if (response.status === 201 || response.status === 200) {
         router.push('/perfil?tab=tickets')

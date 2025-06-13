@@ -3,7 +3,7 @@ import axios from "axios";
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
 
 const axiosInstance = axios.create({
-  baseURL: API_BASE_URL,
+  baseURL: `${API_BASE_URL}/api/v1`,
   headers: {
     "Content-Type": "application/json",
   },
@@ -35,139 +35,114 @@ axiosInstance.interceptors.response.use(
 );
 
 export const login = async (email: string, password: string) => {
-  return await axiosInstance.post("/api/v1/login", {
+  return await axiosInstance.post("/login", {
     email,
     password,
   });
 };
 
-export const cadastrarUsuario = async (userData: {
-  name: string;
+export const cadastrarUsuario = async (dados: {
+  primeiroNome: string;
+  ultimoNome: string;
+  cpf: string;
   email: string;
   password: string;
   dataNascimento: string;
 }) => {
-  return await axiosInstance.post("/api/v1/usuarios", userData);
+  const response = await axiosInstance.post('/usuarios', dados);
+  return response.data.data;
 };
 
 export class UsuarioService {
-  async getUsuarioLogado() {
-    return await axiosInstance.get("/api/v1/usuarios/logado");
+  loginUsuario(data: { email: string, password: string }) {
+    return axiosInstance.post("/login", data)
+  }
+
+  getUsuarioLogado() {
+    return axiosInstance.get("/usuarios/logado")
   }
 
   async getUsuarios() {
-    return await axiosInstance.get("/api/v1/usuarios");
+    return await axiosInstance.get("/usuarios");
   }
 
   async getUsuarioById(id: string) {
-    return await axiosInstance.get(`/api/v1/usuarios/${id}`);
+    return await axiosInstance.get(`/usuarios/${id}`);
   }
 
   async updateUsuario(userData: any) {
-    return await axiosInstance.put("/api/v1/usuarios", userData);
+    return await axiosInstance.put("/usuarios", userData);
   }
 
   async deleteUsuario(id: string) {
-    return await axiosInstance.delete(`/api/v1/usuarios/${id}`);
+    return await axiosInstance.delete(`/usuarios/${id}`);
   }
 }
 
 export class FilmeService {
-  async getFilmes() {
-    return await axiosInstance.get("/api/v1/filmes");
+  getFilmesEmCartaz() {
+    return axiosInstance.get("/filmes/em-cartaz")
   }
 
-  async getFilmesEmCartaz() {
-    return await axiosInstance.get("/api/v1/filmes/em-cartaz");
+  async getFilmes() {
+    return await axiosInstance.get("/filmes");
   }
 
   async getFilmeById(id: string) {
-    return await axiosInstance.get(`/api/v1/filmes/${id}`);
+    return await axiosInstance.get(`/filmes/${id}`);
   }
 
   async criarFilme(filmeData: any) {
-    return await axiosInstance.post("/api/v1/filmes", filmeData);
+    return await axiosInstance.post("/filmes", filmeData);
   }
 
   async updateFilme(id: string, filmeData: any) {
-    return await axiosInstance.put(`/api/v1/filmes/${id}`, filmeData);
+    return await axiosInstance.put(`/filmes/${id}`, filmeData);
   }
 
   async deleteFilme(id: string) {
-    return await axiosInstance.delete(`/api/v1/filmes/${id}`);
+    return await axiosInstance.delete(`/filmes/${id}`);
   }
 }
 
 export class SessaoService {
+  getSessoesEmCartaz() {
+    return axiosInstance.get("/sessoes/em-cartaz")
+  }
+
+  getSessaoById(id: string) {
+    return axiosInstance.get(`/sessoes/${id}`)
+  }
+
   async getSessoes() {
-    return await axiosInstance.get("/api/v1/sessoes");
-  }
-
-  async getSessoesEmCartaz() {
-    return await axiosInstance.get("/api/v1/sessoes/em-cartaz");
-  }
-
-  async getSessaoById(id: string) {
-    return await axiosInstance.get(`/api/v1/sessoes/${id}`);
+    return await axiosInstance.get("/sessoes");
   }
 
   async criarSessao(sessaoData: any) {
-    return await axiosInstance.post("/api/v1/sessoes", sessaoData);
+    return await axiosInstance.post("/sessoes", sessaoData);
   }
 
   async updateSessao(id: string, sessaoData: any) {
-    return await axiosInstance.put(`/api/v1/sessoes/${id}`, sessaoData);
+    return await axiosInstance.put(`/sessoes/${id}`, sessaoData);
   }
 
   async deleteSessao(id: string) {
-    return await axiosInstance.delete(`/api/v1/sessoes/${id}`);
-  }
-}
-
-export class SalaService {
-  async getSalas() {
-    return await axiosInstance.get("/api/v1/salas");
-  }
-
-  async getSalaById(id: string) {
-    return await axiosInstance.get(`/api/v1/salas/${id}`);
-  }
-
-  async getSalasDropdown() {
-    return await axiosInstance.get("/api/v1/salas/dropdown");
-  }
-}
-
-export class GeneroService {
-  async getGeneros() {
-    return await axiosInstance.get("/api/v1/generos");
-  }
-
-  async getGeneroById(id: string) {
-    return await axiosInstance.get(`/api/v1/generos/${id}`);
-  }
-
-  async getGenerosDropdown() {
-    return await axiosInstance.get("/api/v1/generos/dropdown");
+    return await axiosInstance.delete(`/sessoes/${id}`);
   }
 }
 
 export class IngressoService {
-  async comprarIngressos(sessaoId: string, poltronas: string[]) {
-    return await axiosInstance.post("/api/v1/ingressos", {
-      sessaoId,
-      poltronas,
-    });
+  ComprarIngressos(idSessao: string, poltronas: string[]) {
+    return axiosInstance.post("/ingressos", {
+      idSessao,
+      poltronas
+    })
   }
 
   async getPoltronasDisponiveis(idSessao: string) {
     return await axiosInstance.get(
-      `/api/v1/ingressos/poltronas-disponiveis/${idSessao}`
+      `/ingressos/poltronas-disponiveis/${idSessao}`
     );
-  }
-
-  async getMeusIngressos() {
-    return await axiosInstance.get("/api/v1/usuarios/logado/ingressos");
   }
 }
 
