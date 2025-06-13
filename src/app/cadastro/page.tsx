@@ -9,11 +9,12 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Separator } from '@/components/ui/separator'
-import { Film, User, Mail, Lock, Calendar, AlertCircle, Loader2, CheckCircle } from 'lucide-react'
+import { Film, User, Mail, Lock, Calendar, AlertCircle, Loader2, CheckCircle, CreditCard } from 'lucide-react'
 import Link from 'next/link'
 
 interface CadastroForm {
   name: string
+  cpf: string
   email: string
   password: string
   dataNascimento: string
@@ -22,6 +23,7 @@ interface CadastroForm {
 export default function Cadastro() {
   const [form, setForm] = useState<CadastroForm>({
     name: '',
+    cpf: '',
     email: '',
     password: '',
     dataNascimento: ''
@@ -39,8 +41,47 @@ export default function Cadastro() {
     if (error) setError('')
   }
 
+  const formatCPF = (cpf: string) => {
+    const numbers = cpf.replace(/\D/g, '')
+    return numbers.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4')
+  }
+
+  const handleCPFChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const formatted = formatCPF(e.target.value)
+    setForm(prev => ({
+      ...prev,
+      cpf: formatted
+    }))
+    if (error) setError('')
+  }
+
+  const validateCPF = (cpf: string): boolean => {
+    const numbers = cpf.replace(/\D/g, '')
+    if (numbers.length !== 11) return false
+
+    if (/^(\d)\1{10}$/.test(numbers)) return false
+
+    let sum = 0
+    for (let i = 0; i < 9; i++) {
+      sum += parseInt(numbers[i]) * (10 - i)
+    }
+    let remainder = (sum * 10) % 11
+    if (remainder === 10 || remainder === 11) remainder = 0
+    if (remainder !== parseInt(numbers[9])) return false
+
+    sum = 0
+    for (let i = 0; i < 10; i++) {
+      sum += parseInt(numbers[i]) * (11 - i)
+    }
+    remainder = (sum * 10) % 11
+    if (remainder === 10 || remainder === 11) remainder = 0
+    return remainder === parseInt(numbers[10])
+  }
+
   const validateForm = () => {
     if (!form.name.trim()) return 'Nome é obrigatório'
+    if (!form.cpf.trim()) return 'CPF é obrigatório'
+    if (!validateCPF(form.cpf)) return 'CPF inválido'
     if (!form.email.trim()) return 'Email é obrigatório'
     if (!form.password.trim()) return 'Senha é obrigatória'
     if (form.password.length < 6) return 'Senha deve ter pelo menos 6 caracteres'
@@ -48,6 +89,11 @@ export default function Cadastro() {
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
     if (!emailRegex.test(form.email)) return 'Email inválido'
+
+    const birthDate = new Date(form.dataNascimento)
+    const today = new Date()
+    const age = today.getFullYear() - birthDate.getFullYear()
+    if (age < 13) return 'Você deve ter pelo menos 13 anos'
 
     return null
   }
@@ -79,30 +125,32 @@ export default function Cadastro() {
     try {
       const formData = {
         ...form,
+        cpf: form.cpf.replace(/\D/g, ''),
         dataNascimento: formatDateForAPI(form.dataNascimento)
       }
 
       console.log('Dados enviados:', formData)
 
-      const response = await cadastrarUsuario(formData)
+      await cadastrarUsuario(formData)
 
-      if (response.status === 201 || response.status === 200) {
-        setSuccess(true)
-        setTimeout(() => {
-          router.push('/login')
-        }, 2000)
-      } else {
-        setError(response.data.error || 'Erro ao cadastrar usuário')
-      }
+      setSuccess(true)
+      setTimeout(() => {
+        router.push('/login')
+      }, 2000)
+
     } catch (error: any) {
       console.error('Erro no cadastro:', error)
 
       if (error.response?.status === 409) {
-        setError('Email já está em uso')
+        setError('Email ou CPF já está em uso')
       } else if (error.response?.status === 400) {
         const errorMsg = error.response?.data?.error || error.response?.data?.message
         if (errorMsg?.includes('parsing time')) {
           setError('Formato de data inválido. Tente novamente.')
+        } else if (errorMsg?.includes('cpf')) {
+          setError('CPF inválido ou já cadastrado.')
+        } else if (errorMsg?.includes('email')) {
+          setError('Email inválido ou já cadastrado.')
         } else {
           setError(errorMsg || 'Dados inválidos. Verifique os campos.')
         }
@@ -169,6 +217,26 @@ export default function Cadastro() {
                   value={form.name}
                   onChange={handleChange}
                   disabled={loading}
+                  className="pl-10 bg-zinc-700 border-zinc-600 text-white placeholder:text-zinc-400 focus:border-red-500"
+                />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="cpf" className="text-sm font-medium">
+                CPF
+              </Label>
+              <div className="relative">
+                <CreditCard className="absolute left-3 top-3 h-4 w-4 text-zinc-400" />
+                <Input
+                  id="cpf"
+                  name="cpf"
+                  type="text"
+                  placeholder="000.000.000-00"
+                  value={form.cpf}
+                  onChange={handleCPFChange}
+                  disabled={loading}
+                  maxLength={14}
                   className="pl-10 bg-zinc-700 border-zinc-600 text-white placeholder:text-zinc-400 focus:border-red-500"
                 />
               </div>

@@ -42,15 +42,14 @@ export const login = async (email: string, password: string) => {
 };
 
 export const cadastrarUsuario = async (dados: {
-  primeiroNome: string;
-  ultimoNome: string;
+  name: string;
   cpf: string;
   email: string;
   password: string;
   dataNascimento: string;
 }) => {
   const response = await axiosInstance.post('/usuarios', dados);
-  return response.data.data;
+  return response.data;
 };
 
 export class UsuarioService {
