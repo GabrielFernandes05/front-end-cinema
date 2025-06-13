@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { useParams } from 'next/navigation'
+import { useParams, useRouter } from 'next/navigation'
 import { SessaoService, IngressoService } from '@/utils/axios'
 import Background from '@/components/background'
 import Img from '@/components/image'
@@ -10,7 +10,7 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Separator } from '@/components/ui/separator'
 import { cn } from '@/lib/utils'
-import { Film, Calendar, Clock, Star, MapPin, DollarSign, User, CheckCircle } from 'lucide-react'
+import { Film, Calendar, Clock, Star, MapPin, DollarSign, User, CheckCircle, LogIn } from 'lucide-react'
 
 interface Filme {
   id: string
@@ -218,15 +218,33 @@ const LoadingState = () => (
   </Background>
 )
 
-const ErrorState = () => (
+const ErrorState = ({ onRetry }: { onRetry: () => void }) => (
   <Background Propriedades="flex items-center justify-center min-h-screen">
     <Card className="bg-zinc-800 border-zinc-700">
       <CardContent className="p-8 text-center">
         <div className="text-4xl mb-4">❌</div>
         <p className="text-white">Problemas ao carregar esta sessão</p>
+        <Button onClick={onRetry} className="mt-4 bg-red-600 hover:bg-red-700">
+          Tentar Novamente
+        </Button>
       </CardContent>
     </Card>
   </Background>
+)
+
+const LoginRequired = ({ onLogin }: { onLogin: () => void }) => (
+  <Card className="mt-8 bg-zinc-800 border-zinc-700 text-white">
+    <CardContent className="p-6 text-center">
+      <LogIn className="w-12 h-12 mx-auto mb-4 text-red-500" />
+      <h3 className="text-xl font-semibold mb-2">Login necessário</h3>
+      <p className="text-zinc-400 mb-4">
+        Você precisa estar logado para comprar ingressos
+      </p>
+      <Button onClick={onLogin} className="bg-red-600 hover:bg-red-700">
+        Fazer Login
+      </Button>
+    </CardContent>
+  </Card>
 )
 
 export default function CompraIngresso() {
@@ -235,28 +253,63 @@ export default function CompraIngresso() {
   const [poltronasDisponiveis, setPoltronasDisponiveis] = useState<string[]>([])
   const [loading, setLoading] = useState(true)
   const [purchasing, setPurchasing] = useState(false)
+  const [isLoggedIn, setIsLoggedIn] = useState(false)
 
   const params = useParams()
+  const router = useRouter()
   const sessaoService = new SessaoService()
   const ingressoService = new IngressoService()
 
+  const checkAuthStatus = () => {
+    const token = localStorage.getItem('token')
+    setIsLoggedIn(!!token)
+  }
+
   const fetchSessao = async () => {
     try {
-      const [sessaoResponse, poltronasResponse] = await Promise.all([
-        sessaoService.getSessaoById(params.id as string),
-        ingressoService.getPoltronasDisponiveis(params.id as string)
-      ])
+      const sessaoResponse = await sessaoService.getSessaoById(params.id as string)
 
+      let sessaoData = null
       if (sessaoResponse.data.data) {
-        setSessao(sessaoResponse.data.data)
+        sessaoData = sessaoResponse.data.data
       } else if (sessaoResponse.data) {
-        setSessao(sessaoResponse.data)
+        sessaoData = sessaoResponse.data
       }
 
-      if (poltronasResponse.data.data) {
-        setPoltronasDisponiveis(poltronasResponse.data.data)
-      } else if (Array.isArray(poltronasResponse.data)) {
-        setPoltronasDisponiveis(poltronasResponse.data)
+      setSessao(sessaoData)
+
+      if (sessaoData) {
+        try {
+          const poltronasResponse = await ingressoService.getPoltronasDisponiveis(params.id as string)
+
+          if (poltronasResponse.data.data) {
+            setPoltronasDisponiveis(poltronasResponse.data.data)
+          } else if (Array.isArray(poltronasResponse.data)) {
+            setPoltronasDisponiveis(poltronasResponse.data)
+          } else {
+            const totalSeats = []
+            const rows = Array.from({ length: sessaoData.sala.fileiras.charCodeAt(0) - 64 }, (_, i) =>
+              String.fromCharCode(65 + i)
+            )
+            for (const row of rows) {
+              for (let i = 1; i <= sessaoData.sala.poltronas; i++) {
+                totalSeats.push(`${row}${i}`)
+              }
+            }
+            setPoltronasDisponiveis(totalSeats)
+          }
+        } catch (poltronasError) {
+          const totalSeats = []
+          const rows = Array.from({ length: sessaoData.sala.fileiras.charCodeAt(0) - 64 }, (_, i) =>
+            String.fromCharCode(65 + i)
+          )
+          for (const row of rows) {
+            for (let i = 1; i <= sessaoData.sala.poltronas; i++) {
+              totalSeats.push(`${row}${i}`)
+            }
+          }
+          setPoltronasDisponiveis(totalSeats)
+        }
       }
 
     } catch (error) {
@@ -274,31 +327,54 @@ export default function CompraIngresso() {
     )
   }
 
+  const handleLogin = () => {
+    router.push(`/login?redirect=/sessao/${params.id}`)
+  }
+
   const handlePurchase = async () => {
-    if (!sessao || selectedSeats.length === 0) return
+    if (!sessao || selectedSeats.length === 0 || !isLoggedIn) return
 
     setPurchasing(true)
     try {
       const response = await ingressoService.comprarIngressos(sessao.id, selectedSeats)
 
       if (response.status === 201 || response.status === 200) {
-        window.location.href = "/"
+        router.push('/perfil?tab=tickets')
       } else {
         alert(response.data.error || "Erro ao finalizar a compra.")
       }
     } catch (error: any) {
-      alert(error.response?.data?.error || "Erro de conexão com o servidor.")
+      if (error.response?.status === 401) {
+        setIsLoggedIn(false)
+        localStorage.removeItem('token')
+        alert("Sessão expirada. Faça login novamente.")
+      } else {
+        alert(error.response?.data?.error || "Erro de conexão com o servidor.")
+      }
     } finally {
       setPurchasing(false)
     }
   }
 
-  useEffect(() => {
+  const handleRetry = () => {
+    setLoading(true)
     fetchSessao()
+  }
+
+  useEffect(() => {
+    checkAuthStatus()
+    fetchSessao()
+
+    const handleStorageChange = () => {
+      checkAuthStatus()
+    }
+
+    window.addEventListener('storage', handleStorageChange)
+    return () => window.removeEventListener('storage', handleStorageChange)
   }, [params.id])
 
   if (loading) return <LoadingState />
-  if (!sessao) return <ErrorState />
+  if (!sessao) return <ErrorState onRetry={handleRetry} />
 
   const totalPrice = selectedSeats.length * sessao.precoIngresso
 
@@ -319,7 +395,9 @@ export default function CompraIngresso() {
           poltronasDisponiveis={poltronasDisponiveis}
         />
 
-        {selectedSeats.length > 0 && (
+        {!isLoggedIn ? (
+          <LoginRequired onLogin={handleLogin} />
+        ) : selectedSeats.length > 0 ? (
           <Card className="mt-8 bg-zinc-800 border-zinc-700 text-white">
             <CardContent className="p-6">
               <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
@@ -352,7 +430,7 @@ export default function CompraIngresso() {
               </div>
             </CardContent>
           </Card>
-        )}
+        ) : null}
       </div>
     </Background>
   )

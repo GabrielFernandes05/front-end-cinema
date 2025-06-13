@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { login } from '@/utils/axios'
 import Background from '@/components/background'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -9,24 +9,28 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Separator } from '@/components/ui/separator'
-import { Film, Mail, Lock, AlertCircle, Loader2 } from 'lucide-react'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { Film, Mail, Lock, Eye, EyeOff, UserPlus } from 'lucide-react'
 import Link from 'next/link'
 
-interface LoginForm {
-    email: string
-    password: string
-}
-
 export default function Login() {
-    const [form, setForm] = useState<LoginForm>({ email: '', password: '' })
+    const [form, setForm] = useState({
+        email: '',
+        password: ''
+    })
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState('')
+    const [showPassword, setShowPassword] = useState(false)
+
     const router = useRouter()
+    const searchParams = useSearchParams()
+    const redirectUrl = searchParams.get('redirect') || '/'
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const { name, value } = e.target
         setForm(prev => ({
             ...prev,
-            [e.target.name]: e.target.value
+            [name]: value
         }))
         if (error) setError('')
     }
@@ -42,45 +46,22 @@ export default function Login() {
         setError('')
 
         try {
-            console.log('Tentando fazer login com:', { email: form.email, password: '***' })
-
             const response = await login(form.email, form.password)
-
-            console.log('Resposta completa do login:', response)
-            console.log('Status:', response.status)
-            console.log('Data:', response.data)
 
             if (response.status === 200 && response.data) {
                 const token = response.data.data || response.data
 
-                console.log('Token extraído:', token)
-
                 if (token && typeof token === 'string') {
                     localStorage.setItem('token', token)
-                    console.log('Token salvo no localStorage:', token)
-
-                    // Disparar evento para atualizar outros componentes
                     window.dispatchEvent(new Event('storage'))
-
-                    // Redirecionar para a página inicial
-                    router.push('/')
-
-                    // Opcional: forçar refresh para garantir que tudo atualize
-                    setTimeout(() => {
-                        window.location.reload()
-                    }, 100)
+                    router.push(redirectUrl)
                 } else {
-                    console.log('Token não encontrado ou formato inválido')
                     setError('Resposta inválida do servidor')
                 }
             } else {
-                console.log('Login falhou - status ou data inválidos')
                 setError(response.data?.error || 'Credenciais inválidas')
             }
         } catch (error: any) {
-            console.error('Erro completo no login:', error)
-            console.error('Response error:', error.response)
-
             if (error.response?.status === 401) {
                 setError('Email ou senha incorretos')
             } else if (error.response?.data?.error) {
@@ -110,6 +91,12 @@ export default function Login() {
 
                 <CardContent>
                     <form onSubmit={handleSubmit} className="space-y-4">
+                        {error && (
+                            <Alert className="bg-red-900 border-red-700 text-red-200">
+                                <AlertDescription>{error}</AlertDescription>
+                            </Alert>
+                        )}
+
                         <div className="space-y-2">
                             <Label htmlFor="email" className="text-sm font-medium">
                                 Email
@@ -138,31 +125,32 @@ export default function Login() {
                                 <Input
                                     id="password"
                                     name="password"
-                                    type="password"
-                                    placeholder="Sua senha"
+                                    type={showPassword ? "text" : "password"}
+                                    placeholder="••••••••"
                                     value={form.password}
                                     onChange={handleChange}
                                     disabled={loading}
-                                    className="pl-10 bg-zinc-700 border-zinc-600 text-white placeholder:text-zinc-400 focus:border-red-500"
+                                    className="pl-10 pr-10 bg-zinc-700 border-zinc-600 text-white placeholder:text-zinc-400 focus:border-red-500"
                                 />
+                                <button
+                                    type="button"
+                                    onClick={() => setShowPassword(!showPassword)}
+                                    className="absolute right-3 top-3 text-zinc-400 hover:text-white"
+                                    disabled={loading}
+                                >
+                                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                                </button>
                             </div>
                         </div>
 
-                        {error && (
-                            <div className="flex items-center gap-2 p-3 bg-red-950 border border-red-800 rounded-md">
-                                <AlertCircle className="h-4 w-4 text-red-400" />
-                                <span className="text-sm text-red-400">{error}</span>
-                            </div>
-                        )}
-
                         <Button
                             type="submit"
+                            className="w-full bg-red-600 hover:bg-red-700 text-white"
                             disabled={loading}
-                            className="w-full bg-red-600 hover:bg-red-700 text-white font-medium"
                         >
                             {loading ? (
                                 <>
-                                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                                    <div className="animate-spin w-4 h-4 mr-2">⏳</div>
                                     Entrando...
                                 </>
                             ) : (
@@ -174,15 +162,18 @@ export default function Login() {
                     <Separator className="my-6 bg-zinc-600" />
 
                     <div className="text-center">
-                        <p className="text-sm text-zinc-400">
-                            Não tem uma conta?{' '}
-                            <Link
-                                href="/cadastro"
-                                className="text-red-400 hover:text-red-300 font-medium hover:underline"
-                            >
-                                Cadastre-se
-                            </Link>
+                        <p className="text-sm text-zinc-400 mb-3">
+                            Ainda não tem uma conta?
                         </p>
+                        <Link href={`/cadastro${redirectUrl !== '/' ? `?redirect=${redirectUrl}` : ''}`}>
+                            <Button
+                                variant="outline"
+                                className="w-full border-zinc-600 text-zinc-300 hover:bg-zinc-700 hover:text-white"
+                            >
+                                <UserPlus className="w-4 h-4 mr-2" />
+                                Criar conta
+                            </Button>
+                        </Link>
                     </div>
                 </CardContent>
             </Card>

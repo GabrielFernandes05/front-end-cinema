@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import axiosInstance, { IngressoService } from '@/utils/axios'
 import Background from '@/components/background'
 import Img from '@/components/image'
@@ -180,6 +180,8 @@ const UserInfoTab = ({ usuario }: { usuario: Usuario }) => (
 )
 
 const IngressosTab = ({ ingressos, loading }: { ingressos: Ingresso[], loading: boolean }) => {
+  const router = useRouter()
+
   if (loading) {
     return (
       <div className="flex justify-center items-center py-12">
@@ -191,14 +193,17 @@ const IngressosTab = ({ ingressos, loading }: { ingressos: Ingresso[], loading: 
 
   if (ingressos.length === 0) {
     return (
-      <Card className="bg-zinc-800 border-zinc-700 text-white p-6">
+      <Card className="bg-zinc-800 border-zinc-700 text-white">
         <CardContent className="p-12 text-center">
           <Ticket className="w-16 h-16 mx-auto mb-4 text-zinc-400" />
           <h3 className="text-xl font-semibold mb-2">Nenhum ingresso encontrado</h3>
           <p className="text-zinc-400 mb-6">
             Você ainda não comprou nenhum ingresso. Que tal conferir os filmes em cartaz?
           </p>
-          <Button className="bg-red-600 hover:bg-red-700 text-white">
+          <Button
+            onClick={() => router.push('/em-cartaz')}
+            className="bg-red-600 hover:bg-red-700 text-white"
+          >
             Ver Filmes em Cartaz
           </Button>
         </CardContent>
@@ -249,7 +254,10 @@ export default function Perfil() {
   const [loading, setLoading] = useState(true)
   const [ingressosLoading, setIngressosLoading] = useState(true)
   const [error, setError] = useState('')
+
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const activeTab = searchParams.get('tab') || 'profile'
   const ingressoService = new IngressoService()
 
   useEffect(() => {
@@ -281,8 +289,6 @@ export default function Perfil() {
           }
         }
       } catch (error: any) {
-        console.error('Erro ao buscar dados:', error)
-
         if (error.response?.status === 401) {
           localStorage.removeItem('token')
           router.push('/login')
@@ -359,11 +365,12 @@ export default function Perfil() {
           <p className="text-zinc-400">Gerencie sua conta e veja seus ingressos</p>
         </div>
 
-        <Tabs defaultValue="profile" className="w-full">
-          <TabsList className="w-full bg-zinc-800 border-zinc-700 flex">
+        <Tabs value={activeTab} className="w-full">
+          <TabsList className="grid w-full grid-cols-2 bg-zinc-800 border-zinc-700">
             <TabsTrigger
               value="profile"
               className="data-[state=active]:bg-red-600 data-[state=active]:text-white text-zinc-400"
+              onClick={() => router.push('/perfil?tab=profile')}
             >
               <User className="w-4 h-4 mr-2" />
               Informações Pessoais
@@ -371,6 +378,7 @@ export default function Perfil() {
             <TabsTrigger
               value="tickets"
               className="data-[state=active]:bg-red-600 data-[state=active]:text-white text-zinc-400"
+              onClick={() => router.push('/perfil?tab=tickets')}
             >
               <Ticket className="w-4 h-4 mr-2" />
               Meus Ingressos

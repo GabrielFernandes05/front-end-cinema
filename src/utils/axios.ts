@@ -20,9 +20,15 @@ axiosInstance.interceptors.request.use((config) => {
 axiosInstance.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401) {
+    if (
+      error.response?.status === 401 &&
+      error.config?.url?.includes("/usuarios/logado")
+    ) {
       localStorage.removeItem("token");
-      window.location.href = "/login";
+      window.dispatchEvent(new Event("storage"));
+      if (typeof window !== "undefined") {
+        window.location.href = "/login";
+      }
     }
     return Promise.reject(error);
   }
